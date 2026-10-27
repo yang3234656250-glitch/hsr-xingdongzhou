@@ -248,6 +248,7 @@ td.logcell { white-space: normal; line-height: 1.35; }
       <h1>星铁行动轴<small>行动值 · 速度档位模拟</small></h1>
       <p class="formula">单次行动值 <code>AV = 10000 ÷ 速度</code>　拉条 X% 即减少 <code>X% × 10000</code> 行动距离　变速时剩余距离不变</p>
       <p class="formula" id="cloud" aria-live="polite">配置：只存在本机</p>
+      <p class="formula"><button type="button" id="cloud-login" hidden>用谷歌账号登录，同步到云端</button> <button type="button" id="cloud-logout" class="ghost" hidden>退出登录</button></p>
       <div class="undo-bar"><button type="button" data-undo="-1" disabled title="撤销（Ctrl+Z）">↶ 撤销</button><button type="button" data-undo="1" disabled title="重做（Ctrl+Shift+Z）">↷ 重做</button><span class="hint" id="undo-msg" aria-live="polite"></span></div>
     </div>
     <div class="globals">
@@ -389,6 +390,7 @@ td.logcell { white-space: normal; line-height: 1.35; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-27（搬到 GitHub Pages）</b>：网页放到了仓库 yang3234656250-glitch/hsr-xingdongzhou。在 claude.ai 之外，云端同步改用 Firebase（Firestore + 谷歌登录，数据存在 users/&lt;uid&gt;/ 下）；在 claude.ai 里仍用原来的存储。“下载为文件”在 claude.ai 之外改成普通浏览器下载。模拟逻辑和模板没动，已有配置结果不变。</li>
             <li><b>2026-10-27（每日校对）</b>：按官方原文校对花火、知更鸟、布洛妮娅。① 花火【强化版】行迹岁时记“施放普攻时额外恢复 10 点能量”之前漏了（普攻只回 20），补上，普攻共回 30（吃充能效率），默认开启。② 花火【强化版】秘技不可靠叙事者：进入战斗时恢复 3 个战技点、花火恢复 20 点能量，之前没写，补成两条默认关闭（用了秘技再启用）。③ 知更鸟秘技酣醉序曲：领域中进战每个波次开始时 +5 能量，补成默认关闭（按第一波）。布洛妮娅的战技立即行动、天赋普攻后提前 30%（3 魂 33%）、2 魂、回能都和原文一致，没改。已有配置里的花火卡会自动补上普攻 +10 能量（花火普攻回能变多，开大可能提前），两条秘技默认关闭；知更鸟只多一条关闭的效果。你当前配置（记忆队）没有这几个角色，结果不变。依据：StarRailRes 官方原文（花火 11306101、1130607，知更鸟 130907）、BWIKI 花火页。</li>
             <li><b>2026-10-26（第二次）</b>：按官方原文补三处星魂 / 技能。① 刃 6 魂【命留魂销，复返此身】：充能的层数上限降低至 4 层。之前不管几魂都是满 5 层才追加攻击；现在选 6 魂时计数器自动改成满 4 点（你手动改过的不动）。② 万敌 2 魂【纷争见证尸骸的喉鸣】：【血仇】期间接受治疗后，治疗数值的 40% 转化为充能，任意单位两次行动之间最多 40 点（之前没做）。转化来的充能同样会触发 150 点（6 魂 100 点）的额外回合。按事件数值算的效果新增“最多 N 点”的上限。③ 真珠【深度学习】：终结技后之后 3 次行动用强化普攻，秘技进战 2 次，两条都默认关闭（你的配置里真珠是用“普攻 + 每回合 30 能量”代表强普，打开会改变行动方式，需要时再启用）。已有配置里的刃、万敌、真珠卡会自动更新；你当前配置和“狼主爻真”方案的结果不变。长夜月 2 魂“每次获得忆质 +2”查不到战技在【至暗之谜】中的 2 + 12 点算一次还是两次获得，先没做。依据：StarRailRes 官方原文（刃 6 魂，万敌 2 魂 / 6 魂，真珠终结技 150303、秘技 150307）。</li>
             <li><b>2026-10-26</b>：战技耗几个战技点改成按官方数据。① 遐蝶（缄默，幽蝶之轻抚、骸爪，冥龙之环拥）和长夜月（白昼悄然离去）的战技不耗战技点（她们消耗的是生命值），之前按 −1 算。② 同样不耗战技点的还有阿兰、万敌（万死无悔、弑王成王、弑神登神）、千冶•刃、吉尔伽美什。阿兰、万敌之前也按 −1 算；千冶•刃、吉尔伽美什原来用“施放战技时 +1 战技点”抵消，战技点满的时候会白丢 1 点，现在去掉抵消、直接不扣。Archer 的战技耗 2 点，原来是“另扣 1 点”，现在直接扣 2 点，不够 2 点就标“不足”。③ 角色卡“强普也回战技点”旁边多了“战技耗 N 点”，没填 = 1，可以自己改。长夜月产点（行迹天黑黑，月寂寂：「长夜」施放迷梦后为我方恢复 1 个战技点）之前就有，没变。已有配置里这几个角色的卡片会自动更新。你当前配置（400 行动值内）：行动轴和开大不变，战技点不足从 15 次变成 1 次（只剩风堇第 337 行动值那次）。其他队伍里 Archer 战技点更宽裕，回路连接能多放（测的一组多 1 个额外回合）。依据：官方技能配置 AvatarSkillConfig / AvatarSkillConfigLD 的 BPNeed（遐蝶 140702 / 140709，长夜月 141302 / 141309，阿兰 100802，万敌 140402 / 140409 / 140411，千冶•刃 150702 / 150709，吉尔伽美什 150902 / 150909，Archer 101502）。</li>
@@ -3295,11 +3297,13 @@ td.logcell { white-space: normal; line-height: 1.35; }
   };
   // the artifact viewer blocks plain download links, so saving goes through the downloads capability (hidden when unavailable)
   let dlApi = null;
-  $("scheme-dl").hidden = true;
-  (async () => { try { dlApi = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) { dlApi = null; } $("scheme-dl").hidden = !dlApi; })();
+  (async () => { try { dlApi = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) { dlApi = null; } })();
   $("scheme-dl").onclick = async () => {
-    if (!dlApi) return;
     const name = ($("save-name").value.trim() || "行动轴方案").replace(/[\\/:*?"<>|]/g, "_") + ".json";
+    if (!dlApi) {   // 在 claude.ai 之外：普通浏览器下载
+      try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 1)], { type: "application/json" })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); smsg(`已下载「${name}」`); } catch (err) { smsg("下载失败：" + ((err && err.message) || "未知错误")); }
+      return;
+    }
     try { await dlApi.save({ filename: name, data: JSON.stringify(S, null, 1) }); smsg(`已保存「${name}」`); }
     catch (err) { smsg(err && err.code === "declined" ? "已取消" : "保存失败：" + ((err && err.message) || "未知错误")); }
   };
@@ -3682,10 +3686,40 @@ td.logcell { white-space: normal; line-height: 1.35; }
   // 文档 axis/config = { cfg: 配置 JSON 文本, ts: 最后修改时间 }；谁改得晚听谁的。
   // 没有云端能力（没登录、离线）时页面照常只存本机。
   const cloudMsg = t => { const el = $("cloud"); if (el) el.textContent = "配置：" + t; };
+  // 在 claude.ai 之外用 Firebase（Firestore + 谷歌登录）。每个账号的数据存在 users/<uid>/ 下，规则只允许本人读写。
+  // FB_CFG 填 Firebase 网页应用的配置（不是密码，可以公开）；留 null = 只存本机。
+  const FB_CFG = null;
+  const FB_VER = "10.14.1";
+  const loadJs = src => new Promise((ok, no) => { const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = () => no(new Error("load " + src)); document.head.appendChild(el); });
+  async function firebaseDb() {
+    if (!FB_CFG) { cloudMsg("只存在本机（云端不可用）"); return null; }
+    try {
+      const base = "https://www.gstatic.com/firebasejs/" + FB_VER + "/";
+      await loadJs(base + "firebase-app-compat.js"); await loadJs(base + "firebase-auth-compat.js"); await loadJs(base + "firebase-firestore-compat.js");
+      firebase.initializeApp(FB_CFG);
+      const auth = firebase.auth();
+      const user = await new Promise(ok => { const off = auth.onAuthStateChanged(u => { off(); ok(u); }); });
+      const lb = $("cloud-login"), ob = $("cloud-logout");
+      if (!user) {
+        cloudMsg("只存在本机（未登录）");
+        lb.hidden = false;
+        lb.onclick = async () => {
+          try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); location.reload(); }
+          catch (e) { cloudMsg("登录没成功：" + ((e && (e.code || e.message)) || "未知错误")); }
+        };
+        return null;
+      }
+      ob.hidden = false;
+      ob.onclick = async () => { try { await auth.signOut(); } catch (e) {} location.reload(); };
+      const fs = firebase.firestore(), root = "users/" + user.uid + "/";
+      return { collection: n => fs.collection(root + n), doc: p => fs.doc(root + p) };
+    } catch (e) { cloudMsg("云端连接失败，只存在本机"); return null; }
+  }
   (async () => {
     let db = null;
     try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
-    if (!db) { cloudMsg("只存在本机（云端不可用）"); return; }
+    if (!db) db = await firebaseDb();
+    if (!db) return;
     cloudMsg("连接云端…");
     // 命名方案：集合 schemes 里每个方案一个文档 { name, cfg(JSON 文本), ts, del }；谁改得晚听谁的，删除也同步
     const hashName = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return "s" + h.toString(36) + "-" + s.length.toString(36); };
