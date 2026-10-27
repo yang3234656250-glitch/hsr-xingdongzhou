@@ -3688,7 +3688,14 @@ td.logcell { white-space: normal; line-height: 1.35; }
   const cloudMsg = t => { const el = $("cloud"); if (el) el.textContent = "配置：" + t; };
   // 在 claude.ai 之外用 Firebase（Firestore + 谷歌登录）。每个账号的数据存在 users/<uid>/ 下，规则只允许本人读写。
   // FB_CFG 填 Firebase 网页应用的配置（不是密码，可以公开）；留 null = 只存本机。
-  const FB_CFG = null;
+  const FB_CFG = {
+    apiKey: "AIzaSyBf_y3-B-HPqXa2HC8P9ugIHjH2wgnliZc",
+    authDomain: "hsr-xingdongzhou.firebaseapp.com",
+    projectId: "hsr-xingdongzhou",
+    storageBucket: "hsr-xingdongzhou.firebasestorage.app",
+    messagingSenderId: "243584271358",
+    appId: "1:243584271358:web:c4e2ca397f298c336176af"
+  };
   const FB_VER = "10.14.1";
   const loadJs = src => new Promise((ok, no) => { const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = () => no(new Error("load " + src)); document.head.appendChild(el); });
   async function firebaseDb() {
