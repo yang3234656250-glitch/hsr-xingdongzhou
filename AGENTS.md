@@ -41,6 +41,7 @@
 - **强化战技按状态**（`S2ST`）：遐蝶看死龙在不在场（`rec.mIn`）、万敌看【血仇】、流萤看【完全燃烧】（`rec.sts`）；镜流的寒川映月是 fskill。
 - **模拟里给伤害显示的只读记录**：`annRec(rec)` 在每个行动记录上写 `mIn / sts / oc（计数）/ hpm / ohpm（当时的生命上限）`，消耗生命值时写 `selfCost`（死龙连续施放几次、是否自爆），追击日志带 `fm`、开大日志带 `um`。这些只给渲染层读，不影响模拟。
 - 行迹面板只放**有说明的模板效果**（`inTr(e)`）；自己加的效果留在卡片上。
+- **伤害增益**（效果类型 `dbuf`，2026-10-29）：mode = 属性（atkP / atkF / defP / cr / cd / dmg / defIg / resPen / el / xtra / vuln / defRed / resRed），`dsc` = 只对哪类伤害（"" / b / s / u / f / m / e），`srcS` + `flat` = 数值按施放者某项属性的 % 算；duration / stack / count / bk 和加速一样。模拟里挂成 `kind "d"` 的增益（spdOf 不看它），敌人身上的挂在敌人卡上（没放敌人时挂在 `EV0`）。行动记录 `rec.db` / `rec.edb`（阿哈时刻 `rec.dbAll`）、开大 `ultMarks[].db`、追击标记 `marks[].db` 是快照：行动在“施放普攻 / 战技时”效果之后、开大在开大时效果之后重新记一次。`dmgCalc` 用 `dsum` 读快照。DB 缩写：y "dbuf"、m 属性、sc → dsc、ss → srcS、hf → flat。
 
 ## 用户定下的规则（不要改回去）
 

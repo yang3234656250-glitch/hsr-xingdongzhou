@@ -750,6 +750,7 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-29（伤害增益机制）</b>：新效果“伤害增益（只算伤害）”：攻击力 % / 固定值、防御力 %、暴击率、暴击伤害、增伤、无视防御、抗性穿透、欢愉度、额外真实伤害，以及挂在敌人身上的易伤、减防、减抗；可以只对普攻 / 战技 / 终结技 / 追加攻击 / 忆灵 / 欢愉技生效，数值可以按施放者某项属性的百分比算（比如花火的暴伤）；持续回合、叠层、按谁的回合计时和加速一样。模拟里按时间挂上 / 到期，每次出手（施放普攻 / 战技时的效果之后、开大时的效果之后、追击时）记下当时身上的增益和敌人身上的减益，伤害估算按这份记录算，鼠标放到伤害上能看到用了哪些增益。只影响伤害，不影响行动轴（四组模板队伍改前 / 改后行动顺序完全一致）。这一批只加机制，角色 / 光锥 / 遗器的增益接下来分批补：先记忆队，再狼主爻真，再其他角色。</li>
             <li><b>2026-10-29（伤害显示修正 + 行迹面板）</b>：① 强化战技按行动时的状态选：遐蝶死龙在场时按【骸爪，冥龙之环拥】、万敌【血仇】中按【弑王成王】、流萤【完全燃烧】中按【死星过载】（之前只有镜流用到了强化战技）。② 忆灵 / 召唤物的行动也算伤害（官方忆灵技倍率，满级 6 级、星魂 +1）：死龙按这回合实际连续施放焰息的次数（倍率依次提高）+ 自爆的灼掠幽墟的晦翼；长夜按当时的忆质（≥16 点施放迷梦）；德谬歌在开大给的额外回合里对别人施放此诗时不算伤害；衣匠、迷迷、晴空乐手；卡厄斯兰那按白厄的强化普攻。小伊卡按累计治疗量，没做。③ 技能等级按官方星魂（几魂给哪个技能加等级每个角色不一样，之前一律按 3 魂战技、5 魂终结技）。④ 35 个扩散技能缺了相邻目标的倍率，按官方描述补上。⑤ 生命值倍率的伤害按模拟里行动当时的生命上限（含生命上限增益）。⑥ 没填面板攻击 / 生命的角色，伤害数字变灰，提示里写“按基础值算，偏低”。⑦ 行动顺序表的追击和开大伤害改用对应的追击 / 开大记录，不再在日志文字里搜。⑧「伤害设置」挪到图例里「伤害：显示」旁边。⑨ 方案对比多一行「全队伤害（估算）」；配速助手多一个约束「全队伤害不降低」，多人方式的结果显示每组的全队伤害。⑩ 行迹面板：自己加的效果（没写说明的）一律留在卡片上，改触发也不会跑进面板；「忆灵」组搬进面板；技能等级跟着星魂；属性强化去掉混进来的忆灵技能、标题旁显示合计；效果列表放到技能下面，额外能力 / 属性强化默认折叠；立绘缩小；卡片上写“卡片上的效果 N 条 · 行迹面板 M 条”。模拟逻辑不变：四组模板队伍改前 / 改后行动顺序、能量、战技点、每轮行动次数完全一致。</li>
             <li><b>2026-10-29（伤害显示）</b>：行动轴加上伤害估算。① 行动轴标题栏新增「伤害设置」：敌方等级、抗性、命中弱点、易伤、减防、抗性穿透。② 角色卡新增「暴击 % / 爆伤 % / 增伤 %」；倍率默认用官方技能参数（普攻 6 级、战技 / 终结技 10 级，3 / 5 魂自动 +2），点「倍率」可以按 普攻 / 强普 / 战技 / 终结技 手填覆盖。③ 每个行动标记下面显示这一下的预计伤害（太挤就自动省略，鼠标放上去看拆解），满能量开大的「大」标签旁边显示这次开大的伤害；图例里的「伤害：显示 / 隐藏」可以关掉。④ 行动顺序表新增「伤害」列，「每轮行动次数」表底部新增「伤害合计」行（按轮 + 合计）。⑤ 公式：基础值 × 倍率 × (1 + 增伤) × 暴击期望 × 防御区 × 抗性区 × 易伤区。星神★阿哈按官方 4.6.53 参数（普攻 50%、战技 50%、终结技 200% + 5×60%），银狼LV.999 的暴击按当时的隐藏分算。⑥ <b>追击</b>（天赋里写了追加攻击 / 反击的）和<b>欢愉技</b>也算伤害：追击在行动轴的“追击”标记下面、行动顺序的“第 N 次追加攻击”日志行后面；“欢愉技”算在阿哈时刻那一格（悬停看每个人各打了多少）。⑦ <b>多个目标按你放上去的敌人数量</b>：群攻 × 敌人数，扩散 = 主目标 + 最多 2 个相邻，弹射是固定总倍率；伤害设置里能随时看到当前目标数。⑧ “欢愉伤害”没写攻击力的（欢愉技、星神★阿哈）按官方 80 级基础值 7535.107 算，这种不吃增伤。击破、持续伤害不算。⑨ <b>欢愉度</b>：欢愉伤害再乘 (1 + 欢愉度)，角色卡新增「欢愉度 %」。⑩ <b>好活当赏</b>：按官方机制算 B —— 进战每人 +20、每次阿哈时刻所有欢愉角色 +这次计入的笑点、技能里写“获得 N 点好活当赏”的再用技能加一次（真珠 15/20、开拓者 20/10），每条持续该角色 2 个回合、多条叠加；欢愉伤害乘 1 + 5B/(B+240)；持有 B 时额外一段伤害（银狼普攻/战技 50%、开拓者战技 37.5%、真珠强普 20%）。悬停里能看到这一下用的 B 是多少。真珠终结技按“美学底本”的目标把 30 点好活当赏给队友（2 魂 60，要 4 名欢愉；<b>这 30 点只在给出来的那个额外回合里有效，额外回合结束就消失</b>，不是 2 回合）；银狼持有好活当赏时，强化普攻的伤害转成欢愉伤害（吃欢愉度和好活当赏乘区、不吃增伤）。⑪ <b>韧性 ×0.9</b>（没击破时，设置里可以勾“已击破”）；敌人等级改读敌人卡上的等级（多个取最高），抗性默认 20%、命中弱点按 0。⑫ 纯辅助的“下一次攻击额外造成伤害”这类不再算成自己的伤害（真珠的欢愉技）；伤害只读不写，不影响行动轴 / 能量 / 战技点（同一份配置改前改后行动顺序逐行比对过，52 行完全一致）。数据由 _src/build_dmg.py 从官方技能参数（character_skills.json）生成。</li>
 <li><b>2026-10-29（界面改版）</b>：整页视觉按游戏内风格重做，并新增「行迹」面板。① 皮肤：深蓝星空底、青色细发光细线、圆角玻璃面板、胶囊按钮，金色只留给稀有度和数值；标题改成左侧小图标 + 白色主标题 + 浅青副标题。② 角色卡：横幅卡头（立绘 + 大名字 + 大速度数字 + SPD 标签），速度滑块移到卡头下面；没有立绘时用名字首字占位；颜色选择器缩成色块；折叠态卡片左侧留一条角色色条。③ 行迹面板：卡片头的「迹」按钮打开游戏式弹窗，左边立绘，右边命途 / 属性 / 能量标签、5 个技能节点 + 行迹（各带条数，点一下只看该来源的效果，再点一次回到总览）、额外能力、属性强化，下面是「技能与行迹效果」——原来卡片上的普攻 / 战技 / 终结技 / 天赋 / 秘技 / 行迹六组效果都搬到这里，整组开关、折叠、摘要照旧；卡片只留星魂 / 光锥 / 遗器 / 忆灵 / 其他，另留一个「技能/行迹 N 条 ›」入口。④ 行迹节点和额外能力来自官方 character_skill_trees.json（99 个角色，内嵌进页面）。模拟逻辑没动：simulate 和计算相关的代码与原版逐行一致，已有方案的行动轴、能量、开大次数、战技点都不变。</li>
@@ -1080,6 +1081,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (x.uc) e.useCnt = x.uc;    // 消耗自己的计数才生效
       if (x.nc) e.needCnt = x.nc;   // 自己的计数至少这么多才生效（不消耗），比如爻光结界还在
       if (x.lv) { e.lvE = x.lv[0]; e.lvV = x.lv[1]; e.lvV0 = e.value; }
+      if (x.sc) e.dsc = x.sc;                     // 伤害增益：只对哪类伤害
+      if (x.ss) e.srcS = x.ss;                    // 伤害增益：数值按施放者哪项属性算
       if (x.hf !== undefined) e.flat = x.hf;      // 治疗：固定值部分（数值框 = 百分比，方式 = 按谁的什么属性）
       if (x.ho) e.hot = x.ho;                     // 持续治疗：目标每回合开始时回复，持续几回合
       if (x.hx) e.hotX = true;                    // 持续治疗的额外部分（并在同一次治疗里，不另算一次“受到治疗”）
@@ -1545,6 +1548,43 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       addLog(`${src ? src.name : "事件"}「${healLabel(eff)}」${inc ? "受到的治疗量" : low ? `治疗量（目标生命值 ≤${num(eff.ovT, 50)}% 时）` : "治疗量"} ${same ? `我方 ${parts.length} 人各 +${pc(parts[0][1])}%` : parts.map(([tg, a]) => `${tg.name} +${pc(a)}%`).join("、")}${lasts}`, false, srcColor, null, true);
     };
     const healLabel = eff => { const n = String(eff.note || ""), k = n.indexOf("："); return k > 0 && k <= 16 ? n.slice(0, k) : "治疗"; };
+    // 伤害增益（只给伤害显示用，不影响行动轴）：增益 kind "d"，st = 哪个属性，sc = 只对哪类伤害（"" 全部 / b 普攻 / s 战技 / u 终结技 / f 追加攻击 / m 忆灵 / e 欢愉技）
+    // 目标是敌人的（易伤、减防、减抗）挂在敌人卡上；没放敌人时挂在一个看不见的“敌人”上（EV0）
+    const EV0 = { id: "_enemy", name: "敌人", kind: "enemy", buffs: [] };
+    const dbAmt = (eff, src, v) => {
+      if (eff.srcS && src) {   // 数值 = 施放者某项属性的 X% + 固定值（花火暴伤、知更鸟攻击力……），属性按卡片面板
+        const o = ownerOf(src) || src, k = eff.srcS;
+        const x = k === "spd" ? spdOf(src) : k === "hp" ? hpNow(src) : num(o[k] ?? o[k + "B"] ?? ({ cr: 5, cd: 50 })[k]);
+        return x * v / 100 + num(eff.flat);
+      }
+      return v;
+    };
+    const doDBuf = (eff, src, srcColor, v) => {
+      const onEnemy = ["vuln", "defRed", "resRed"].includes(eff.mode) || eff.target === "enemies";
+      let tgs = onEnemy ? (U.filter(u => u.kind === "enemy")) : resolve(eff.target, src).filter(u => u && u.kind === "ally" && !isCd(u));
+      if (onEnemy && !tgs.length) tgs = [EV0];
+      if (!tgs.length) return;
+      const dur = Math.max(0, Math.round(num(eff.duration))), lim = Math.round(num(eff.stack));
+      const bk = eff.bk ? String(eff.bk) : "", key = (src ? src.id : "ev") + ":" + (bk ? bk + (bk.startsWith("st:") ? "#d" + eff.mode : ":d" + eff.mode) : "d:" + eff.id);
+      const amt0 = dbAmt(eff, src, v);
+      for (const tg of tgs) {
+        const old = tg.buffs.find(b => b.key === key), n = lim > 0 ? Math.min(lim, (old ? old.n || 1 : 0) + 1) : 1;
+        tg.buffs = tg.buffs.filter(b => b.key !== key);
+        if (v === 0 && bk) continue;
+        const b = { key, kind: "d", st: eff.mode, sc: eff.dsc || "", src: src ? src.id : null, v: amt0 * n, n };
+        if (eff.count === "own" && tg !== EV0) Object.assign(b, { own: true, left: dur > 0 ? dur : Infinity, expire: Infinity });
+        else b.expire = expireAt(src, dur);
+        tg.buffs.push(b);
+      }
+    };
+    // 行动时的伤害增益快照：[[属性, 范围, 数值], …]；敌人身上的按属性取最大的那个敌人
+    const dbSnap = u => (u && u.buffs ? u.buffs.filter(b => b.kind === "d").map(b => [b.st, b.sc, b.v]) : []);
+    const edbSnap = () => {
+      const all = [...U.filter(u => u.kind === "enemy"), EV0].map(dbSnap).filter(x => x.length);
+      if (all.length <= 1) return all[0] || [];
+      const sum = l => l.reduce((p, x) => p + x[2], 0);
+      return all.sort((a, b) => sum(b) - sum(a))[0];
+    };
     const healTxt = (eff, a) => a != null ? "+" + Math.round(a)
       : eff.mode === "lost" ? `回复已损失生命值的 ${num(eff.value)}%` : `+${num(eff.value)}% ${HEALSTAT[eff.mode] || ""}${num(eff.flat) ? "+" + num(eff.flat) : ""}（没有属性数值）`;
     const addHealTot = (src, a) => { if (a == null) return; const H = ownerOf(src), k = H ? H.id : "ev"; healTot[k] = (healTot[k] || 0) + a; };
@@ -1695,6 +1735,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (eff.type === "heal" && HEALM.includes(eff.mode)) { doHeal(eff, src, srcColor); return; }
       if (eff.type === "hpup") { doHpUp(eff, src, srcColor, val); return; }
       if (eff.type === "hbup") { doHbUp(eff, src, srcColor, val); return; }   // 治疗加成 / 受到的治疗量
+      if (eff.type === "dbuf") { doDBuf(eff, src, srcColor, val); return; }   // 伤害增益（只给伤害显示用）
       if (eff.type === "hpcost") {   // 消耗生命值：按当前生命值 / 生命上限的 % 或全部扣，最多降到 1 点；每次扣都触发“我方目标生命值降低时”(hpLoss，带损失量)
         const tgs = resolve(eff.target, src).filter(u => u && u.kind === "ally" && !u.gone && !isCd(u) && !(u.sm && !u.sm.mem));
         if (!tgs.length) return;
@@ -1960,6 +2001,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     let fuaDepth = 0, curActor = null, fuaT = -1, fuaN = 0;
     // 伤害显示用的只读记录（不参与模拟）：行动时自己的忆灵在不在场、身上的状态、计数、当前生命上限
     let curRec = null;
+    // 伤害增益在“施放普攻 / 战技时”的效果之后再记一次（这次攻击吃得到施放时给的增益）
+    const reSnap = (rec, a) => { if (!a) return; rec.db = dbSnap(a); rec.edb = edbSnap(); if (rec.dbAll) rec.dbAll = Object.fromEntries(Object.keys(rec.dbAll).map(id => [id, dbSnap(byId[id])])); };
     const annRec = rec => {
       const a = byId[rec.uid]; curRec = rec; if (!a) return;
       rec.mIn = U.some(x => x.sm && x.sm.owner === a.id && x.sm.mem && !x.gone);
@@ -1968,6 +2011,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       rec.oc = num((o || a).cnt);
       const h = hpNow(a); if (h != null) rec.hpm = h;
       if (o) { const oh = hpNow(o); if (oh != null) rec.ohpm = oh; }
+      rec.db = dbSnap(a); rec.edb = edbSnap();
+      if (a.kind === "aha") rec.dbAll = Object.fromEntries(U.filter(x => x.kind === "ally" && x.elation && !x.sm).map(x => [x.id, dbSnap(x)]));
     };
     // as = “这次攻击视为追加攻击”（托帕普攻 / 战技、飞霄终结技……）：攻击本身已经算过一次，不再另算“队友攻击后”
     const fuaHooks = (u, as) => {
@@ -1988,7 +2033,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         stats.fua = (stats.fua || 0) + 1;
         // 真正的追击（不是“视为”）按角色编号：第 N 次追击，可以在行动轴上点它安排“这次追击后开大”
         const fn = as ? 0 : (u.fuaN = (u.fuaN || 0) + 1);
-        marks.push({ t, uid: u.id, label: "追击", color: color || u.color, from: why, key: fn ? u.id + "#f" + fn : null });
+        marks.push({ t, uid: u.id, label: "追击", color: color || u.color, from: why, key: fn ? u.id + "#f" + fn : null, db: dbSnap(ownerOf(u)), edb: edbSnap(), hpm: hpNow(ownerOf(u)) ?? undefined });
         addLog(`${u.name} ${as ? "这次攻击视为追加攻击" : `第${fn}次追加攻击`}（${why}）`, false, u.color, u.id);
         if (fn) log[log.length - 1].fm = marks[marks.length - 1];   // 伤害显示：这行日志对应的追击标记
         if (!as && hasEnergy(u) && num(u.fuaE) > 0) { curWhy = "追加攻击回能"; addEnergy(u, num(u.fuaE), true); }   // 追击本身回能（卡片上的“追击回能”）
@@ -2105,7 +2150,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       u.ultN = (u.ultN || 0) + 1;
       if (u.wxTurns) wxUntil = u.turns + u.wxTurns + (u.acting ? 0 : 1);   // 欢愉万相开启
       const usesPick = u.effects.some(e => trig(e, "ult") && e.target === "ultpick");
-      ultMarks.push({ t, uid: u.id, n: u.ultN, target: usesPick ? pickFor(u) : null, hpm: hpNow(u) ?? undefined, sts: u.st ? Object.keys(u.st).filter(k => u.st[k]) : [] });
+      ultMarks.push({ t, uid: u.id, n: u.ultN, target: usesPick ? pickFor(u) : null, hpm: hpNow(u) ?? undefined, sts: u.st ? Object.keys(u.st).filter(k => u.st[k]) : [], db: dbSnap(u), edb: edbSnap() });
       addLog(`${why}${u.name} 开大`, false, u.color, u.id);
       log[log.length - 1].um = ultMarks[ultMarks.length - 1];   // 伤害显示：这行日志对应的开大
       const entry = log[log.length - 1], pool0 = pool, score0 = sw.score, aha0 = pendingAha.length, x0 = pendingX.length;
@@ -2113,6 +2158,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (usesPick) parts.push(`第${u.ultN}次大招目标：${nameOf(pickFor(u))}`);
       markHit(u, parts);
       for (const e of u.effects) if (trig(e, "ult")) apply(e, u, u.color);
+      { const um = ultMarks[ultMarks.length - 1]; if (um && um.uid === u.id) { um.db = dbSnap(u); um.edb = edbSnap(); } }   // 伤害增益：吃得到开大时自己给的
       allyAct(u, true);
       teamFire("aUlt", u);
       if (u.atkUlt !== false) atkAct(u);
@@ -2307,7 +2353,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         swU.acting = true;
         for (const e of swU.effects) if (trig(e, "xturn")) apply(e, swU, swU.color);   // 银狼的额外回合同样只触发“额外回合时”的效果
         swU.acting = false;
-        rec.spShort = onAction(swU, rec.act);
+        rec.spShort = onAction(swU, rec.act); reSnap(rec, swU);
         if (rec.ult) spendCharge();
         rec.pool = pool; rec.score = sw.score; rec.sp = sp;
         if (isAtk(swU, rec.act)) atkAct(swU);
@@ -2338,7 +2384,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         u.acting = true;
         for (const e of u.effects) if (trig(e, "xturn")) apply(e, u, u.color);   // 额外回合只触发“额外回合时”的效果
         u.acting = false;
-        rec.spShort = rec.act ? onAction(u, rec.act) : false;
+        rec.spShort = rec.act ? onAction(u, rec.act) : false; reSnap(rec, u);
         if (u === swU && !rec.ult && rec.act === "skill" && num(W.skillPunch) > 0) addPunch(num(W.skillPunch), "银狼战技");
         if (rec.ult) spendCharge();
         rec.pool = pool; rec.score = sw.score;
@@ -2404,6 +2450,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       actor.turns++;
       for (const k of Object.keys(teamCnt)) if (k.split("|")[1] === actor.id) delete teamCnt[k];   // “每回合最多 N 次”在自己回合开始时清零
       for (const u of U) u.buffs = u.buffs.filter(b => !(b.src === actor.id && b.expire <= actor.turns));
+      EV0.buffs = EV0.buffs.filter(b => !(b.src === actor.id && b.expire <= actor.turns));
       tickSt(actor, "start");   // “每回合开始时持续回合数减 1”的状态（藿藿禳命、风堇雨过天晴）
       for (const z of U) for (const [k, st] of Object.entries(z.st || {})) if (st.tick === "src" && st.by === actor.id && --st.left <= 0) endSt(z, k);   // 施放者回合开始时 −1（收债人）
       if (!isCd(actor) && actor.kind !== "aha") settle();   // 任意目标回合开始时（小伊卡统一治疗）
@@ -2466,6 +2513,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       }
       actor.acting = false;
       if (rec.act) rec.spShort = onAction(actor, rec.act);
+      reSnap(rec, actor);
       if (hasEnergy(actor)) { curWhy = `${actName[rec.act] || "每回合"}回能（卡片设置）`; addEnergy(actor, actE(actor, rec.act), true); }
       // 未开大时银狼的行动是战技，给队伍加笑点；无敌玩家中是强普，没有这一项
       if (actor === swU && !rec.ult && rec.act === "skill" && num(W.skillPunch) > 0) addPunch(num(W.skillPunch), "银狼战技");
@@ -2575,6 +2623,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (e.type === "heal") return `${t} → ${healSum(e)}${c}`;
     if (e.type === "hpup") return `${t} → 生命上限 +${e.mode === "flat" ? "" : num(e.value) + "%" + (HPUPL[e.mode] || "")}${num(e.flat) ? (e.mode === "flat" ? "" : " +") + num(e.flat) : ""}${num(e.duration) > 0 ? ` ${num(e.duration)} 回合` : ""}${c}`;
     if (e.type === "hbup") return `${t} → ${hbSum(e)}${c}`;
+    if (e.type === "dbuf") { const L = { atkP: "攻击力", atkF: "攻击力", defP: "防御力", cr: "暴击率", cd: "暴击伤害", dmg: "增伤", defIg: "无视防御", resPen: "抗性穿透", el: "欢愉度", xtra: "额外真伤", vuln: "敌人易伤", defRed: "敌人减防", resRed: "敌人减抗" }[e.mode] || e.mode;
+      const sc = { b: "普攻", s: "战技", u: "终结技", f: "追击", m: "忆灵", e: "欢愉技" }[e.dsc || ""];
+      return `${t} → ${sc ? sc + " " : ""}${L} +${e.srcS ? `${({ atk: "攻击力", hp: "生命上限", def: "防御力", cd: "暴伤", cr: "暴击率", spd: "速度" })[e.srcS]}的 ${num(e.value)}%${num(e.flat) ? " + " + num(e.flat) : ""}` : num(e.value) + (e.mode === "atkF" ? "" : "%")}${num(e.duration) > 0 ? ` ${num(e.duration)} 回合` : ""}${c}`; }
     if (e.type === "hpcost") return `${t} → ${e.mode === "set" ? `生命值设为生命上限的 ${num(e.value)}%` : e.mode === "init" ? `当前生命值设为生命上限的 ${num(e.value)}%（不算消耗）` : `消耗${e.mode === "all" ? "全部生命值" : `生命值 ${num(e.value)}%${e.mode === "max" ? " 生命上限" : ""}`}`}${num(e.rep) > 1 ? ` 连续 ${Math.round(num(e.rep))} 次` : ""}${c}`;
     if (e.type === "hpgain") return `${t} → 恢复生命值 ${e.byAmt ? num(e.value) + "% 事件数值" : num(e.value)}${c}`;
     if (e.type === "count" && e.byAmt) return `${t} → 计数 +${e.amtHp ? "每损失 1% 生命值 " + num(e.value) / 100 + " 点" : num(e.value) + "% 事件数值"}${c}`;
@@ -2772,10 +2823,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
               ${TEAMT.some(k => e.trigger === k || e.or === k) ? `<span class="ev">（<select id="ew-${e.id}" data-u="${i}" data-e="${j}" data-f="allyWho" aria-label="谁算">${opt([["others", "其他队友"], ["all", "包括自己"], ["self", "只算自己"], ["sm", "只算自己的召唤物"], ["smany", "任何召唤物 / 忆灵"], ["oc", "其他角色（不含召唤物 / 忆灵）"], ["osm", "其他角色的忆灵"], ["mem", "任何忆灵"], ["exsm", "除自己的忆灵外谁都算"]], e.allyWho || "others")}</select>${e.trigger === "atk" || e.or === "atk" ? ` <label for="enf-${e.id}"><input type="checkbox" id="enf-${e.id}" data-u="${i}" data-e="${j}" data-f="nf" ${e.nf ? "checked" : ""}>追加攻击不算</label>` : ""}${e.trigger === "ally" || e.or === "ally" ? ` <label for="eu-${e.id}"><input type="checkbox" id="eu-${e.id}" data-u="${i}" data-e="${j}" data-f="allyUlt" ${e.allyUlt ? "checked" : ""}>开大也算</label>` : ""} 每回合最多<input type="number" id="ek-${e.id}" min="0" step="1" value="${num(e.allyCap)}" data-u="${i}" data-e="${j}" data-f="allyCap" aria-label="每回合最多次数" style="width:42px">次，0 不限${num(e.pw) > 0 ? `；同一个队友最多<input type="number" id="epw-${e.id}" min="0" step="1" value="${num(e.pw)}" data-u="${i}" data-e="${j}" data-f="pw" aria-label="同一个队友每回合最多次数" style="width:42px">次` : ""}）</span>` : ""}
               ${["kill", "hit", "hpLoss"].some(k => e.trigger === k || e.or === k) ? `<span class="ev">（<select id="eq-${e.id}" data-u="${i}" data-e="${j}" data-f="evWho" aria-label="谁算">${opt(EVW, e.evWho || "self")}</select> 每回合最多<input type="number" id="ek2-${e.id}" min="0" step="1" value="${num(e.allyCap)}" data-u="${i}" data-e="${j}" data-f="allyCap" aria-label="每回合最多次数" style="width:42px">次，0 不限）</span>` : ""}
               ${e.type === "punch" || e.type === "aha" || e.type === "pend" ? "" : `<select id="ex-${e.id}" data-u="${i}" data-e="${j}" data-f="target" aria-label="目标">${targetOptions(e.target, null, trig(e, "ult"), EVTT.some(k => e.trigger === k || e.or === k), e.trigger === "tick" || e.or === "tick")}</select>`}
-              <select id="ey-${e.id}" data-u="${i}" data-e="${j}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["spd", "加速"], ["energy", "回能"], ["erbuff", "充能效率"], ["punch", "阿哈笑点"], ["aha", "额外阿哈时刻"], ["elskill", "释放欢愉技"], ["xturn", "欢愉额外回合"], ["mark", "开大回能标记"], ["heal", "治疗"], ["shield", "护盾"], ["lingshi", "令使"], ["extra", "额外回合"], ["sp", "战技点"], ["count", "计数"], ["summon", "召唤 / 登场"], ["dismiss", "召唤物离场"], ["fua", "追加攻击"], ["cntE", "计数换能量"], ["force", "之后的行动方式"], ["spmax", "战技点上限"], ["cast", "施放一次战技"], ["state", "状态"], ["hpup", "生命上限"], ["hbup", "治疗加成"], ["hpcost", "消耗生命值"], ["hpgain", "恢复生命值（不算治疗）"], ["pend", "记下生命值降低的目标"]], e.type)}</select>
+              <select id="ey-${e.id}" data-u="${i}" data-e="${j}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["spd", "加速"], ["energy", "回能"], ["erbuff", "充能效率"], ["punch", "阿哈笑点"], ["aha", "额外阿哈时刻"], ["elskill", "释放欢愉技"], ["xturn", "欢愉额外回合"], ["mark", "开大回能标记"], ["heal", "治疗"], ["shield", "护盾"], ["lingshi", "令使"], ["extra", "额外回合"], ["sp", "战技点"], ["count", "计数"], ["summon", "召唤 / 登场"], ["dismiss", "召唤物离场"], ["fua", "追加攻击"], ["cntE", "计数换能量"], ["force", "之后的行动方式"], ["spmax", "战技点上限"], ["cast", "施放一次战技"], ["state", "状态"], ["hpup", "生命上限"], ["hbup", "治疗加成"], ["hpcost", "消耗生命值"], ["hpgain", "恢复生命值（不算治疗）"], ["pend", "记下生命值降低的目标"], ["dbuf", "伤害增益（只算伤害）"]], e.type)}</select>
               ${e.type === "aha" || e.type === "elskill" ? "计入笑点" : e.type === "xturn" ? "回合内临时笑点" : e.type === "mark" ? "目标开大时自己固定回复" : ""}
-              ${["shield", "extra", "summon", "dismiss", "fua", "cast", "state", "pend"].includes(e.type) || (e.type === "energy" && e.mode === "full") || (e.type === "heal" && !["hp", "atk", "def", "thp", "lost"].includes(e.mode)) || (e.type === "hpup" && e.mode === "flat") ? "" : `<input type="number" id="ev-${e.id}" step="${e.type === "hbup" ? "any" : e.type === "heal" || e.type === "hpup" || e.type === "hpcost" ? "0.1" : "1"}" value="${e.value}" data-u="${i}" data-e="${j}" data-f="value" aria-label="${e.type === "heal" ? "治疗百分比" : e.type === "hpup" ? "生命上限百分比" : e.type === "hbup" ? "治疗加成百分比" : e.type === "hpcost" ? "消耗生命值百分比" : "数值"}">`}
-              ${e.type === "heal" ? healEd(u, e, i, j) : e.type === "state" ? stateEd(e, i, j) : e.type === "hpup" ? hpupEd(u, e, i, j) : e.type === "hbup" ? hbupEd(e, i, j) : e.type === "hpcost" ? hpcostEd(e, i, j) : e.type === "hpgain" ? "点生命值（不算治疗，不超过生命上限）" : e.type === "pend" ? `结算 <select id="epm-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="什么时候结算">${opt([["now", "马上（这次消耗生命值 / 受到攻击处理完）"], ["at", "任意目标回合开始时或行动后（原文）"]], e.mode === "now" ? "now" : "at")}</select>（把这次生命值降低的目标记下来，同一目标只记一次；结算时，这张卡上触发是“结算记下的目标时”的效果统一生效一次，目标可以选“记下的目标”。小伊卡的治疗就是这样）` : e.type === "shield" ? "（让目标触发“受到护盾时”的效果）"
+              ${["shield", "extra", "summon", "dismiss", "fua", "cast", "state", "pend"].includes(e.type) || (e.type === "energy" && e.mode === "full") || (e.type === "heal" && !["hp", "atk", "def", "thp", "lost"].includes(e.mode)) || (e.type === "hpup" && e.mode === "flat") ? "" : `<input type="number" id="ev-${e.id}" step="${e.type === "hbup" || e.type === "dbuf" ? "any" : e.type === "heal" || e.type === "hpup" || e.type === "hpcost" ? "0.1" : "1"}" value="${e.value}" data-u="${i}" data-e="${j}" data-f="value" aria-label="${e.type === "heal" ? "治疗百分比" : e.type === "hpup" ? "生命上限百分比" : e.type === "hbup" ? "治疗加成百分比" : e.type === "hpcost" ? "消耗生命值百分比" : "数值"}">`}
+              ${e.type === "heal" ? healEd(u, e, i, j) : e.type === "state" ? stateEd(e, i, j) : e.type === "hpup" ? hpupEd(u, e, i, j) : e.type === "hbup" ? hbupEd(e, i, j) : e.type === "dbuf" ? dbufEd(e, i, j) : e.type === "hpcost" ? hpcostEd(e, i, j) : e.type === "hpgain" ? "点生命值（不算治疗，不超过生命上限）" : e.type === "pend" ? `结算 <select id="epm-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="什么时候结算">${opt([["now", "马上（这次消耗生命值 / 受到攻击处理完）"], ["at", "任意目标回合开始时或行动后（原文）"]], e.mode === "now" ? "now" : "at")}</select>（把这次生命值降低的目标记下来，同一目标只记一次；结算时，这张卡上触发是“结算记下的目标时”的效果统一生效一次，目标可以选“记下的目标”。小伊卡的治疗就是这样）` : e.type === "shield" ? "（让目标触发“受到护盾时”的效果）"
                 : e.type === "cast" ? "（目标立即施放 1 次战技：不占回合、不消耗战技点，触发它的“施放战技时”效果并按战技回能；秘技进战用）"
                 : e.type === "extra" ? "（目标立即获得 1 个额外回合）" : e.type === "sp" ? "个战技点（负数是消耗）" : e.type === "count" ? `点 <select id="ecm-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="计数方式">${opt([["pct", "加（负数是减）"], ["half", "扣当前的一半，至少扣这么多"], ["set", "设为"]], e.mode === "half" || e.mode === "set" ? e.mode : "pct")}</select>（满了触发“计数满时”，扣到 0 触发“计数归零时”）`
                 : e.type === "force" ? `次 <select id="efo-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="行动方式">${opt([["ebasic", "强化普攻"], ["basic", "普攻"], ["skill", "战技"], ["fskill", "战技（不耗战技点）"]], ["basic", "skill", "fskill"].includes(e.mode) ? e.mode : "ebasic")}</select>（目标接下来这么多次行动固定用这种方式；0 = 取消；行动轴上单独点过的优先）`
@@ -2839,6 +2890,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
               <select id="ec2-${e.id}" data-u="${i}" data-e="${j}" data-f="count" aria-label="计时方式">${opt([["caster", "按施放者回合"], ["own", "按各自回合结束"]], e.count || "caster")}</select>
               ${String(e.bk || "").startsWith("st:") ? `<span class="hint">跟着【${esc(String(e.bk).slice(3).replace(/#.*/, ""))}】，状态结束时消失</span>` : ""}<span class="hint">${pv}（治疗按当前生命上限算）</span>`;
   };
+  const DBM = [["atkP", "攻击力 %"], ["atkF", "攻击力（固定值）"], ["defP", "防御力 %"], ["cr", "暴击率"], ["cd", "暴击伤害"], ["dmg", "增伤（造成的伤害提高）"], ["defIg", "无视防御"], ["resPen", "抗性穿透"], ["el", "欢愉度"], ["xtra", "额外真实伤害（原伤害的 %）"], ["vuln", "敌人受到的伤害提高（易伤）"], ["defRed", "敌人防御力降低"], ["resRed", "敌人抗性降低"]];
+  const DSC = [["", "所有伤害"], ["b", "普攻 / 强普"], ["s", "战技"], ["u", "终结技"], ["f", "追加攻击"], ["m", "忆灵造成的"], ["e", "欢愉技"]];
+  const dbufEd = (e, i, j) => `% <select id="edm-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="哪项属性">${opt(DBM, DBM.some(x => x[0] === e.mode) ? e.mode : "dmg")}</select>
+              对 <select id="eds-${e.id}" data-u="${i}" data-e="${j}" data-f="dsc" aria-label="对哪类伤害">${opt(DSC, e.dsc || "")}</select>
+              <select id="edss-${e.id}" data-u="${i}" data-e="${j}" data-f="srcS" aria-label="数值怎么算">${opt([["", "数值就是上面的数"], ["atk", "= 施放者攻击力的 X%"], ["hp", "= 施放者生命上限的 X%"], ["def", "= 施放者防御力的 X%"], ["cd", "= 施放者暴击伤害的 X%"], ["cr", "= 施放者暴击率的 X%"], ["spd", "= 施放者速度的 X%"]], e.srcS || "")}</select>${e.srcS ? `+<input type="number" id="edf-${e.id}" step="any" value="${num(e.flat)}" data-u="${i}" data-e="${j}" data-f="flat" aria-label="另加固定值" style="width:52px">` : ""}
+              持续<input type="number" id="edd-${e.id}" min="0" step="1" value="${num(e.duration)}" data-u="${i}" data-e="${j}" data-f="duration" aria-label="持续回合" style="width:42px">回合（0 = 一直有）
+              叠加上限<input type="number" id="edst-${e.id}" min="0" step="1" value="${num(e.stack)}" data-u="${i}" data-e="${j}" data-f="stack" aria-label="叠加上限" style="width:42px">层
+              <select id="edc-${e.id}" data-u="${i}" data-e="${j}" data-f="count" aria-label="计时方式">${opt([["caster", "按施放者回合"], ["own", "按各自回合结束"]], e.count || "caster")}</select>
+              <span class="hint">（只影响伤害估算，不影响行动轴；易伤 / 减防 / 减抗挂在敌人身上）</span>`;
   const hbupEd = (e, i, j) => {
     const m = HBM.some(x => x[0] === e.mode) ? e.mode : "out";
     return `% <select id="ehb-${e.id}" data-u="${i}" data-e="${j}" data-f="mode" aria-label="治疗加成方式">${opt(HBM, m)}</select>`
@@ -3130,6 +3190,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (f === "type" && val === "state") { e.stKey = e.stKey || "状态"; e.value = 1; e.duration = 2; }
       if (f === "type" && val === "hpup") { e.mode = "pct"; e.value = 20; e.flat = 0; e.duration = 2; }
       if (f === "type" && val === "hbup") { e.mode = "out"; e.value = 10; e.duration = 2; }
+      if (f === "type" && val === "dbuf") { e.mode = "dmg"; e.value = 20; e.duration = 2; e.dsc = ""; }
       if (f === "type" && val === "hpcost") { e.value = 10; e.mode = "cur"; }
       if (f === "type" && val === "hpgain") { e.value = 1000; }
       if (["rep", "amtCap", "amtCapN", "hpGE", "hpLE", "anyLE", "hpX", "amtGE"].includes(f) && !(num(val) > 0)) delete e[f];
@@ -4007,19 +4068,28 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (!(v > 0 || adj > 0 || rnd > 0)) return null;
     return { v, adj, rnd, tg: e.tg | 0, stat: e.stat || "atk", el: !!e.el, br: e.br, brtg: e.brtg, lv, n: e.n || "", key: k };
   }
+  // 伤害增益快照里某项属性的合计（范围 "" = 全部，否则要和这次伤害的类型对上）
+  const SCK = { b: "b", b2: "b", s: "s", s2: "s", u: "u", f: "f", m: "m", e: "e" };
+  const DBL = { atkP: "攻击力%", atkF: "攻击力", defP: "防御力%", cr: "暴击率", cd: "暴击伤害", dmg: "增伤", defIg: "无视防御", resPen: "抗性穿透", el: "欢愉度", xtra: "额外真实伤害", vuln: "受到伤害提高", defRed: "防御降低", resRed: "抗性降低" };
+  const dsum = (list, st, key) => (list || []).reduce((p, x) => p + (x[0] === st && (!x[1] || x[1] === SCK[key]) ? num(x[2]) : 0), 0);
   function dmgCalc(u, e, rec, baseOv) {
     const cfg = dgCfg(), dsm = DSM[e.stat] || DSM.atk, lab = dsm[2];
     const T0 = tplOf(u);
     const isLv = e.stat === "lv";
+    const DB0 = rec ? (rec.dbAll ? rec.dbAll[u.id] : rec.db) || [] : [], EDB = rec && rec.edb || [];
+    const D = st => dsum(DB0, st, e.key), ED = st => dsum(EDB, st, e.key);
     // 生命值：用模拟里行动当时的生命上限（含生命上限增益）；没有就按卡片面板
     const hpm = e.stat === "hp" && rec && rec.uid === u.id && rec.hpm != null ? rec.hpm : null;
-    const base = baseOv != null ? baseOv : isLv ? LVBASE : (hpm ?? cardStat(u, dsm[0]) ?? cardStat(u, dsm[1]) ?? (T0 ? num(T0[dsm[0]]) : 0));
+    let base = baseOv != null ? baseOv : isLv ? LVBASE : (hpm ?? cardStat(u, dsm[0]) ?? cardStat(u, dsm[1]) ?? (T0 ? num(T0[dsm[0]]) : 0));
+    if (!isLv && e.stat === "atk") base += num(cardStat(u, "atkB") ?? (T0 ? T0.atk : 0)) * D("atkP") / 100 + D("atkF");   // 攻击力% 按基础攻击力
+    if (!isLv && e.stat === "def") base += num(cardStat(u, "defB") ?? (T0 ? T0.def : 0)) * D("defP") / 100;
+    const buffTxt = [...new Set([...DB0, ...EDB].map(x => x[0]))].map(st => { const v = (["vuln", "defRed", "resRed"].includes(st) ? ED : D)(st); return v ? `${DBL[st] || st} +${fmt(v, 1)}${st === "atkF" ? "" : "%"}` : ""; }).filter(Boolean).join("、");
     const noPanel = !isLv && dsm[0] && (u[dsm[0]] == null || u[dsm[0]] === "");   // 没填面板：按基础值算，偏低
     const N = enemyCount();
     const nAll = e.tg === 3 ? N : 1;                       // 群攻打所有敌人
     const nAdj = e.tg === 2 ? Math.min(2, Math.max(0, N - 1)) : e.tg === 4 ? N - 1 : 0;   // 扩散：主目标 + 最多 2 个相邻；4 = 主目标 + 其他全部
     const mult = e.v * nAll + e.adj * nAdj + e.rnd;
-    let cr = num(u.cr, 5), cd = num(u.cd, 50), bonus = num(u.dmg, 0), defI = 0;
+    let cr = num(u.cr, 5) + D("cr"), cd = num(u.cd, 50) + D("cd"), bonus = num(u.dmg, 0) + D("dmg"), defI = D("defIg");
     // 银狼LV.999 天赋：每点【隐藏分】暴击率 +0.5%，满 100% 后每点 +1% 暴击伤害；强化普攻每 60 点 +15%（最多 2 层）
     if (String(u.tplId) === "1506" && rec && rec.score != null) {
       const sc = num(rec.score);
@@ -4029,15 +4099,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     // 星神★阿哈 固有行迹：欢愉万相期间暴击率 +12%（2 魂 +20%），造成的伤害无视 30%（2 魂 60%）防御力
     if (String(u.tplId) === "1511" && rec && rec.wx) { cr += num(u.eid) >= 2 ? 20 : 12; defI = num(u.eid) >= 2 ? 60 : 30; }
     const critM = 1 + Math.min(1, Math.max(0, cr) / 100) * Math.max(0, cd) / 100;
-    const defM = 100 / (100 + (enemyLevel() + 20) * Math.max(0, 1 - num(cfg.defR) / 100) * Math.max(0, 1 - defI / 100));
+    const defM = 100 / (100 + (enemyLevel() + 20) * Math.max(0, 1 - (num(cfg.defR) + ED("defRed")) / 100 - defI / 100));
     const res = cfg.weak ? 0 : num(cfg.res);
-    const resM = Math.max(0, 1 - (res - num(cfg.pen)) / 100);
-    const vulnM = 1 + num(cfg.vuln) / 100;
+    const resM = Math.min(2, Math.max(0.1, 1 - (res - num(cfg.pen) - D("resPen") - ED("resRed")) / 100));
+    const vulnM = (1 + (num(cfg.vuln) + ED("vuln")) / 100) * (1 + D("xtra") / 100);
     // 欢愉伤害：再乘 (1 + 欢愉度) 和笑点 1 + 5P/(P+240)，而且不吃增伤
     // P = 这次算进去的笑点：阿哈时刻是这一次消耗的，其它行动是当时的笑点池
     let elStat = 0, punch = 0, punchM = 1, elM = 1;
     const bg = bangerAt(u, rec);   // 好活当赏点数
-    elStat = Math.max(0, num(u.el, 0));
+    elStat = Math.max(0, num(u.el, 0) + D("el"));
     punchM = 1 + 5 * bg / (bg + 240);
     const elMall = (1 + elStat / 100) * punchM;   // 欢愉伤害的乘区（额外一段也用它）
     const b2el = String(u.tplId) === "1506" && e.key === "b2" && bg > 0;   // 银狼：持有好活当赏时强普转欢愉伤害
@@ -4051,7 +4121,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (riderV > 0) rider = LVBASE * riderV * (e.brtg === 3 ? nAll : 1) * elMall * critM * defM * resM * vulnM * toughM;
     }
     const total = base * mult * elM * dmgM * critM * defM * resM * vulnM * toughM + rider;
-    return { total, noPanel, panelLab: lab, rider, riderV, bg, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
+    return { total, noPanel, panelLab: lab, buffTxt, rider, riderV, bg, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
       mult, multOne: e.v + e.rnd, v: e.v, adj: e.adj, rnd: e.rnd, adjN: nAdj, tg: e.tg, targets: nAll + nAdj, name: e.n, lv: e.lv, key: e.key };
   }
   // 一次行动的伤害；没有倍率数据（辅助 / 忆灵 / 敌人）返回 null
@@ -4152,6 +4222,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       + `｜${r.stat} ${Math.round(r.base)}${r.noPanel ? `（没填面板${r.panelLab}，按基础值算，偏低）` : ""} × ${r.isLv ? "不吃增伤" : `增伤 ${fmt(r.dmgM, 3)}`}`
       + (r.el ? ` × 欢愉度 ${fmt(1 + r.elStat / 100, 2)}（${fmt(r.elStat, 1)}%） × 好活当赏 ${Math.round(r.bg)} → ${fmt(r.punchM, 2)}` : "")
       + ` × 暴击 ${fmt(r.critM, 3)}（${fmt(Math.min(100, r.cr), 1)}% / ${fmt(r.cd, 1)}%）`
+      + (r.buffTxt ? `（增益：${r.buffTxt}）` : "")
       + ` × 防御 ${fmt(r.defM, 3)} × 抗性 ${fmt(r.resM, 3)} × 易伤 ${fmt(r.vulnM, 3)} × 韧性 ${fmt(r.toughM, 2)}（${r.toughM === 1 ? "已击破" : "未击破"}，敌人 ${enemyLevel()} 级）`
       + (r.rider ? ` ＋ 好活当赏额外一段 ${fmt(r.riderV * 100, 1)}% = ${Math.round(r.rider).toLocaleString()}` : "")
       + ` = ${Math.round(r.total).toLocaleString()}`;
