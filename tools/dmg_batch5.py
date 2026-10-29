@@ -1,0 +1,92 @@
+"""伤害增益第 5 批（3.x 角色）：丹恒•腾荒、刻律德菈、海瑟音、白厄、赛飞儿、那刻夏、万敌、缇宝、阿格莱雅、大黑塔。"""
+import sys; sys.path.insert(0, 'tools')
+from dmgbatch import run, D
+BASE = {
+ 1414: [D(t='skill', tg='$ally', m='atkF', ss='atk', v=15, d=0, bk='sx', n='行迹神秀：施放战技时【同袍】攻击力 +丹恒•腾荒攻击力的 15%（同袍 = 模板里的第一个队友）')],
+ 1412: [
+  D(t='start', tg='$ally', m='atkF', ss='atk', v=24, lv=[5, 25.2], d=0, bk='jg', n='天赋：持有【军功】的角色攻击力 +刻律德菈攻击力的 24%（军功 = 模板里的第一个队友）'),
+  D(t='start', tg='$ally', m='cd', v=72, lv=[3, 79.2], sc='s', d=0, bk='jw', off=1, n='战技：持有【爵位】时战技的暴击伤害 +72%（爵位要充能 6 点，时有时无，需要时启用）'),
+  D(t='start', tg='$ally', m='resPen', v=10, lv=[3, 10.4], d=0, bk='jwp', off=1, n='战技：持有【爵位】时全属性抗性穿透 +10%（同上）'),
+  D(t='start', tg='self', m='cd', ss='atk', v=0.18, hf=-360, cap=360, d=0, bk='lz', n='行迹来者：攻击力超过 2000 时每 100 点暴击伤害 +18%，最多 +360%（按卡片面板攻击力，线性近似）'),
+  D(t='start', tg='self', m='cr', v=100, d=0, bk='jz', n='行迹见者：暴击率 +100%'),
+ ],
+ 1410: [
+  D(t='skill', tg='enemies', m='vuln', v=20, lv=[5, 22], d=3, bk='skv', n='战技：敌方全体受到的伤害 +20%，持续 3 回合'),
+  D(t='ult', tg='enemies', m='defRed', v=25, lv=[3, 27], d=3, bk='ultd', n='终结技：结界内敌方防御力 −25%，持续 3 回合（战斗开始的结界没算）'),
+  D(t='start', tg='self', m='dmg', v=90, d=0, bk='zz', off=1, n='行迹珍珠的琴弦：效果命中高于 60% 时每超过 10% 伤害 +15%，最多 +90%（没有效果命中数值，按叠满写；确认效果命中 ≥120% 时启用）'),
+ ],
+ 1408: [
+  D(t='aSk', aw='others', tg='self', m='cd', v=30, lv=[5, 33], d=3, bk='hz', n='天赋：成为队友技能目标时暴击伤害 +30%，持续 3 回合（按“队友施放战技后”近似）'),
+  D(t='smOn', sk='khaslana', tg='self', m='atkP', v=80, lv=[5, 88], d=0, bk='bs', n='天赋：变身期间攻击力 +80%'),
+  D(t='smEnd', sk='khaslana', tg='self', m='atkP', v=0, d=0, bk='bs', n='天赋：变身结束，攻击力加成取消'),
+  D(t='heal', o='shield', tg='self', m='dmg', v=45, d=4, bk='yj', n='行迹身承炎炬万千：受到队友的治疗或护盾时造成的伤害 +45%，持续 4 回合'),
+  D(t='start', tg='self', m='atkP', v=50, st=2, d=0, bk='yx', n='行迹照见英雄本色：进入战斗时攻击力 +50%（最多 2 层）'),
+  D(t='smEnd', sk='khaslana', tg='self', m='atkP', v=50, st=2, d=0, bk='yx', n='行迹照见英雄本色：变身结束时攻击力 +50%（最多 2 层）'),
+ ],
+ 1406: [
+  D(t='skill', tg='self', m='atkP', v=30, d=2, bk='sk', n='战技：赛飞儿攻击力 +30%，持续 2 回合'),
+  D(t='start', tg='self', m='cr', v=25, ms=140, d=0, bk='xx1', n='行迹神行宝鞋：速度 ≥140 时暴击率 +25%（按战斗开始时的速度）'),
+  D(t='start', tg='self', m='cr', v=25, ms=170, d=0, bk='xx2', n='行迹神行宝鞋：速度 ≥170 时再 +25%（共 50%）'),
+  D(t='start', tg='self', m='cd', v=100, sc='f', d=0, bk='tr', n='行迹偷天换日：天赋追加攻击的暴击伤害 +100%'),
+  D(t='start', tg='enemies', m='vuln', v=40, d=0, bk='trv', n='行迹偷天换日：赛飞儿在场时敌方全体受到的伤害 +40%'),
+ ],
+ 1405: [
+  D(t='start', tg='self', m='dmg', v=30, lv=[5, 32.4], d=0, bk='zx', n='天赋：对【质性揭露】（至少 5 种弱点）的敌人伤害 +30%（按敌人一直处于揭露算）'),
+  D(t='start', tg='self', m='cd', v=140, d=0, bk='lb1', n='行迹必要的留白：队伍里只有 1 名智识角色时那刻夏暴击伤害 +140%（有 2 名以上时关掉这条，启用下一条）'),
+  D(t='start', tg='team', m='dmg', v=50, d=0, bk='lb2', off=1, n='行迹必要的留白：至少 2 名智识角色时我方全体造成的伤害 +50%'),
+  D(t='start', tg='self', m='defIg', v=28, d=0, bk='zb', n='行迹质性的嬗变：敌人每有 1 种弱点无视 4% 防御力，最多 7 种（按 7 种）'),
+ ],
+ 1404: [
+  D(t='start', tg='self', m='cr', ss='hp', v=1.2, hf=-48, cap=48, d=0, bk='xx', n='行迹血祥罩衫：生命上限超过 4000 时每 100 点暴击率 +1.2%，最多计入 4000 点（按战斗开始时的生命值）'),
+ ],
+ 1403: [
+  D(t='skill', tg='team', m='resPen', v=24, lv=[5, 26.4], d=3, bk='sq', n='战技：【神启】期间我方全体全属性抗性穿透 +24%，持续 3 回合'),
+  D(t='ult', tg='enemies', m='vuln', v=30, lv=[3, 33], d=2, bk='jj', n='终结技：结界期间敌方受到的伤害 +30%，持续 2 回合'),
+  D(t='fua', tg='self', m='dmg', v=72, st=3, d=3, bk='yg', n='行迹城墙外的羊羔儿…：施放天赋追加攻击后缇宝造成的伤害 +72%，最多 3 层，持续 3 回合'),
+ ],
+ 1402: [
+  D(t='smOn', sk='supreme', tg='self', m='atkF', ss='spd', v=720, d=0, bk='dsz', n='行迹短视之惩：【至高之姿】时阿格莱雅攻击力 +自身速度的 720%（衣匠速度的 360% 那部分没算）'),
+  D(t='smOn', sk='supreme', tg='sm:garment', m='atkF', ss='spd', v=720, d=0, bk='dszg', n='行迹短视之惩：衣匠同样提高（按阿格莱雅速度的 720%）'),
+  D(t='smEnd', sk='supreme', tg='self', m='atkF', v=0, d=0, bk='dsz', n='行迹短视之惩：至高之姿结束，攻击力加成取消'),
+  D(t='smEnd', sk='supreme', tg='sm:garment', m='atkF', v=0, d=0, bk='dszg', n='行迹短视之惩：至高之姿结束，衣匠攻击力加成取消'),
+ ],
+ 1401: [
+  D(t='ult', tg='self', m='atkP', v=80, lv=[5, 88], d=3, bk='ult', n='终结技：攻击力 +80%，持续 3 回合（解读、谜底的倍率提高没算）'),
+  D(t='start', tg='team', m='cd', v=80, d=0, bk='sj', off=1, n='行迹视界外来信：队伍里至少 2 名智识角色时我方全体暴击伤害 +80%（符合时启用）'),
+  D(t='start', tg='self', m='atkP', v=60, d=2, bk='tech', off=1, n='秘技：下一次战斗开始时攻击力 +60%，持续 2 回合（用了秘技再启用）'),
+ ],
+}
+EID = {
+ 1414: {1: [D(t='ult', tg='$ally', m='resPen', v=18, d=3, bk='e1', n='E1：施放终结技时【同袍】全属性抗性穿透 +18%，持续 3 回合')],
+        6: [D(t='start', tg='enemies', m='vuln', v=20, d=0, bk='e6', n='E6：有【同袍】时敌方全体受到的伤害 +20%'),
+            D(t='start', tg='$ally', m='defIg', v=12, d=0, bk='e6i', n='E6：【同袍】造成伤害时无视敌方 12% 防御力')]},
+ 1412: {1: [D(t='start', tg='$ally', m='defIg', v=16, d=0, bk='e1', n='E1：持有【军功】的角色无视目标 16% 防御力（爵位战技额外 20% 没算）')],
+        2: [D(t='start', tg='$ally', m='dmg', v=40, d=0, bk='e2', n='E2：持有【军功】的角色造成的伤害 +40%'),
+            D(t='start', tg='self', m='dmg', v=160, d=0, bk='e2s', n='E2：场上有持有【军功】的队友时刻律德菈造成的伤害 +160%')],
+        6: [D(t='start', tg='$ally', m='resPen', v=20, d=0, bk='e6', n='E6：持有【军功】的角色全属性抗性穿透 +20%'),
+            D(t='start', tg='self', m='resPen', v=20, d=0, bk='e6s', n='E6：刻律德菈全属性抗性穿透 +20%（军功附加伤害倍率提高没算）')]},
+ 1410: {2: [D(t='ult', tg='others', m='dmg', v=90, d=3, bk='e2', off=1, n='E2：结界期间珍珠的琴弦对我方全体生效（同上，确认效果命中 ≥120% 时启用）')],
+        4: [D(t='ult', tg='enemies', m='resRed', v=20, d=3, bk='e4', n='E4：结界期间敌方全体全属性抗性 −20%（持续伤害 ×1.16 等没算）')]},
+ 1408: {1: [D(t='ult', tg='self', m='cd', v=50, d=3, bk='e1', n='E1：施放终结技时暴击伤害 +50%，持续 3 回合')],
+        2: [D(t='smOn', sk='khaslana', tg='self', m='resPen', v=20, d=0, bk='e2', n='E2：卡厄斯兰那物理属性抗性穿透 +20%'),
+            D(t='smEnd', sk='khaslana', tg='self', m='resPen', v=0, d=0, bk='e2', n='E2：变身结束，穿透取消')]},
+ 1406: {1: [D(t='fua', tg='self', m='atkP', v=80, d=2, bk='e1', n='E1：施放天赋追加攻击时攻击力 +80%，持续 2 回合')],
+        2: [D(t='atk', aw='self', tg='enemies', m='vuln', v=30, d=2, bk='e2', n='E2：击中敌人时使其受到的伤害 +30%，持续 2 回合')],
+        6: [D(t='start', tg='self', m='dmg', v=350, sc='f', d=0, bk='e6', n='E6：天赋追加攻击伤害 +350%')]},
+ 1405: {1: [D(t='skill', tg='enemies', m='defRed', v=16, d=2, bk='e1', n='E1：战技击中敌人时防御力 −16%，持续 2 回合')],
+        2: [D(t='start', tg='enemies', m='resRed', v=20, d=0, bk='e2', n='E2：敌人入场时全属性抗性 −20%')],
+        4: [D(t='skill', tg='self', m='atkP', v=30, st=2, d=2, bk='e4', n='E4：施放战技时攻击力 +30%，持续 2 回合，最多 2 层')],
+        6: [D(t='start', tg='self', m='xtra', v=30, d=0, bk='e6', n='E6：那刻夏造成的伤害为原伤害的 130%（必要的留白两种效果都触发：请把上面团队增伤那条也启用）')]},
+ 1404: {2: [D(t='turn', ns='血仇', tg='self', m='defIg', v=15, d=0, bk='e2', n='E2：【血仇】期间无视敌方 15% 防御力（血仇中的回合开始时挂上）')],
+        4: [D(t='turn', ns='血仇', tg='self', m='cd', v=30, d=0, bk='e4', n='E4：【血仇】期间暴击伤害 +30%')]},
+ 1403: {4: [D(t='skill', tg='team', m='defIg', v=18, d=3, bk='e4', n='E4：【神启】期间我方全体无视目标 18% 防御力')],
+        6: [D(t='start', tg='self', m='dmg', v=729, sc='f', d=0, bk='e6', n='E6：天赋追加攻击伤害 +729%')]},
+ 1402: {1: [D(t='start', tg='enemies', m='vuln', v=15, d=0, bk='e1', n='E1：【间隙织线】的敌人受到的伤害 +15%（按一直有算）')],
+        2: [D(t='start', tg='self', m='defIg', v=42, d=0, bk='e2', off=1, n='E2：阿格莱雅 / 衣匠行动时无视防御 +14%，最多 3 层，其他单位施放技能时清掉（按叠满 3 层写，需要时启用）')],
+        6: [D(t='smOn', sk='supreme', tg='self', m='resPen', v=20, d=0, bk='e6', n='E6：【至高之姿】时阿格莱雅雷属性抗性穿透 +20%'),
+            D(t='smOn', sk='supreme', tg='sm:garment', m='resPen', v=20, d=0, bk='e6g', n='E6：衣匠同样 +20%（速度档位的连携伤害提高没算）'),
+            D(t='smEnd', sk='supreme', tg='self', m='resPen', v=0, d=0, bk='e6', n='E6：至高之姿结束，穿透取消'),
+            D(t='smEnd', sk='supreme', tg='sm:garment', m='resPen', v=0, d=0, bk='e6g', n='E6：至高之姿结束，衣匠穿透取消')]},
+ 1401: {6: [D(t='start', tg='self', m='resPen', v=20, d=0, bk='e6', n='E6：冰属性抗性穿透 +20%（终结技倍率按敌人数量提高没算）')]},
+}
+run(sys.argv[1] if len(sys.argv) > 1 else 'index.html', 25, BASE, EID, {}, {}, '伤害增益第 5 批（3.x 角色）')
