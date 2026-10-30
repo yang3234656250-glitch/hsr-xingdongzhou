@@ -62,7 +62,7 @@
 
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 38）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 39）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 
 ## 数据来源
@@ -76,3 +76,11 @@
 - 欢愉伤害（dmgCalc）：LVBASE × 倍率 × (1 + 欢愉度) × 笑点区 (1 + 5P/(P+240)) × (1 + 增笑) × 暴击 × 防御 × 抗性 × 易伤 × 韧性，不吃增伤和攻击力。P：阿哈时刻里的欢愉技 = 这次消耗 / 计入的笑点（rec.consumed），其它欢愉伤害 = 持有的【好活当赏】（bangerAt）。
 - 额外伤害（2026-10-30）：`XR` 表（tools/xr.py 生成，`const XR=` 一行）+ `riderDmg`，在 dmgCalc 里加进这一下的伤害。who = self / other / ally / flag；flag 类靠伤害增益里的 `rx` 标记（mode "rx"，dsc = 标记名，比如知更鸟协奏 rob、缇宝结界 trb、刻律德菈军功 cer、停云赐福 ty1、真珠 prl、迷迷 mimi）。角色卡上 `u.xr[k]` = 勾选覆盖默认。旧的 DMG 里的 `br`（好活当赏额外一段）数值不准，已停用，改由 XR 按官方原文算。
 - DMG 表（技能倍率）是早先生成的，2026-10-30 对照官方参数修过一轮（tools/fix_dmg.py 记录了改了哪些、怎么算）。改倍率时先看官方原文：持续伤害 / 冻结附加伤害 / 治疗系数不能混进倍率；“由敌方全体均分”用 tg 0；附加伤害走 XR 表。
+- 记忆 / 欢愉角色全面补齐（tv 39，tools/dmg_fix39.py）：老存档里“原地改字段”的效果用 `PATCH39`（按效果说明找，字段值 null = 删掉），新加的走 TPLFIX39。新字段：
+  - 条件：`maxEl`（队伍欢愉角色不超过 N 名）、`mm` minMem（「记忆」角色含自己 ≥N）、`ptp` / `pg` / `pe`（这次大招目标是某模板 / 黄金裔 / 欢愉）、`te`（只对欢愉 / 非欢愉目标）、`so: "pick"`（needSt 看大招目标身上的状态）、`ptn` perTn（任意单位的一个回合里最多一次，turnSeq 计数）。
+  - 队友触发过滤：`aa` 行动类型（lastAct：basic / ebasic / skill / ult / fua）、`at` 模板 id、`as` 行动者（或它的主人）身上的状态、`ae0` 只算能量上限为 0（noStdE）的角色；`acR: "skill"` = 每回合次数改成自己施放战技时清零。新触发 `aGive`（我方提供治疗或护盾时）。
+  - 目标：`ultpickm`（大招目标 + 它的忆灵）、`withm:<id>`（模板写 `$allym`）、`evto`（事件对象，召唤物换成主人）、`tsm`（只对召唤物）。
+  - 加速：`ste` [几魂, 叠层上限]、`cpy`（照抄同一施放者另一组加速的层数）、`stc`（只保留几层）、`fl`（叠满）、`ow`（增益键按目标的主人算）。
+  - 伤害增益：`dy`（出手时按施放者当时属性重算，速度门槛 ms 也按当时）、`ssm`（属性取自己某个召唤物）、`clr`（数值 0 时清掉所有人给的同键增益）、`tp`（我方全体里只对某命途）。
+  - 其他：能量方式 `maxp`（目标能量上限 X%）/ `atl`（不足 X% 补到 X%）/ `zero`（清空并标出溢出，遐蝶）；类型 `life`（召唤物多行动几次）、`ecap`（能量最多存到上限 X%）；计数 `cmk`（设为时标出清掉多少，砂金•戏浪 All in 用 `heat`）、模板 cnt 的 `pl` [几魂, +N]（每次计数增加额外 +N）、`ats` / `lm`、计数来源 `tenergy`（我方每回复 10 能量 +1，不含追忆 / 新蕊 / 火种 / 愿力）；消耗生命值 `ofs`（主人身上充能型状态抵扣，遐蝶炽意）。额外回合记 `why`（触发），德谬歌只有 why = ult 的才是“此诗”。
+  - 伤害层：`poolAt(rec)`（行动时队伍持有的笑点，rec.pAt 快照；阿哈时刻按 consumed）用于火花沸腾 / 1 魂；XR 新字段 `mIn`、`self`、`flag2`、`pickEl` / `pickSt`（真珠美学底本，pickAt）、`num`（角色卡上可填次数，u.xrn）、`bgMin: "maxE"`、`cnt: "bnc"`、`upE`、`mEn`、`vE`、`pool`。知更鸟•晴歌 1 魂的记录伤害走 `r1Of`（按时间顺序把全队伤害累计一遍）。
