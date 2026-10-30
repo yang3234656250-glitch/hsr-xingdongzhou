@@ -61,6 +61,7 @@
 ## 页面结构
 
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
+- **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
 - 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 41）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。

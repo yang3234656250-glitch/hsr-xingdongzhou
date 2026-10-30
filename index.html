@@ -755,6 +755,7 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-30（面板在所有方案里共用）</b>：同一个角色（按模板认，没套模板但名字对得上的老卡也算）的<b>面板数值</b>——生命 / 攻击 / 防御、治疗加成、暴击 / 爆伤 / 增伤 / 欢愉度、充能效率、手填倍率——现在所有方案共用一份：在任何方案里改，载入别的方案时这个角色也是新数值；新套模板的卡也会直接带上。速度、星魂、光锥、遗器仍然跟着各个方案走。想让某个方案单独用一套面板：在那张卡上勾「本方案单独面板」再保存方案；取消勾选会换回共用的面板。共用面板第一次按你现在这份配置建立，并跟着当前配置一起同步到云端；载入方案、导入、恢复历史版本时都用共用面板（方案里存的旧面板只在共用面板里还没有这个角色时才用上），撤销会连面板一起撤回。方案对比也按共用面板算。行动轴和伤害的算法没变。</li>
             <li><b>2026-10-30（阿哈欢愉技的真实伤害）</b>：星神★阿哈的欢愉技【满月，是神在的时间】始终在阿哈时刻最后施放，除了 60% 欢愉伤害，还按<b>本次阿哈时刻我方非真实伤害总和的 20%</b>（4 魂 25%）造成真实伤害，由敌方全体均分（总量不变）。真实伤害不受暴击、防御、抗性等任何效果影响，所以直接 = 这次阿哈时刻里所有欢愉技（含她自己的 60%）伤害之和 × 20%；各段里本来就是真实伤害的部分不计入。悬停阿哈时刻的伤害数字能看到这一段。只加伤害，行动轴不变。</li>
             <li><b>2026-10-30（星神★阿哈按官方数据补齐，tv 41）</b>：用 nanoka.cc 4.6.54 的官方数据（技能每级参数、行迹、星魂，含 2 魂强化版的固有行迹）逐条对过。<b>行动轴</b>：① 战技是辅助技能，给出【「欢愉」令使】后<b>立即发动 1 次追加攻击</b>（算攻击、会触发队友的“追加攻击后”），战技本身不再算攻击；② 令使改成“施放战技时”给（之前写成每回合，只普攻时也会有令使），保留你选的目标；③ 行迹愚弄众神的玩笑：战技的追加攻击<b>恢复 1 个战技点</b>（之前漏了，战技实际不耗点）；④ 天赋“笑点首次达到 40 后 +1 愿力”之后的<b>我方全体暴击伤害 +40%（5 魂 44%）3 回合</b>（新触发“笑点首次达到阈值时”）。<b>伤害</b>：令使持有者欢愉度 +20%（5 魂 22%）；盒中蕴藏的世界速度 ≥125 / ≥150 欢愉度 +120% / +150%（面板已经算进去就关掉）；1 魂全队增笑 15%；4 魂计入队友好活当赏总和；倍率换成官方 15 级参数（原来是手填的平值：普攻每级 50%、终结技 500%），终结技 = 全体 200% + 5 次随机 60%，补上追加攻击 50% 和欢愉技【满月，是神在的时间】60%；3 魂普攻 +1 / 终结技 +2、5 魂战技 / 天赋 +2、欢愉技 3 / 5 魂各 +1。没建模：欢愉负债（阿哈正传、6 魂）。<b>对已有配置</b>：顺带修了迁移的一个漏洞——老存档之前只迁移到 tv 39 就停了，上一版（tv 40）8 个欢愉角色的补全对老存档没生效，这次会一起补上；带阿哈的队伍行动顺序、每轮次数都不变；阿哈每次战技战技点 +1（原来的“不足”会少很多），日志多出“第 N 次追加攻击”；伤害合计会变（模板队伍 47.6 万 → 83.4 万，主要是盒中蕴藏的世界的欢愉度）。别的队伍不变。</li>
             <li><b>2026-10-30（其余欢愉角色的说明补齐）</b>：按欢愉主的方式，把火花 / 爻光 / 真珠 / 绯英 / 银狼 / 砂金 里“代码里算了、效果列表里看不到”的部分都写成说明行：真珠的战技 15 点 / 终结技 20 点【好活当赏】、强化普攻的 15% / 60% / 240% 冰欢愉伤害；火花的强化普攻 40% / 20% + 互动陷阱 20%、终结技（60%×欢愉度 + 50%）与 48% 欢愉伤害；爻光【大吉大利】；绯英战技 16%、终结技 24% + 每次弹射 28%；银狼战技 40%；砂金战技 40% / 终结技 72%。另外把说明行改成<b>每次载入自动按模板补齐</b>（只加缺的，不删不改别的行），以后再加说明不用升版本号。只加说明，行动轴和伤害都不变（21狼11虚01爻01真 合计 783.0 万）。</li>
@@ -1198,6 +1199,28 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   const tplOf = u => DB.chars.find(c => c.id === u.tplId) || DB.chars.find(c => normName(c.name) === normName(u.name));
   // 角色的模板 id（字符串）：没套模板、但名字对得上的老角色（比如早期手动建的“银狼LV999”）也按模板认，召唤物不算
   const tidOf = u => !u ? "" : u.tplId != null && u.tplId !== "" ? String(u.tplId) : u.kind === "ally" && !u.sm ? String((tplOf(u) || {}).id || "") : "";
+  // 共享面板（2026-10-30 用户要求）：同一个角色（按模板）在所有方案里共用一份面板数值，存在 S.panels[模板id]；
+  // 卡片勾“本方案单独面板”（u.ownPanel）的不参与。u.pk = 这张卡上次对上的面板键：键变了（刚载入方案 / 刚换模板）就从面板库拉，
+  // 没变就把卡片上的数值写回面板库。速度、星魂、光锥、遗器不在里面（仍跟着方案走）。
+  const PANELF = ["hp", "atk", "def", "hb", "cr", "cd", "dmg", "el", "er", "mult"];
+  const panelKey = u => { const t = u && u.kind === "ally" && !u.sm ? tidOf(u) : ""; return t ? "t" + t : ""; };
+  function panelSync(s) {
+    s = s || S; if (!s.panels || typeof s.panels !== "object") s.panels = {};
+    const pick = u => { const o = {}; for (const f of PANELF) if (u[f] !== undefined && u[f] !== null && u[f] !== "") o[f] = JSON.parse(JSON.stringify(u[f])); return o; };
+    const L = s.units.filter(u => { const k = panelKey(u); if (!k || u.ownPanel) { delete u.pk; return false; } return true; });
+    // ① 已经对上面板的卡：和面板库不一样 = 刚被改过，写回面板库
+    for (const u of L) { const k = panelKey(u); if (u.pk === k && JSON.stringify(pick(u)) !== JSON.stringify(s.panels[k] || {})) s.panels[k] = pick(u); }
+    // ② 刚载入 / 刚换模板的卡：面板库里没有这个角色就用卡上的数值建一份
+    for (const u of L) { const k = panelKey(u); if (u.pk !== k && !s.panels[k]) s.panels[k] = pick(u); }
+    // ③ 所有卡跟面板库对齐（同一方案里有两张同一角色的卡时也一样）
+    let pulled = false;
+    for (const u of L) {
+      const k = panelKey(u), p = s.panels[k];
+      if (JSON.stringify(pick(u)) !== JSON.stringify(p)) { for (const f of PANELF) { if (p[f] !== undefined) u[f] = JSON.parse(JSON.stringify(p[f])); else delete u[f]; } pulled = true; }
+      u.pk = k;
+    }
+    return pulled;
+  }
   // 角色立绘（StarRailRes 的 character_preview，裁上半身压成小图）：套了模板、或名字对得上的角色才有
   const chImg = u => { if (u && u.img) return u.img; if (!u || u.kind !== "ally" || u.sm) return ""; const T = tplOf(u); return T && IMG.ch && IMG.ch[T.id] ? IMG.ch[T.id] : ""; };
   const avaOrDot = u => (img => img ? `<img class="ava" src="${img}" alt="" style="box-shadow:0 0 0 2px ${esc(u.color)}">` : `<span class="dot" style="background:${esc(u.color)}"></span>`)(chImg(u));
@@ -3148,6 +3171,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           <input type="range" id="sr-${u.id}" min="70" max="250" step="0.1" value="${u.spd}" data-u="${i}" data-f="spd" aria-label="速度滑块">
         </div>
         ${u.kind === "ally" && !u.sm ? `<div class="row stat-row">${STATS.map(([k, l]) => `<label for="${k}p-${u.id}" title="面板${l}：照游戏里角色面板填；没填就按基础${l}">${l} <input type="number" id="${k}p-${u.id}" min="0" step="1" value="${u[k] ?? ""}" placeholder="${u[k + "B"] ?? ""}" data-u="${i}" data-f="${k}" style="width:76px"></label>`).join("")}<label for="hb-${u.id}" title="面板上的治疗量加成：行迹、遗器、常驻的光锥效果都算在里面，照游戏面板填">治疗加成 % <input type="number" id="hb-${u.id}" min="0" step="0.1" value="${u.hb ?? ""}" placeholder="0" data-u="${i}" data-f="hb" style="width:60px"></label></div>` : ""}
+        ${panelKey(u) ? `<div class="row"><label for="op-${u.id}" title="不勾：这些面板数值在所有方案里共用，改一处所有方案都跟着变；勾上：这张卡只在这个方案里用自己的面板（取消勾选会换回共用的面板）"><input type="checkbox" id="op-${u.id}" ${u.ownPanel ? "checked" : ""} data-u="${i}" data-f="ownPanel"> 本方案单独面板</label><span class="hint">${u.ownPanel ? "只在这个方案里用" : "生命 / 攻击 / 防御、治疗加成、暴击 / 爆伤 / 增伤 / 欢愉度、充能效率、手填倍率：所有方案共用"}</span></div>` : ""}
         ${u.kind === "ally" && !u.sm ? `<div class="row dmg-row">
           <span class="lab">伤害</span>
           <label for="cr-${u.id}" title="面板暴击率，没填按 5%">暴击 % <input type="number" id="cr-${u.id}" min="0" max="100" step="0.1" value="${u.cr ?? ""}" placeholder="5" data-u="${i}" data-f="cr" style="width:58px"></label>
@@ -3396,6 +3420,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       else if (f.startsWith("xrn.")) { u.xrn = u.xrn || {}; if (String(el.value).trim() === "") delete u.xrn[f.slice(4)]; else u.xrn[f.slice(4)] = Math.max(0, Math.round(num(el.value, 0))); }
       else if (f.startsWith("mult.")) { u.mult = u.mult || {}; const mk = f.slice(5); if (String(el.value).trim() === "") delete u.mult[mk]; else u.mult[mk] = num(el.value, 0) / 100; if (!Object.keys(u.mult).length) delete u.mult; }
       else u[f] = val;
+      if (f === "ownPanel") { if (!val) delete u.ownPanel; delete u.pk; structural = true; }   // 取消单独面板 = 换回共用的面板
       if (["basicE", "skillE", "ebasicE", "fuaE", "hp", "atk", "def", "hpB", "atkB", "defB", "hb", "cr", "cd", "dmg", "el", "capE", "maxE2", "ultCost", "skillSP"].includes(f) && String(el.value).trim() === "") delete u[f];   // 清空 = 用默认 / 基础值   // 清空 = 用“每回合回能”
       if (f === "lv" && u.mon) { u.spd = u.base = monSpeed(u); structural = true; }   // 敌人等级变了，速度跟着算
       if (f === "spd") document.querySelectorAll(`[data-u="${el.dataset.u}"][data-f="spd"]`).forEach(o => { if (o !== el) o.value = val; });
@@ -3818,7 +3843,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   $("hist-list").addEventListener("click", e => {
     const b = e.target.closest("[data-hist]"); if (!b) return;
     const r = histRows[+b.dataset.hist]; if (!r) return;
-    try { const d = JSON.parse(r.cfg); beforeReplace("恢复历史版本前"); loadConfig(d); hmsg(`已恢复 ${tStr(r.ts)} 的版本（可以撤销）`); renderHist(); }
+    try { const d = JSON.parse(r.cfg); beforeReplace("恢复历史版本前"); loadConfig(d, true); hmsg(`已恢复 ${tStr(r.ts)} 的版本（可以撤销）`); renderHist(); }
     catch (err) { hmsg("恢复失败：" + err.message); }
   });
 
@@ -3827,7 +3852,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const keep = S;
     try {
       const d2 = JSON.parse(JSON.stringify(d)); migrateX(d2); migrateTpl(d2);
-      S = Object.assign(example(), d2); S.events = S.events || []; S.aha = Object.assign(defaultAha(), S.aha || {}); S.sw = Object.assign(defaultSw(), S.sw || {});
+      d2.panels = Object.assign({}, d2.panels || {}, keep.panels || {}); for (const u of d2.units) delete u.pk;   // 对比时也用共享面板
+      S = Object.assign(example(), d2); panelSync(S); S.events = S.events || []; S.aha = Object.assign(defaultAha(), S.aha || {}); S.sw = Object.assign(defaultSw(), S.sw || {});
       const R = simulate(), live = simulateSpeeds();
       const units = allUnits().filter(u => !u.sm).map(u => {
         const cyc = Array(S.cycles).fill(0);
@@ -4168,22 +4194,25 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (!(s.tv >= 41)) fixTpl41(s);
     s.tv = 41;
   }
-  function loadConfig(d) {
+  function loadConfig(d, keepPanels) {
     if (!d || !Array.isArray(d.units)) throw new Error("缺少 units 数组");
     const d2 = JSON.parse(JSON.stringify(d)); migrateX(d2); migrateTpl(d2);
+    // 载入方案 / 导入 / 恢复历史：沿用现在的共享面板（方案里存的面板只补面板库里没有的角色）；撤销、另一台设备同步过来的原样接收
+    if (keepPanels) { d2.panels = Object.assign({}, d2.panels || {}, (S && S.panels) || {}); for (const u of d2.units) delete u.pk; }
     S = Object.assign(example(), d2);
     S.events = S.events || []; S.aha = Object.assign(defaultAha(), S.aha || {}); S.sw = Object.assign(defaultSw(), S.sw || {}); S.dg = Object.assign({}, DGC, S.dg || {}); bumpIds();
     if (typeof syncDgInputs === "function") syncDgInputs();
     for (const [id, k] of Object.entries(G)) $(id).value = S[k] ?? GDEF[k];
     $("g-hpmx").value = S.hpMx === "keep" ? "keep" : "";
     $("ult-mode").value = S.ultMode === "in" ? "in" : "after";
+    panelSync(S);
     renderEditor(); update();
   }
   $("io-load").onclick = () => {
-    try { const d = JSON.parse($("io").value); beforeReplace("从文本导入前"); loadConfig(d); msg("已导入"); }
+    try { const d = JSON.parse($("io").value); beforeReplace("从文本导入前"); loadConfig(d, true); msg("已导入"); }
     catch (err) { msg("导入失败：" + err.message + "。请粘贴从这里导出的 JSON。"); }
   };
-  $("io-reset").onclick = () => { beforeReplace("恢复示例队伍前"); loadConfig(example()); msg("已恢复示例队伍"); };
+  $("io-reset").onclick = () => { beforeReplace("恢复示例队伍前"); loadConfig(example(), true); msg("已恢复示例队伍"); };
 
   // 狼主爻真: the user's own team setup (same content as 狼主爻真.json next to this page)
   const SCHEME_LANG_ZHU_YAO_ZHEN = '{"cycles":1,"c0":300,"cn":100,"zoom":1.6,"units":[{"id":"u1","name":"银狼LV999","color":"#d99a2b","kind":"ally","spd":190,"base":110,"opening":0,"effects":[{"id":"u101","trigger":"start","every":1,"type":"punch","target":"aha","value":2,"mode":"pct","duration":2}],"elation":true},{"id":"u2","name":"欢愉主","color":"#5b8def","kind":"ally","spd":175,"base":106,"opening":40,"effects":[{"id":"u129","every":1,"target":"self","mode":"pct","duration":2,"trigger":"turn","type":"punch","value":3},{"id":"u130","every":1,"target":"self","mode":"er","duration":2,"trigger":"turn","type":"energy","value":10},{"id":"u131","every":1,"target":"self","mode":"pct","duration":2,"trigger":"aha","type":"punch","value":3},{"id":"u132","every":1,"target":"self","mode":"er","duration":2,"trigger":"aha","type":"energy","value":10},{"id":"u133","every":1,"target":"u1","mode":"pct","duration":2,"trigger":"ult","type":"elskill","value":20},{"id":"u134","every":1,"target":"self","mode":"pct","duration":2,"trigger":"ult","type":"punch","value":5},{"id":"u135","trigger":"ult","every":1,"type":"spd","target":"allies","value":12,"mode":"pct","duration":1,"count":"own"}],"elation":true,"autoUlt":false,"maxE":160,"er":124.4,"turnE":30,"ultAfter":["u2#x1"]},{"id":"u3","name":"爻光","color":"#b46be0","kind":"ally","spd":192,"base":101,"opening":40,"effects":[{"id":"u117","every":1,"target":"self","mode":"pct","duration":2,"trigger":"start","type":"punch","value":3},{"id":"u118","every":1,"target":"self","mode":"pct","duration":2,"trigger":"start","type":"energy","value":30},{"id":"u119","every":1,"target":"self","mode":"pct","duration":2,"trigger":"turn","type":"punch","value":3},{"id":"u120","every":1,"target":"self","mode":"pct","duration":2,"trigger":"ult","type":"punch","value":5},{"id":"u121","every":1,"target":"self","mode":"pct","duration":2,"trigger":"ult","type":"aha","value":20},{"id":"u122","trigger":"start","every":1,"type":"energy","target":"self","value":15,"mode":"fixed","duration":2},{"id":"u123","trigger":"start","every":1,"type":"erbuff","target":"self","value":12,"mode":"pct","duration":3},{"id":"u124","trigger":"ult","every":1,"type":"erbuff","target":"self","value":12,"mode":"pct","duration":3}],"elation":true,"autoUlt":false,"maxE":180,"er":124.4,"ultAfter":["u3#1"],"turnE":30},{"id":"u4","name":"真珠","color":"#3fae8c","kind":"ally","spd":169,"base":99,"opening":40,"effects":[{"id":"u141","every":1,"target":"u1","mode":"pct","duration":2,"trigger":"start","type":"mark","value":90},{"id":"u142","every":1,"target":"ultpick","mode":"pct","duration":2,"trigger":"ult","type":"advance","value":30},{"id":"u143","every":1,"target":"ultpick","mode":"pct","duration":2,"trigger":"ult","type":"xturn","value":60},{"id":"u144","every":1,"target":"ultpick","mode":"pct","duration":2,"trigger":"ult","type":"mark","value":90},{"id":"u145","trigger":"ult","every":1,"type":"advance","target":"self","value":25,"mode":"pct","duration":2}],"elation":true,"autoUlt":false,"maxE":180,"er":124.4,"ultAfter":["u2#1"],"ultTargets":["u2"]}],"events":[],"aha":{"base":80,"k1":0.2,"k2":0.1,"k3":0.05,"k4":0.025,"opening":0,"color":"#e8457a","startPunch":5,"cap":0,"thresholds":"20,40","endPunch":true,"endPunchExtra":true},"sw":{"uid":"u1","start":0,"cap":300,"gate":60,"cost":40,"base":15,"skillPunch":5,"tierBonus":20,"sig":true,"sigPunch":20,"charges":3,"adv":100,"e1":true,"e1pct":20,"e2":true,"e2step":120,"e2when":"after","e2rev":2,"ultAfter":["u2#1#in"]},"ultWho":"u2","ultMode":"after"}';
@@ -4214,7 +4243,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const v = $("scheme").value, k = v.slice(2);
     try {
       const d = v[0] === "s" ? readSaved()[k] : SCHEMES[k](); beforeReplace(`载入方案「${k}」前`);
-      loadConfig(d); smsg(`已载入「${k}」`);
+      loadConfig(d, true); smsg(`已载入「${k}」`);
       if (v[0] === "s") $("save-name").value = k;
     } catch (err) { smsg("载入失败：" + err.message); }
   };
@@ -4250,7 +4279,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const f = e.target.files && e.target.files[0]; if (!f) return;
     const r = new FileReader();
     r.onload = () => {
-      try { const d = JSON.parse(r.result); beforeReplace(`从文件「${f.name}」导入前`); loadConfig(d); smsg(`已从「${f.name}」载入`); }
+      try { const d = JSON.parse(r.result); beforeReplace(`从文件「${f.name}」导入前`); loadConfig(d, true); smsg(`已从「${f.name}」载入`); }
       catch (err) { smsg(`「${f.name}」载入失败：${err.message}。请选择从这里导出的 JSON 文件。`); }
       e.target.value = "";
     };
@@ -4260,6 +4289,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
 
   // ---------- output ----------
   function update() {
+    if (panelSync(S)) renderEditor();   // 刚换模板的卡片从共享面板拉数值
     save();
     const io = $("io"); if (document.activeElement !== io) io.value = JSON.stringify(S);
     const R = simulate();
@@ -5528,6 +5558,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   });
   syncInfoRows(S);   // 说明行每次载入都补（不升版本号）
   if (!(S.tv >= 41)) { migrateTpl(S); lastSaved = JSON.stringify(S); }
+  { const before = JSON.stringify(S); panelSync(S); if (before === lastSaved) lastSaved = JSON.stringify(S); }   // 第一次打开新版：用现在的配置建共享面板，不算一次修改
   renderEditor();
   update();
 
