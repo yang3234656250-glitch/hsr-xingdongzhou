@@ -750,6 +750,7 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-30（银狼LV.999 强化普攻修正）</b>：之前银狼强普严重算少了，三处错：① 持有【好活当赏】时强普转成欢愉伤害，但基础值还在用攻击力，现在按 80 级欢愉基础值 7535 算。② 强普【狼尊时刻】每次固定触发 3 次【头号补给盲盒】（每次 90% 欢愉伤害由敌方全体均分，5 魂 99%；1/3 概率再多 20% 真实伤害按期望算），之前完全没算。③ “每 60 点隐藏分强普期间伤害提高原伤害的 15%（最多 2 层）”之前加在增伤里，而欢愉伤害不吃增伤；现在按原伤害倍乘，强普本身、盲盒和附加段都吃。6 魂“强普期间欢愉伤害增笑 50%”对强普里的盲盒也生效。行动顺序不变。</li>
             <li><b>2026-10-30（银狼LV.999 补全）</b>：① 终结技【头号补给盲盒】：无敌玩家结界里银狼持有【好活当赏】时，我方施放战技（消耗战技点）后触发 90% 欢愉伤害（5 魂 99%），由敌方全体均分，用银狼自己的欢愉度、好活当赏和隐藏分暴击；结界里第 1 次按 100% 触发，之后按 20% 算期望；1/3 概率的 20% 真实伤害也按期望加上。加在触发它的那次战技的伤害里，银狼卡上“额外伤害”可以勾掉。② 修正：无敌玩家结界外，银狼的欢愉技是【殿堂级操作回放】（只加隐藏分，没有伤害），之前阿哈时刻里也算了她的欢愉技伤害，现在只在结界里算【崩坏级伤害演示】。行动顺序不变。</li>
             <li><b>2026-10-30（欢愉伤害再修）</b>：① 欢愉主（两个性别）的欢愉技倍率之前写错了：“最后 60% 由敌方全体均分”被当成了对每个敌人 480%，现在按官方 8 次 × 20% 随机 + 60% 均分（共 220%）。② 欢愉技等级：官方是 3 魂、5 魂各 +1 级，之前按终结技 +2 级算，现在改了。行动顺序不变。</li>
             <li><b>2026-10-30（复查补漏：额外伤害）</b>：把所有角色的官方原文又对了一遍，补上之前完全没算的“额外伤害”——附加伤害、额外几次伤害、欢愉附加段、真实伤害。现在加在对应那一下的伤害数字里，悬停能看到每一段；角色卡“伤害”里新增“额外伤害”一栏，可以逐条勾掉（带条件的默认不勾）。① 队友给的：知更鸟【协奏】每次攻击后的附加伤害（暴击率 100%、暴伤 150%，6 魂 +450%）、缇宝结界每击中 1 个目标的附加伤害（1 魂真实伤害、2 魂 ×2.4）、刻律德菈【军功】持有者攻击后的附加伤害（6 魂 +300%）、停云【赐福】和天赋的附加伤害（4 魂 +20%）、貊泽对【猎物】的附加伤害、迷迷【声援】的 36% 真实伤害、真珠欢愉技给全队的下一次攻击欢愉附加段（按到真珠下回合，偏高）。② 自己的：火花、绯英、银狼LV.999、砂金•戏浪、真珠、欢愉主持有【好活当赏】时的欢愉附加段（之前的数值不准：绯英、银狼、欢愉主、真珠都按官方原文改了）；瓦尔特天赋（打减速敌人）和行迹审判、希露瓦天赋、虎克天赋、驭空天赋、娜塔莎 / 佩拉 / 银狼 / 艾丝妲 / 桑博 / 姬子 / 真理医生 / 刃 / 存护主 / 三月七的相关星魂。③ 补上的伤害增益：克拉拉复仇（反击 +30%）、停云止厄（普攻 +40%）、大黑塔【谜底】（按叠满）、刻律德菈 4 魂、米沙 4 魂、千冶•刃 6 魂、远坂凛 4 魂、爻光 4 魂（她终结技给的额外阿哈时刻里欢愉技 ×1.5）。④ 修了一个问题：飞霄、银枝、千冶•刃、姬子•启行、毁灭主的另一种终结技，和砂金•戏浪的强化欢愉技，之前吃不到“只对终结技 / 只对欢愉技”的增益，现在吃得到。还没做：希儿 6 魂【乱蝶】、景元 1 魂神君相邻倍率、赛飞儿记录值转成的真实伤害、知更鸟•晴歌 1 魂真实伤害、银狼LV.999 4 魂 5 倍笑点、姬子•启行助战技、昔涟 4 魂、貊泽 6 魂、阿哈时刻外施放的欢愉技（砂金•戏浪举杯）的伤害、忆灵 / 召唤物的攻击触发的这些额外伤害；击破、超击破、持续伤害本来就不算。旧配置会自动补上（tv 37）；行动顺序不变。</li>
@@ -4262,13 +4263,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const nAll = e.tg === 3 ? N : 1;                       // 群攻打所有敌人
     const nAdj = e.tg === 2 ? Math.min(2, Math.max(0, N - 1)) : e.tg === 4 ? N - 1 : 0;   // 扩散：主目标 + 最多 2 个相邻；4 = 主目标 + 其他全部
     const mult = e.v * nAll + e.adj * nAdj + e.rnd;
+    let swScoreM = 1;
     let cr = num(u.cr, 5) + D("cr"), cd = num(u.cd, 50) + D("cd"), bonus = num(u.dmg, 0) + D("dmg"), defI = D("defIg");
     // 银狼LV.999 天赋（官方原文）：每点【隐藏分】暴击率 +0.4%，暴击率达到 100% 后其余每点改为暴击伤害 +0.8%（5 魂天赋 +2 级：0.44% / 0.88%）；强化普攻每 60 点 +15%（最多 2 层）
     if (String(u.tplId) === "1506" && rec && rec.score != null) {
       const sc = num(rec.score), k1 = num(u.eid) >= 5 ? 0.44 : 0.4, k2 = num(u.eid) >= 5 ? 0.88 : 0.8;
       const need = Math.max(0, (100 - cr) / k1), used = Math.min(sc, need);
       cr += used * k1; cd += Math.max(0, sc - used) * k2;
-      if (e.key === "b2") bonus += Math.min(2, Math.floor(sc / 60)) * 15;
+      // 强化普攻：每 60 点隐藏分强化普攻期间的伤害提高原伤害的 15%，最多 2 层（乘在最后，欢愉伤害和盲盒也吃）
+      if (e.key === "b2" || rec.__eb) swScoreM = 1 + Math.min(2, Math.floor(sc / 60)) * 0.15;
     }
     // 银狼LV.999 1 魂：【无敌玩家】结界中敌方受到的伤害 +20%；6 魂：【禁限弱点】，敌方全属性弱点、基础抗性降为 0
     const SW = S.units.find(x => x.kind === "ally" && String(x.tplId) === "1506");
@@ -4288,9 +4291,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const bg = inAha ? num(rec.consumed, 0) : bangerAt(u, rec);
     elStat = Math.max(0, num(u.el, 0) + D("el"));
     punchM = 1 + 5 * bg / (bg + 240);
-    const laughB = D("lm");   // 增笑：欢愉伤害独立的一个乘区（爻光 / 真珠 / 绯英 / 银狼LV.999 / 砂金•戏浪 6 魂）
+    const laughB = rec && rec.__eb ? dsum(DB0, "lm", "b2") : D("lm");   // 强化普攻里触发的盲盒也算“强化普攻期间”   // 增笑：欢愉伤害独立的一个乘区（爻光 / 真珠 / 绯英 / 银狼LV.999 / 砂金•戏浪 6 魂）
     const elMall = (1 + elStat / 100) * punchM * (1 + laughB / 100);   // 欢愉伤害的乘区（额外一段也用它）
     const b2el = String(u.tplId) === "1506" && e.key === "b2" && bg > 0;   // 银狼：持有好活当赏时强普转欢愉伤害
+    if (b2el) base = LVBASE;   // 转成欢愉伤害后基础值按 80 级欢愉基础值，不再按攻击力
     if (e.el || b2el) elM = elMall;
     // 爻光 4 魂：爻光终结技给的额外阿哈时刻里，我方欢愉技伤害为原伤害的 150%
     const YG4 = rec && rec.uid === "aha" && rec.extra ? S.units.find(x => x.kind === "ally" && !x.sm && String(x.tplId) === "1502" && num(x.eid) >= 4 && rec.from === x.name) : null;
@@ -4317,8 +4321,14 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const mainDmg = base * mult * elM * dmgM * critM * defM * resM * vulnM * toughM;
     const oneHit = base * e.v * elM * dmgM * critM * defM * resM * vulnM * toughM;
     const xr = isLv && !e.el ? null : riderDmg(u, e, rec, DB0, { base, mainDmg, oneHit, dmgM, critM, defM, resM, vulnM, toughM, elStat, laughB, bg, inAha, nAll, nAdj });
-    const total = mainDmg + rider + yaoDmg + (xr ? xr.sum : 0);
-    return { total, xr, noPanel, panelLab: lab, buffTxt, rider, riderV, yaoN, yaoV, yaoEl, yaoDmg, bg, inAha, laughB, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
+    // 银狼LV.999 强化普攻【狼尊时刻】：每次固定触发 3 次【头号补给盲盒】（90% 欢愉伤害由敌方全体均分，1/3 概率再多 20% 真实伤害）
+    let swBox = 0;
+    if (String(u.tplId) === "1506" && e.key === "b2" && rec && !rec.__box) {
+      const ent = { v: num(dmgLv(u, "u")) >= 12 ? 0.99 : 0.9, adj: 0, rnd: 0, tg: 0, stat: "lv", el: true, key: "box", n: "头号补给盲盒", lv: dmgLv(u, "u") };
+      swBox = 3 * dmgCalc(u, ent, Object.assign({}, rec, { __box: true, __eb: true })).total * (1 + 0.2 / 3);
+    }
+    const total = (mainDmg + rider + yaoDmg + (xr ? xr.sum : 0)) * swScoreM + swBox;
+    return { total, xr, swBox, swScoreM, b2el, noPanel: noPanel && !b2el, panelLab: lab, buffTxt, rider, riderV, yaoN, yaoV, yaoEl, yaoDmg, bg, inAha, laughB, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: b2el ? "欢愉基础值（80 级）" : lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
       mult, multOne: e.v + e.rnd, v: e.v, adj: e.adj, rnd: e.rnd, adjN: nAdj, tg: e.tg, targets: nAll + nAdj, name: e.n, lv: e.lv, key: e.key };
   }
   // 一次行动的伤害；没有倍率数据（辅助 / 忆灵 / 敌人）返回 null
@@ -4431,6 +4441,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       + (r.buffTxt ? `（增益：${r.buffTxt}）` : "")
       + ` × 防御 ${fmt(r.defM, 3)} × 抗性 ${fmt(r.resM, 3)} × 易伤 ${fmt(r.vulnM, 3)} × 韧性 ${fmt(r.toughM, 2)}（${r.toughM === 1 ? "已击破" : "未击破"}，敌人 ${enemyLevel()} 级）`
       + (r.rider ? ` ＋ 好活当赏额外一段 ${fmt(r.riderV * 100, 1)}% = ${Math.round(r.rider).toLocaleString()}` : "")
+      + (r.swScoreM > 1 ? ` × 隐藏分强普增伤 ${fmt(r.swScoreM, 2)}` : "")
+      + (r.swBox ? ` ＋ 头号补给盲盒 3 次 ${Math.round(r.swBox).toLocaleString()}` : "")
       + (r.xr ? r.xr.parts.map(x => ` ＋ ${esc(x.n)} ${Math.round(x.amt).toLocaleString()}`).join("") : "")
       + (r.yaoDmg ? ` ＋ 爻光【大吉大利】${r.yaoN} 次 × ${fmt(r.yaoV * 100, 1)}%（欢愉度 ${fmt(r.yaoEl, 1)}%） = ${Math.round(r.yaoDmg).toLocaleString()}` : "")
       + ` = ${Math.round(r.total).toLocaleString()}`;
