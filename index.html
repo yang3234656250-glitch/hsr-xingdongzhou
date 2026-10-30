@@ -753,6 +753,7 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-30（好活当赏 / 老配置里的银狼）</b>：① 早期手动建的角色（比如方案里的“银狼LV999”，没有套模板）之前只在倍率上认出了模板，银狼的强化普攻转欢愉伤害、隐藏分暴击、头号补给盲盒、天赋欢愉附加段、星魂这些按模板判断的伤害规则都没生效，所以强普一直按攻击力算；现在名字对得上的角色也按模板认（所有按角色判断的伤害规则都改了）。② 【好活当赏】按官方原文“阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续 2 回合，各个【好活当赏】的持续时间各自独立计算”核对：之前同一时刻连续的几个回合（银狼 2 魂的额外回合）会被一起算成过期，现在按行动先后数回合；补上银狼LV.999 2 魂“进入【无敌玩家】后自身所有增益效果延长 1 回合”对【好活当赏】的延长。额外回合也算持有者的回合。只影响伤害，行动轴不变。</li>
             <li><b>2026-10-30（记忆 / 欢愉角色按游戏原文全面补齐）</b>：把所有记忆、欢愉角色的技能 / 天赋 / 行迹 / 星魂 / 秘技逐条对照官方文本，缺的都补上，<b>会改变行动轴</b>的有：
               阿格莱雅（至高之姿获得衣匠的速度层数，每层 +15%；织运之竭衣匠消失只保留 1 层；4 魂阿格莱雅攻击也给衣匠叠层、上限 7 层；飞驰之阳开局能量不足 50% 补到 50%）；
               遐蝶（2 魂【炽意】2 层抵扣焰息的生命值消耗，下一次强化战技 +30% 新蕊）；
@@ -1186,6 +1187,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   // 当前角色对应的资料：套过模板就按模板，否则按名字对（忽略点和空格）
   const normName = s => String(s || "").replace(/[.\s]/g, "");
   const tplOf = u => DB.chars.find(c => c.id === u.tplId) || DB.chars.find(c => normName(c.name) === normName(u.name));
+  // 角色的模板 id（字符串）：没套模板、但名字对得上的老角色（比如早期手动建的“银狼LV999”）也按模板认，召唤物不算
+  const tidOf = u => !u ? "" : u.tplId != null && u.tplId !== "" ? String(u.tplId) : u.kind === "ally" && !u.sm ? String((tplOf(u) || {}).id || "") : "";
   // 角色立绘（StarRailRes 的 character_preview，裁上半身压成小图）：套了模板、或名字对得上的角色才有
   const chImg = u => { if (u && u.img) return u.img; if (!u || u.kind !== "ally" || u.sm) return ""; const T = tplOf(u); return T && IMG.ch && IMG.ch[T.id] ? IMG.ch[T.id] : ""; };
   const avaOrDot = u => (img => img ? `<img class="ava" src="${img}" alt="" style="box-shadow:0 0 0 2px ${esc(u.color)}">` : `<span class="dot" style="background:${esc(u.color)}"></span>`)(chImg(u));
@@ -1434,7 +1437,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       : (src.startPick && U.some(x => x.id === src.startPick) ? src.startPick : pickTarget(src, 1, U));
     // 绯英天赋：获得【好活当赏】时同步获得等值的能量（单次最多 100 点）；这里只算阿哈时刻结束时按计入笑点获得的那一份
     const BSYNC = "天赋：获得好活当赏时同步获得等量能量";
-    const bangSync = n => { for (const u of U) if (u.kind === "ally" && !u.gone && u.elation && String(u.tplId) === "1505" && n > 0) { curWhy = BSYNC; addEnergy(u, Math.min(100, n), false); } };
+    const bangSync = n => { for (const u of U) if (u.kind === "ally" && !u.gone && u.elation && tidOf(u) === "1505" && n > 0) { curWhy = BSYNC; addEnergy(u, Math.min(100, n), false); } };
     // extra turns given to 欢愉 allies, with punchlines that exist only during that turn
     const pendingX = [];
     // buffs last N of the caster's turns. Applied during its own turn, that turn counts as the first;
@@ -1690,7 +1693,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (a == null) return; const H = ownerOf(src), k = H ? H.id : "ev"; healTot[k] = (healTot[k] || 0) + a; healAcc[k] = (healAcc[k] || 0) + a;
       // 昔涟献予「天空」之诗：风堇持有【献予「天空」之诗】时，计入小伊卡忆灵技的治疗数值额外 +本次治疗数值的 72%（昔涟 3 魂 79.2%）
       const sk = H && H.st && H.st["献予「天空」之诗"];
-      if (sk && sk.left > 0) { const C = U.find(x => String(x.tplId) === "1415" && !x.sm); healAcc[k] += a * (C && num(C.eid) >= 3 ? 0.792 : 0.72); }
+      if (sk && sk.left > 0) { const C = U.find(x => tidOf(x) === "1415" && !x.sm); healAcc[k] += a * (C && num(C.eid) >= 3 ? 0.792 : 0.72); }
     };
     const doHeal = (eff, src, srcColor) => {
       const group = ["allies", "others", "exown", "exevt", "elothers"].includes(eff.target);
@@ -3134,8 +3137,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
             <div class="row">${[["b", "普攻"], ["b2", "强普"], ["s", "战技"], ["u", "终结技"], ["e", "欢愉技"], ["f", "追击"]].map(([k, l]) => { const e = dmgEntry(u, k); return `<label for="mt-${k}-${u.id}">${l} <input type="number" id="mt-${k}-${u.id}" min="0" step="1" value="${u.mult && u.mult[k] != null ? fmt(num(u.mult[k]) * 100, 2) : e ? fmt(e.v * 100, 2) : ""}" placeholder="—" data-u="${i}" data-f="mult.${k}" style="width:64px">%</label>`; }).join("")}</div>
             <p class="hint">官方技能参数（普攻 6 级、战技 / 终结技 10 级，3 / 5 魂自动 +2）：留空 = 用官方值，填了就用你填的。倍率 = 对主目标的总倍率（多段已合并，「相邻 / 其他目标」不算）。</p>
           </details>
-          ${(XR[String(u.tplId)] || []).length ? `<details class="dmg-mult"><summary>额外伤害 ${(XR[String(u.tplId)] || []).filter(r => num(u.eid) >= num(r.e) && xrOn(u, r)).length} 条</summary>
-            <div style="display:flex;flex-direction:column;gap:4px">${XR[String(u.tplId)].map(r => `<label for="xr-${r.k}-${u.id}" style="${num(u.eid) < num(r.e) ? "opacity:.5" : ""}"><input type="checkbox" id="xr-${r.k}-${u.id}" data-u="${i}" data-f="xr.${r.k}" ${xrOn(u, r) ? "checked" : ""}> ${esc(r.n)}${num(r.e) ? `（${r.e} 魂起）` : ""}</label>${r.num ? `<label for="xrn-${r.k}-${u.id}" style="margin-left:22px">${esc(r.num[0])} <input type="number" id="xrn-${r.k}-${u.id}" min="0" max="${num(r.num[2], 99)}" step="1" value="${xrN(u, r)}" data-u="${i}" data-f="xrn.${r.k}" style="width:56px"></label>` : ""}`).join("")}</div>
+          ${(XR[tidOf(u)] || []).length ? `<details class="dmg-mult"><summary>额外伤害 ${(XR[tidOf(u)] || []).filter(r => num(u.eid) >= num(r.e) && xrOn(u, r)).length} 条</summary>
+            <div style="display:flex;flex-direction:column;gap:4px">${XR[tidOf(u)].map(r => `<label for="xr-${r.k}-${u.id}" style="${num(u.eid) < num(r.e) ? "opacity:.5" : ""}"><input type="checkbox" id="xr-${r.k}-${u.id}" data-u="${i}" data-f="xr.${r.k}" ${xrOn(u, r) ? "checked" : ""}> ${esc(r.n)}${num(r.e) ? `（${r.e} 魂起）` : ""}</label>${r.num ? `<label for="xrn-${r.k}-${u.id}" style="margin-left:22px">${esc(r.num[0])} <input type="number" id="xrn-${r.k}-${u.id}" min="0" max="${num(r.num[2], 99)}" step="1" value="${xrN(u, r)}" data-u="${i}" data-f="xrn.${r.k}" style="width:56px"></label>` : ""}`).join("")}</div>
             <p class="hint">附加伤害、额外几次伤害、欢愉附加段、真实伤害，加在对应那一下的伤害数字里（悬停能看到）。按官方原文，条件写在每条后面；不满足的取消勾选。</p>
           </details>` : ""}
         </div>` : ""}
@@ -4341,7 +4344,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const allies = S.units.filter(x => x.kind === "ally" && !x.sm);
     const elN = allies.filter(x => x.elation).length;
     for (const o of allies) {
-      const L = XR[String(o.tplId)]; if (!L) continue;
+      const L = XR[tidOf(o)]; if (!L) continue;
       for (const r of L) {
         if (r.kind === "swbox" || num(o.eid) < num(r.e) || !xrOn(o, r)) continue;
         const who = r.who || "self";
@@ -4393,7 +4396,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     }
     // 银狼LV.999 终结技【头号补给盲盒】：无敌玩家结界里我方每消耗 1 个战技点（这里按施放战技）按概率触发，
     // 第 1 次 100%，成功后降到 20%（这里结界里之后的每次按 20% 期望）；用银狼自己的欢愉度 / 好活当赏 / 隐藏分暴击
-    const SWU = allies.find(x => String(x.tplId) === "1506");
+    const SWU = allies.find(x => tidOf(x) === "1506");
     const box = SWU && (XR["1506"] || []).find(r => r.k === "box");
     if (box && xrOn(SWU, box) && rec.act === "skill" && !rec.__box && R_REF && bangerAt(SWU, rec) > 0) {
       const sp = R_REF.spans.find(z => rec.t >= z.a - 1e-9 && rec.t <= z.b + 1e-9);
@@ -4427,9 +4430,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     let mult = e.v * nAll + e.adj * nAdj + e.rnd;
     let swScoreM = 1;
     // 火花互动陷阱：每发动 1 次，强化普攻对主目标倍率 +20%、相邻 +10%（次数在“额外伤害”里填；自己改了强普倍率就不加）
-    if (String(u.tplId) === "1501" && e.key === "b2" && !(u.mult && u.mult.b2 != null)) { const tr = (XR["1501"] || []).find(r => r.k === "trap"), k = tr ? xrN(u, tr) : 1; mult += k * (0.2 * nAll + 0.1 * nAdj); }
+    if (tidOf(u) === "1501" && e.key === "b2" && !(u.mult && u.mult.b2 != null)) { const tr = (XR["1501"] || []).find(r => r.k === "trap"), k = tr ? xrN(u, tr) : 1; mult += k * (0.2 * nAll + 0.1 * nAdj); }
     // 砂金•戏浪【All in！】：每消耗 1 点热意额外 1 次（欢愉技倍率 × 35%）随机单体欢愉伤害；6 魂阿哈时刻外的 All in 不消耗热意，按当时的热意
-    if (String(u.tplId) === "1513" && e.key === "e" && rec && R_REF) {
+    if (tidOf(u) === "1513" && e.key === "e" && rec && R_REF) {
       let heat = 0;
       if (rec.uid === "aha" && !rec.outAha) { const hm = R_REF.marks.find(m => m.uid === u.id && m.heat != null && Math.abs(m.t - rec.t) < 1e-9); heat = hm ? num(hm.heat) : 0; }
       else if (rec.outAha && num(u.eid) >= 6 && num(rec.elN) >= 2) heat = num(rec.hc);
@@ -4437,9 +4440,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     }
     let cr = num(u.cr, 5) + D("cr"), cd = num(u.cd, 50) + D("cd"), bonus = num(u.dmg, 0) + D("dmg"), defI = D("defIg");
     // 阿格莱雅 6 魂：至高之姿时（连携攻击就是孤锋千吻），阿格莱雅或衣匠速度高于 160 / 240 / 320 时其造成的连携攻击伤害 +10% / 30% / 60%（两人各占一半倍率）
-    if (String(u.tplId) === "1402" && e.key === "b2" && num(u.eid) >= 6 && rec) { const f = sp => sp > 320 ? 60 : sp > 240 ? 30 : sp > 160 ? 10 : 0, fa = f(num(rec.spd)), fg = f(num(rec.mSpd)); bonus += (fa + fg) / 2; }
+    if (tidOf(u) === "1402" && e.key === "b2" && num(u.eid) >= 6 && rec) { const f = sp => sp > 320 ? 60 : sp > 240 ? 30 : sp > 160 ? 10 : 0, fa = f(num(rec.spd)), fg = f(num(rec.mSpd)); bonus += (fa + fg) / 2; }
     // 银狼LV.999 天赋（官方原文）：每点【隐藏分】暴击率 +0.4%，暴击率达到 100% 后其余每点改为暴击伤害 +0.8%（5 魂天赋 +2 级：0.44% / 0.88%）；强化普攻每 60 点 +15%（最多 2 层）
-    if (String(u.tplId) === "1506" && rec && rec.score != null) {
+    if (tidOf(u) === "1506" && rec && rec.score != null) {
       const sc = num(rec.score), k1 = num(u.eid) >= 5 ? 0.44 : 0.4, k2 = num(u.eid) >= 5 ? 0.88 : 0.8;
       const need = Math.max(0, (100 - cr) / k1), used = Math.min(sc, need);
       cr += used * k1; cd += Math.max(0, sc - used) * k2;
@@ -4447,16 +4450,16 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (e.key === "b2" || rec.__eb) swScoreM = 1 + Math.min(2, Math.floor(sc / 60)) * 0.15;
     }
     // 银狼LV.999 1 魂：【无敌玩家】结界中敌方受到的伤害 +20%；6 魂：【禁限弱点】，敌方全属性弱点、基础抗性降为 0
-    const SW = S.units.find(x => x.kind === "ally" && String(x.tplId) === "1506");
+    const SW = S.units.find(x => x.kind === "ally" && tidOf(x) === "1506");
     const swE = SW ? num(SW.eid) : 0, inWx = swE >= 1 && R_REF && rec && R_REF.spans.some(sp => rec.t >= sp.a - 1e-9 && rec.t <= sp.b + 1e-9);
     // 火花行迹沸腾！真伪调色盘：当前每有 1 个笑点我方全体暴伤 +8%（最多 80%）；1 魂：每个笑点全属性抗性穿透 +1.5%（最多 15%）
-    const SPK = rec ? S.units.find(x => x.kind === "ally" && !x.sm && String(x.tplId) === "1501") : null;
+    const SPK = rec ? S.units.find(x => x.kind === "ally" && !x.sm && tidOf(x) === "1501") : null;
     let spkPen = 0;
     if (SPK) { const P = poolAt(rec); cd += Math.min(80, 8 * P); if (num(SPK.eid) >= 1) spkPen = Math.min(15, 1.5 * P); }
     // 昔涟献予「律法」之诗：持有【军功】的角色暴击伤害 +30%
     if (DB0.some(x => x[0] === "rx" && x[1] === "cer") && DB0.some(x => x[0] === "rx" && x[1] === "law")) cd += 30;
     // 星神★阿哈 固有行迹：欢愉万相期间暴击率 +12%（2 魂 +20%），造成的伤害无视 30%（2 魂 60%）防御力
-    if (String(u.tplId) === "1511" && rec && rec.wx) { cr += num(u.eid) >= 2 ? 20 : 12; defI = num(u.eid) >= 2 ? 60 : 30; }
+    if (tidOf(u) === "1511" && rec && rec.wx) { cr += num(u.eid) >= 2 ? 20 : 12; defI = num(u.eid) >= 2 ? 60 : 30; }
     const critM = 1 + Math.min(1, Math.max(0, cr) / 100) * Math.max(0, cd) / 100;
     const defM = 100 / (100 + (enemyLevel() + 20) * Math.max(0, 1 - (num(cfg.defR) + ED("defRed")) / 100 - defI / 100));
     const res = cfg.weak || swE >= 6 ? 0 : num(cfg.res);
@@ -4469,25 +4472,25 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const inAha = !!(rec && rec.uid === "aha" && e.key === "e");
     let bg = inAha ? num(rec.consumed, 0) : bangerAt(u, rec);
     // 银狼LV.999 4 魂：【崩坏级伤害演示】（无敌玩家结界里的欢愉技）额外计入 5 倍的笑点（这里按共 6 倍）
-    if (inAha && String(u.tplId) === "1506" && num(u.eid) >= 4) bg *= 6;
+    if (inAha && tidOf(u) === "1506" && num(u.eid) >= 4) bg *= 6;
     // 火花 6 魂：欢愉技每计入 1 个笑点额外伤害次数 +1，最多加到 40 次（基础 20 次）
-    if (inAha && String(u.tplId) === "1501" && num(u.eid) >= 6 && e.rnd > 0) mult += Math.min(20, num(rec.consumed, 0)) * e.rnd / 20;
+    if (inAha && tidOf(u) === "1501" && num(u.eid) >= 6 && e.rnd > 0) mult += Math.min(20, num(rec.consumed, 0)) * e.rnd / 20;
     // 绯英行迹瞰众乐：敌人 ≥3 / 2 / 1 个时终结技弹射次数 +1 / +2 / +4（每次和原来的弹射一样）
-    if (String(u.tplId) === "1505" && e.key === "u" && e.rnd > 0) { const N0 = enemyCount(); mult += e.rnd / 5 * (N0 >= 3 ? 1 : N0 === 2 ? 2 : 4); }
+    if (tidOf(u) === "1505" && e.key === "u" && e.rnd > 0) { const N0 = enemyCount(); mult += e.rnd / 5 * (N0 >= 3 ? 1 : N0 === 2 ? 2 : 4); }
     elStat = Math.max(0, num(u.el, 0) + D("el"));
     // 火花终结技：倍率 =（0.6 × 欢愉度 + 50%）攻击力（5 魂 0.54 / 0.6 里的系数按官方：0.6 不变，基础 50% → 54%）
-    if (String(u.tplId) === "1501" && e.key === "u") mult += 0.6 * elStat / 100 * nAll;
+    if (tidOf(u) === "1501" && e.key === "u") mult += 0.6 * elStat / 100 * nAll;
     punchM = 1 + 5 * bg / (bg + 240);
     let laughB = rec && rec.__eb ? dsum(DB0, "lm", "b2") : D("lm");
     // 绯英 6 魂：每持有 100 点【好活当赏】额外增笑 2%，最多计入 1000 点
-    if (String(u.tplId) === "1505" && num(u.eid) >= 6) laughB += 2 * Math.floor(Math.min(1000, bg) / 100);
+    if (tidOf(u) === "1505" && num(u.eid) >= 6) laughB += 2 * Math.floor(Math.min(1000, bg) / 100);
     // 增笑：欢愉伤害独立的一个乘区（爻光 / 真珠 / 绯英 / 银狼LV.999 / 砂金•戏浪 6 魂）；强化普攻里触发的盲盒也算“强化普攻期间”
     const elMall = (1 + elStat / 100) * punchM * (1 + laughB / 100);   // 欢愉伤害的乘区（额外一段也用它）
-    const b2el = String(u.tplId) === "1506" && e.key === "b2" && bg > 0;   // 银狼：持有好活当赏时强普转欢愉伤害
+    const b2el = tidOf(u) === "1506" && e.key === "b2" && bg > 0;   // 银狼：持有好活当赏时强普转欢愉伤害
     if (b2el) base = LVBASE;   // 转成欢愉伤害后基础值按 80 级欢愉基础值，不再按攻击力
     if (e.el || b2el) elM = elMall;
     // 爻光 4 魂：爻光终结技给的额外阿哈时刻里，我方欢愉技伤害为原伤害的 150%
-    const YG4 = rec && rec.uid === "aha" && rec.extra ? S.units.find(x => x.kind === "ally" && !x.sm && String(x.tplId) === "1502" && num(x.eid) >= 4 && rec.from === x.name) : null;
+    const YG4 = rec && rec.uid === "aha" && rec.extra ? S.units.find(x => x.kind === "ally" && !x.sm && tidOf(x) === "1502" && num(x.eid) >= 4 && rec.from === x.name) : null;
     if (YG4 && e.key === "e") elM *= 1.5;
     const dmgM = (e.el || isLv || b2el) ? 1 : 1 + bonus / 100;
     const toughM = cfg.broken ? 1 : 0.9;   // 韧性条没破：伤害 ×0.9
@@ -4500,7 +4503,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     // 爻光天赋【大吉大利】：爻光持有【好活当赏】时，我方目标施放攻击后对随机 1 个击中的目标额外造成 1 次天赋倍率的欢愉伤害，
     // 这次攻击消耗战技点（施放战技）再触发 1 次；攻击者欢愉度低于爻光时按爻光的欢愉度。笑点区按攻击者自己的【好活当赏】
     let yaoN = 0, yaoV = 0, yaoDmg = 0, yaoEl = 0;
-    const YG = rec && !isLv ? S.units.find(x => x.kind === "ally" && !x.sm && String(x.tplId) === "1502") : null;
+    const YG = rec && !isLv ? S.units.find(x => x.kind === "ally" && !x.sm && tidOf(x) === "1502") : null;
     if (YG && !rec.__box && (e.key !== "e" || rec.uid === "aha") && bangerAt(YG, rec) > 0) {
       yaoN = rec.act === "skill" && rec.uid === u.id ? 2 : 1;
       yaoV = [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.1625, 0.175, 0.1875, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25][dmgLv(YG, "f") - 1] || 0.2;
@@ -4515,7 +4518,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const xr = isLv && !e.el ? null : riderDmg(u, e, rec, DB0, { base, mainDmg, oneHit, dmgM, critM, defM, resM, vulnM, toughM, elStat, laughB, bg, inAha, nAll, nAdj });
     // 银狼LV.999 强化普攻【狼尊时刻】：每次固定触发 3 次【头号补给盲盒】（90% 欢愉伤害由敌方全体均分，1/3 概率再多 20% 真实伤害）
     let swBox = 0;
-    if (String(u.tplId) === "1506" && e.key === "b2" && rec && !rec.__box) {
+    if (tidOf(u) === "1506" && e.key === "b2" && rec && !rec.__box) {
       const ent = { v: num(dmgLv(u, "u")) >= 12 ? 0.99 : 0.9, adj: 0, rnd: 0, tg: 0, stat: "lv", el: true, key: "box", n: "头号补给盲盒", lv: dmgLv(u, "u") };
       swBox = 3 * dmgCalc(u, ent, Object.assign({}, rec, { __box: true, __eb: true })).total * (1 + 0.2 / 3);
     }
@@ -4574,7 +4577,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (sc.boom && R_REF) {
           const on = R_REF.marks.filter(m => m.uid === u.id && m.label === "登场" && m.t <= a.t + 1e-9).pop();
           const om = on && R_REF.marks.find(m => m.uid === o.id && m.ovf != null && Math.abs(m.t - on.t) < 1e-9);
-          const C = S.units.find(x => String(x.tplId) === "1415" && !x.sm), k = C && num(C.eid) >= 3 ? [0.0026, 0.0053] : [0.0024, 0.0048];
+          const C = S.units.find(x => tidOf(x) === "1415" && !x.sm), k = C && num(C.eid) >= 3 ? [0.0026, 0.0053] : [0.0024, 0.0048];
           if (om) wAdd = num(om.ovf) * (k[0] + (enemyCount() <= 2 ? k[1] : 0));
         }
         e = { v, rnd: sc.boom ? (pv(sp.wing) + wAdd) * wn * f(sc.n) : 0, tg: 3 };
@@ -4609,7 +4612,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         let acc = 0;
         for (const z of ev) {
           const w = z.x && by[z.x.uid];
-          if (w && w.sm && w.sm.key === "band" && byId0(w.sm.owner) && String(byId0(w.sm.owner).tplId) === "1512") { M.set(z.x.seq, acc * (0.11 + 0.001 * num(z.x.oc))); acc *= 0.5; }
+          if (w && w.sm && w.sm.key === "band" && byId0(w.sm.owner) && tidOf(byId0(w.sm.owner)) === "1512") { M.set(z.x.seq, acc * (0.11 + 0.001 * num(z.x.oc))); acc *= 0.5; }
           const d = z.f(); if (d) acc += d.total;
         }
       } finally { R.__r1busy = false; }
@@ -4634,14 +4637,14 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   // 阿哈时刻外施放的欢愉技（砂金•戏浪举杯、欢愉主终结技让队友施放的）：笑点区按这次固定计入的笑点
   function elskDmgOf(m, u) {
     if (!m || !u || u.kind !== "ally" || u.elDmg === "no") return null;
-    if (String(u.tplId) === "1506" && !(R_REF && R_REF.spans.some(sp => m.t >= sp.a - 1e-9 && m.t <= sp.b + 1e-9))) return null;   // 银狼结界外的欢愉技没有伤害
+    if (tidOf(u) === "1506" && !(R_REF && R_REF.spans.some(sp => m.t >= sp.a - 1e-9 && m.t <= sp.b + 1e-9))) return null;   // 银狼结界外的欢愉技没有伤害
     const e = dmgEntry(u, "e"); if (!e) return null;
     const elN = R_REF ? R_REF.actions.filter(a => a.uid === "aha" && a.t < m.t - 1e-9).length + R_REF.marks.filter(x => x.elv && x.uid === u.id && (x.t < m.t - 1e-9 || (Math.abs(x.t - m.t) < 1e-9 && num(x.seq) < num(m.seq)))).length : 0;   // 这之前已经施放过几次欢愉技
     return dmgCalc(u, e, Object.assign({}, m, { uid: "aha", consumed: m.elv, dbAll: { [u.id]: m.db || [] }, outAha: true, elN }));
   }
   // 一次开大的伤害（银狼的终结技本身不造成伤害）
   function ultDmgOf(m, u) {
-    if (!u || String(u.tplId) === "1506") return null;
+    if (!u || tidOf(u) === "1506") return null;
     const e = dmgEntry(u, "u"); if (!e) return null;
     return dmgCalc(u, e, Object.assign({}, m));
   }
@@ -4661,7 +4664,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     for (const u of allUnits()) {
       if (u.kind !== "ally" || u.sm || !u.elation || u.elDmg === "no") continue;
       // 银狼LV.999：无敌玩家外的欢愉技是【殿堂级操作回放】（只加隐藏分，没有伤害），结界里才是【崩坏级伤害演示】
-      if (String(u.tplId) === "1506" && !(R_REF && R_REF.spans.some(sp => a.t >= sp.a - 1e-9 && a.t <= sp.b + 1e-9))) continue;
+      if (tidOf(u) === "1506" && !(R_REF && R_REF.spans.some(sp => a.t >= sp.a - 1e-9 && a.t <= sp.b + 1e-9))) continue;
       const e = dmgEntry(u, "e"); if (!e) continue;
       const r = dmgCalc(u, e, a);
       if (r.total > 0) parts.push({ u, r });
@@ -4731,13 +4734,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (!R) return [];
     R.__bang = R.__bang || {};
     if (R.__bang[u.id]) return R.__bang[u.id];
-    const times = R.actions.filter(a => a.uid === u.id && (a.turn || a.extra)).map(a => a.t);
+    const turns = R.actions.filter(a => a.uid === u.id && (a.turn || a.extra)).map(a => ({ t: a.t, s: num(a.seq) }));
     // 持续 3 个自己的回合；爻光行迹鸿运鳞集、砂金•戏浪天赋 +1，绯英 6 魂 +1；真珠的持续时间无限（最多 50 点）
     const tp = String((tplOf(u) || {}).id || ""), durN = tp === "1503" ? Infinity : 3 + (tp === "1502" || tp === "1513" ? 1 : 0) + (tp === "1505" && num(u.eid) >= 6 ? 1 : 0);
-    const expOf = t => { if (!isFinite(durN)) return Infinity; const af = times.filter(x => x > t + 1e-9); return af.length >= durN ? af[durN - 1] : Infinity; };
-    const g = [{ amt: 20, from: -1e9, seq: -1e9, exp: expOf(-1e9) }];   // 进战 +20
+    // 官方：【好活当赏】持续 2 回合（按持有者自己的回合，额外回合也算），各条独立计时。这里记成“第 durN 个回合开始时失效”（durN = 2 + 1）；
+    // sq = 获得时那一刻的行动序号：同一时刻、排在它后面的回合也算“之后的回合”（不知道序号的只算更晚时刻的回合）
+    const ex = (t, sq) => { if (!isFinite(durN)) return { exp: Infinity, expS: null }; const af = turns.filter(x => x.t > t + 1e-9 || (sq != null && Math.abs(x.t - t) < 1e-9 && x.s > sq)); return af.length >= durN ? { exp: af[durN - 1].t, expS: af[durN - 1].s } : { exp: Infinity, expS: null }; };
+    const g = [{ amt: 20, from: -1e9, seq: -1e9, ...ex(-1e9) }];   // 进战 +20
     for (const a of R.actions) {
-      if (a.uid === "aha" && num(a.consumed, 0) > 0) g.push({ amt: num(a.consumed, 0), from: a.t, seq: a.seq, exp: expOf(a.t) });
+      if (a.uid === "aha" && num(a.consumed, 0) > 0) g.push({ amt: num(a.consumed, 0), from: a.t, seq: a.seq, ...ex(a.t, num(a.seq)) });
     }
     const elN = allUnits().filter(x => x.kind === "ally" && x.elation && !x.sm).length;
     for (const src of allUnits()) {
@@ -4761,18 +4766,18 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const T = tplOf(u), BG = T ? BGR[String(T.id)] : null, tid = T ? String(T.id) : "";
     const allies = allUnits().filter(x => x.kind === "ally" && !x.sm);
     // 欢愉主终结技：目标拥有欢愉技时额外获得 10 点【好活当赏】（1 魂：之前每次施放战技 +2，最多 3 层）
-    for (const src of allies) if (["8009", "8010"].includes(String(src.tplId))) {
+    for (const src of allies) if (["8009", "8010"].includes(tidOf(src))) {
       for (const m of R.ultMarks) {
         if (m.uid !== src.id || m.target !== u.id || !u.elation) continue;
         let amt = 10;
         if (num(src.eid) >= 1) { const prevU = R.ultMarks.filter(x => x.uid === src.id && x.t < m.t - 1e-9).map(x => x.t).pop() ?? -1e9; amt += 2 * Math.min(3, R.actions.filter(a => a.uid === src.id && a.act === "skill" && a.t > prevU && a.t <= m.t + 1e-9).length); }
-        g.push({ amt, from: m.t, seq: num(m.seq, 0) + 0.25, exp: expOf(m.t) });
+        g.push({ amt, from: m.t, seq: num(m.seq, 0) + 0.25, ...ex(m.t, m.seq != null ? num(m.seq) + 0.25 : null) });
       }
     }
     // 欢愉主行迹阿哈咬它！：我方施放欢愉技后，下一次施放战技时额外 +2
     if (["8009", "8010"].includes(tid)) {
       let armed = false; const ev = R.actions.filter(a => a.uid === "aha" || (a.uid === u.id && a.act === "skill")).sort((p, q) => p.t - q.t || num(p.seq) - num(q.seq));
-      for (const a of ev) { if (a.uid === "aha") armed = true; else if (armed) { armed = false; g.push({ amt: 2, from: a.t, seq: a.seq + 0.6, exp: expOf(a.t) }); } }
+      for (const a of ev) { if (a.uid === "aha") armed = true; else if (armed) { armed = false; g.push({ amt: 2, from: a.t, seq: a.seq + 0.6, ...ex(a.t, num(a.seq) + 0.6) }); } }
     }
     // 真珠行迹感知容差：我方目标回合开始时 +5（真珠两个回合之间最多 50）
     if (tid === "1503") {
@@ -4786,18 +4791,18 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     }
     // 砂金•戏浪行迹纵享惊涛（队伍里只有她 1 名欢愉角色）：队友施放攻击后 +2
     if (tid === "1513" && allies.filter(x => x.elation).length <= 1) {
-      for (const a of R.actions) { const w = allUnits().find(x => x.id === a.uid); if (w && w.kind === "ally" && w !== u && a.act && (a.turn || a.extra)) g.push({ amt: 2, from: a.t, seq: a.seq + 0.5, exp: expOf(a.t) }); }
+      for (const a of R.actions) { const w = allUnits().find(x => x.id === a.uid); if (w && w.kind === "ally" && w !== u && a.act && (a.turn || a.extra)) g.push({ amt: 2, from: a.t, seq: a.seq + 0.5, ...ex(a.t, num(a.seq) + 0.5) }); }
     }
     // 绯英天赋：获得能量时同步获得等值的【好活当赏】（单次最多 100）；E1 狐狸老师攻击后的欢愉技 +10
     if (tid === "1505") {
-      for (const x of (R.eH && R.eH[u.id]) || []) if (x.d > 0 && x.why !== "天赋：获得好活当赏时同步获得等量能量") g.push({ amt: Math.min(100, x.d), from: x.t, seq: -1e9, exp: expOf(x.t) });
-      if (num(u.eid) >= 1) for (const m of R.marks) if (m.uid === u.id && /追击/.test(m.label)) g.push({ amt: 10 + 5, from: m.t, seq: num(m.seq, 0) + 0.5, exp: expOf(m.t) });
+      for (const x of (R.eH && R.eH[u.id]) || []) if (x.d > 0 && x.why !== "天赋：获得好活当赏时同步获得等量能量") g.push({ amt: Math.min(100, x.d), from: x.t, seq: -1e9, ...ex(x.t) });
+      if (num(u.eid) >= 1) for (const m of R.marks) if (m.uid === u.id && /追击/.test(m.label)) g.push({ amt: 10 + 5, from: m.t, seq: num(m.seq, 0) + 0.5, ...ex(m.t, m.seq != null ? num(m.seq) + 0.5 : null) });
       // 行迹瞰众乐（参演编号在她前面的队友获得时 50%）/ 开不败（队友持有的好活当赏结束时 50%）；2 魂额外 +50% / +100%
       const me = allies.indexOf(u), k1 = num(u.eid) >= 2 ? 0.75 : 0.5, k2 = num(u.eid) >= 2 ? 1 : 0.5;
       for (const w of allies) if (w !== u && w.elation) for (const x of bangGrants(w, R)) {
         if (x.xfer) continue;
-        if (allies.indexOf(w) < me) g.push({ amt: x.amt * k1, from: x.from, seq: x.seq + 0.1, exp: expOf(x.from), xfer: true });
-        if (isFinite(x.exp)) { const at = allUnits().length && R.actions.find(a => Math.abs(a.t - x.exp) < 1e-9); g.push({ amt: x.amt * k2, from: x.exp, seq: at ? at.seq + 0.1 : 0, exp: expOf(x.exp), xfer: true }); }
+        if (allies.indexOf(w) < me) g.push({ amt: x.amt * k1, from: x.from, seq: x.seq + 0.1, ...ex(x.from, isFinite(x.seq) ? x.seq + 0.1 : null), xfer: true });
+        if (isFinite(x.exp)) { const sq = x.expS != null ? x.expS - 0.1 : 0; g.push({ amt: x.amt * k2, from: x.exp, seq: sq, ...ex(x.exp, sq), xfer: true }); }
       }
     }
     if (BG) for (const a of R.actions) {
@@ -4805,7 +4810,13 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const k = dmgKey(a, u), arr = k === "b" || k === "b2" ? BG.b : k === "s" || k === "s2" ? BG.s : k === "u" ? BG.u : k === "e" ? BG.e : null;
       if (!arr || !arr.length) continue;
       const v = arr[Math.max(0, Math.min(arr.length, bangKeyLv(u, k)) - 1)];
-      if (num(v, 0) > 0) g.push({ amt: num(v), from: a.t, seq: a.seq + 0.5, exp: expOf(a.t) });
+      if (num(v, 0) > 0) g.push({ amt: num(v), from: a.t, seq: a.seq + 0.5, ...ex(a.t, num(a.seq) + 0.5) });
+    }
+    // 银狼LV.999 2 魂：进入【无敌玩家】后自身所有增益效果延长 1 回合（这时持有的【好活当赏】也多 1 回合）
+    if (S.sw && S.sw.uid === u.id && S.sw.e2 && R.spans) for (const sp of R.spans) for (const x of g) {
+      if (!isFinite(x.exp) || x.to != null || x.from > sp.a + 1e-9 || !(sp.a < x.exp - 1e-9)) continue;
+      const nx = turns.find(z => z.t > x.exp + 1e-9 || (Math.abs(z.t - x.exp) < 1e-9 && x.expS != null && z.s > x.expS));
+      x.exp = nx ? nx.t : Infinity; x.expS = nx ? nx.s : null;
     }
     R.__bang[u.id] = g;
     return g;
@@ -4815,11 +4826,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const g = bangGrants(u, R_REF), t = num(rec.t, 0), sq = num(rec.seq, -1e9);
     let v = 0;
     for (const x of g) {
-      if (t >= x.exp - 1e-9) continue;
+      if (x.expS != null ? (t > x.exp + 1e-9 || (Math.abs(t - x.exp) < 1e-9 && sq >= x.expS - 1e-9)) : t >= x.exp - 1e-9) continue;   // 到第 3 个回合（按行动序号）就失效
       if (x.to != null && sq > x.to + 1e-9) continue;
       if (x.from < t - 1e-9 || (Math.abs(x.from - t) < 1e-9 && x.seq < sq)) v += x.amt;
     }
-    if (String(u.tplId) === "1503") v = Math.min(50, v);   // 真珠天赋：持有上限 50 点
+    if (tidOf(u) === "1503") v = Math.min(50, v);   // 真珠天赋：持有上限 50 点
     return v;
   }
   // 行动轴上要不要显示伤害数字
