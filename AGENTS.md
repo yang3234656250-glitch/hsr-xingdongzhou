@@ -62,7 +62,7 @@
 
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 37）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 38）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 
 ## 数据来源
@@ -75,3 +75,4 @@
 
 - 欢愉伤害（dmgCalc）：LVBASE × 倍率 × (1 + 欢愉度) × 笑点区 (1 + 5P/(P+240)) × (1 + 增笑) × 暴击 × 防御 × 抗性 × 易伤 × 韧性，不吃增伤和攻击力。P：阿哈时刻里的欢愉技 = 这次消耗 / 计入的笑点（rec.consumed），其它欢愉伤害 = 持有的【好活当赏】（bangerAt）。
 - 额外伤害（2026-10-30）：`XR` 表（tools/xr.py 生成，`const XR=` 一行）+ `riderDmg`，在 dmgCalc 里加进这一下的伤害。who = self / other / ally / flag；flag 类靠伤害增益里的 `rx` 标记（mode "rx"，dsc = 标记名，比如知更鸟协奏 rob、缇宝结界 trb、刻律德菈军功 cer、停云赐福 ty1、真珠 prl、迷迷 mimi）。角色卡上 `u.xr[k]` = 勾选覆盖默认。旧的 DMG 里的 `br`（好活当赏额外一段）数值不准，已停用，改由 XR 按官方原文算。
+- DMG 表（技能倍率）是早先生成的，2026-10-30 对照官方参数修过一轮（tools/fix_dmg.py 记录了改了哪些、怎么算）。改倍率时先看官方原文：持续伤害 / 冻结附加伤害 / 治疗系数不能混进倍率；“由敌方全体均分”用 tg 0；附加伤害走 XR 表。
