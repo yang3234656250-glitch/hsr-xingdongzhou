@@ -73,6 +73,14 @@
 
 页面顶部 HTML 注释「校对记录」列出已校对的角色。目标是让模板尽量和游戏原文一致：每天挑最久未校对的角色，对照官方原文改，并更新这条注释和更新日志。
 
+每日校对的流程（定时任务也按这个做）：
+1. 先跑一遍全页检查：`git show HEAD:index.html > /tmp/old.html`，`node tools/regress.js /tmp/old.html index.html` 看页面能不能正常打开、有没有报错、伤害有没有 NaN。
+2. 挑 3～4 个最久没校对（或从没校对过）的角色，或者一组光锥 / 遗器 / 机制。官方数据：`curl -sL https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/index_new/cn/<文件>.json`（characters、character_skills、character_skill_trees、character_ranks、light_cones、light_cone_ranks、relic_sets），技能参数在 `params[等级-1]`。
+3. 逐条对照：技能 / 天赋 / 行迹 / 星魂 / 秘技 / 忆灵技能，每一个效果都要在模板里（影响行动轴的：拉条推条、能量、战技点、额外回合、加速、计数、召唤；只影响伤害的：伤害增益、XR 额外伤害、DMG 倍率），数值用官方参数（3 / 5 魂升级后的等级也要对）。以游戏原文为准，不确定的不改，记成存疑。
+4. 改模板数据写成 tools/ 下的脚本（参考 dmg_fix39.py：BASE 新加、DROP 删掉、PATCH 原地改、星魂直接改 DB），涉及老存档就把 tv +1 并加迁移。
+5. 再跑 `tools/regress.js`（包含改到的角色的队伍，星魂 0 和 6 各一次），行动顺序的每处变化都要能用这次的改动解释；`node --check` 页面脚本。
+6. 更新「校对记录」注释（日期、角色、改了什么、核对无误的、存疑的）和更新日志，提交并 push 到 main；`python3 tools/pub.py index.html <输出路径>` 生成发布文件，Artifact 先 read 再发布到同一个 url（不传 capabilities）。
+
 - 欢愉伤害（dmgCalc）：LVBASE × 倍率 × (1 + 欢愉度) × 笑点区 (1 + 5P/(P+240)) × (1 + 增笑) × 暴击 × 防御 × 抗性 × 易伤 × 韧性，不吃增伤和攻击力。P：阿哈时刻里的欢愉技 = 这次消耗 / 计入的笑点（rec.consumed），其它欢愉伤害 = 持有的【好活当赏】（bangerAt）。
 - 额外伤害（2026-10-30）：`XR` 表（tools/xr.py 生成，`const XR=` 一行）+ `riderDmg`，在 dmgCalc 里加进这一下的伤害。who = self / other / ally / flag；flag 类靠伤害增益里的 `rx` 标记（mode "rx"，dsc = 标记名，比如知更鸟协奏 rob、缇宝结界 trb、刻律德菈军功 cer、停云赐福 ty1、真珠 prl、迷迷 mimi）。角色卡上 `u.xr[k]` = 勾选覆盖默认。旧的 DMG 里的 `br`（好活当赏额外一段）数值不准，已停用，改由 XR 按官方原文算。
 - DMG 表（技能倍率）是早先生成的，2026-10-30 对照官方参数修过一轮（tools/fix_dmg.py 记录了改了哪些、怎么算）。改倍率时先看官方原文：持续伤害 / 冻结附加伤害 / 治疗系数不能混进倍率；“由敌方全体均分”用 tg 0；附加伤害走 XR 表。
