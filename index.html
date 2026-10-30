@@ -750,6 +750,7 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+            <li><b>2026-10-30（爻光天赋【大吉大利】）</b>：爻光持有【好活当赏】时，我方目标施放攻击后额外造成 1 次天赋倍率（10 级 20%，5 魂 22%）的欢愉伤害，施放战技（消耗战技点）时再多 1 次；攻击者欢愉度低于爻光时按爻光的欢愉度（爻光的按卡片面板）。这段伤害加进每次攻击的伤害数字里，悬停能看到“爻光【大吉大利】N 次”。笑点区按攻击者自己的【好活当赏】（官方没写清楚，按攻击者算）；暴击、防御、抗性、易伤按这次攻击的。阿哈时刻里每个欢愉角色的欢愉技也各算 1 次。忆灵 / 召唤物的攻击还没加。行动顺序不变。</li>
             <li><b>2026-10-30（欢愉伤害修正）</b>：① 笑点区按官方公式 1 + 5P/(P+240)，之前阿哈时刻里的欢愉技也用了角色持有的【好活当赏】当 P，不对；现在阿哈时刻里的欢愉技按这次消耗 / 计入的笑点算（额外阿哈时刻按固定计入的数），阿哈时刻外的欢愉伤害仍按【好活当赏】。悬停伤害数字时会写明用的是“计入笑点”还是“好活当赏”。② 新增“增笑”乘区（伤害增益里选“增笑”，只乘欢愉伤害，和欢愉度、笑点区分开相乘），补上爻光 6 魂（全队 25%）、真珠 6 魂（全队 15%）、绯英 6 魂（15%；按好活当赏额外部分默认关闭）、银狼LV.999 6 魂（强化普攻期间 50%）、砂金•戏浪 6 魂（25%）。旧配置会自动补上（tv 36）；行动顺序不变。</li>
             <li><b>2026-10-30（伤害增益：遗器套装 / 位面饰品，全部完成）</b>：遗器 4 件套和位面饰品 2 件套的伤害增益按官方原文补齐。只加战斗中才有、面板上看不到的部分（普攻 / 战技 / 终结技 / 追击增伤、无视防御、团队光环、按战斗事件叠层的）；常驻属性和只看面板属性门槛的（太空封印站额外攻击、停转的萨尔索图之外的暴击门槛等）游戏面板里已经有，没重复加；按速度门槛的（苍穹战线格拉默、不老者的仙舟、应天涉远的卜者）按卡片速度判断。要队伍组成、能量上限、笑点 / 好活当赏数量这类额外条件的默认关闭；星如我见的领航员没算回合开始 / 终结技后掉层（偏高）。到这里，角色、光锥、遗器三部分都过完了。已装备的旧配置会自动补上（tv 35）；行动顺序不变。</li>
             <li><b>2026-10-30（伤害增益：光锥第 3 批，光锥完成）</b>：21029～20000（四星、三星光锥）的条件增益按官方原文补齐，光锥到这里全部过完。“消灭敌人时”触发的只在模拟里有消灭事件时才有；对灼烧 / 触电 / 减速 / 低血量敌人这类要看敌人状态的默认关闭，按“一直满足”算的在说明里写明了。只附加伤害、击破、持续伤害的光锥不算。已装备的旧配置会自动补上（tv 34）；行动顺序不变。</li>
@@ -4219,8 +4220,19 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       riderV = e.br[Math.max(0, Math.min(e.br.length, (e.lv || 10)) - 1)] || 0;
       if (riderV > 0) rider = LVBASE * riderV * (e.brtg === 3 ? nAll : 1) * elMall * critM * defM * resM * vulnM * toughM;
     }
-    const total = base * mult * elM * dmgM * critM * defM * resM * vulnM * toughM + rider;
-    return { total, noPanel, panelLab: lab, buffTxt, rider, riderV, bg, inAha, laughB, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
+    // 爻光天赋【大吉大利】：爻光持有【好活当赏】时，我方目标施放攻击后对随机 1 个击中的目标额外造成 1 次天赋倍率的欢愉伤害，
+    // 这次攻击消耗战技点（施放战技）再触发 1 次；攻击者欢愉度低于爻光时按爻光的欢愉度。笑点区按攻击者自己的【好活当赏】
+    let yaoN = 0, yaoV = 0, yaoDmg = 0, yaoEl = 0;
+    const YG = rec && !isLv ? S.units.find(x => x.kind === "ally" && !x.sm && String(x.tplId) === "1502") : null;
+    if (YG && (e.key !== "e" || rec.uid === "aha") && bangerAt(YG, rec) > 0) {
+      yaoN = rec.act === "skill" && rec.uid === u.id ? 2 : 1;
+      yaoV = [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.1625, 0.175, 0.1875, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25][dmgLv(YG, "f") - 1] || 0.2;
+      yaoEl = Math.max(elStat, num(YG.el, 0));
+      const bgA = inAha ? bangerAt(u, rec) : bg;
+      yaoDmg = yaoN * LVBASE * yaoV * (1 + yaoEl / 100) * (1 + 5 * bgA / (bgA + 240)) * (1 + laughB / 100) * critM * defM * resM * vulnM * toughM;
+    }
+    const total = base * mult * elM * dmgM * critM * defM * resM * vulnM * toughM + rider + yaoDmg;
+    return { total, noPanel, panelLab: lab, buffTxt, rider, riderV, yaoN, yaoV, yaoEl, yaoDmg, bg, inAha, laughB, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
       mult, multOne: e.v + e.rnd, v: e.v, adj: e.adj, rnd: e.rnd, adjN: nAdj, tg: e.tg, targets: nAll + nAdj, name: e.n, lv: e.lv, key: e.key };
   }
   // 一次行动的伤害；没有倍率数据（辅助 / 忆灵 / 敌人）返回 null
@@ -4331,6 +4343,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       + (r.buffTxt ? `（增益：${r.buffTxt}）` : "")
       + ` × 防御 ${fmt(r.defM, 3)} × 抗性 ${fmt(r.resM, 3)} × 易伤 ${fmt(r.vulnM, 3)} × 韧性 ${fmt(r.toughM, 2)}（${r.toughM === 1 ? "已击破" : "未击破"}，敌人 ${enemyLevel()} 级）`
       + (r.rider ? ` ＋ 好活当赏额外一段 ${fmt(r.riderV * 100, 1)}% = ${Math.round(r.rider).toLocaleString()}` : "")
+      + (r.yaoDmg ? ` ＋ 爻光【大吉大利】${r.yaoN} 次 × ${fmt(r.yaoV * 100, 1)}%（欢愉度 ${fmt(r.yaoEl, 1)}%） = ${Math.round(r.yaoDmg).toLocaleString()}` : "")
       + ` = ${Math.round(r.total).toLocaleString()}`;
   }
   function elationTip(el) {
