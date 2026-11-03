@@ -11,7 +11,10 @@ async function run(b, file, team) {
   await p.goto('file://' + path.resolve(file)); await p.waitForTimeout(1200);
   const opts = await p.evaluate(() => [...document.querySelectorAll('[data-preset="0"] option')].map(o => o.value));
   for (let i = 0; i < 4; i++) { const v = 'db:' + team[i]; if (!opts.includes(v)) { errs.push('没有模板 ' + team[i]); continue; } await p.selectOption(`[data-preset="${i}"]`, v); await p.waitForTimeout(300); }
-  if (eidArg != null) { await p.evaluate(e => document.querySelectorAll('[id^=ei-]').forEach(s => { s.value = e; s.dispatchEvent(new Event('change', { bubbles: true })); }), String(eidArg)); await p.waitForTimeout(500); }
+  if (eidArg != null) {   // 每改一张卡页面会重画，所以一张一张改、每次重新找下拉框（以前一次改全部，只有第一张卡生效）
+    const ids = await p.evaluate(() => [...document.querySelectorAll('[id^=ei-]')].map(s => s.id));
+    for (const id of ids) { await p.evaluate(([id, e]) => { const s = document.getElementById(id); if (s && s.value !== e) { s.value = e; s.dispatchEvent(new Event('change', { bubbles: true })); } }, [id, String(eidArg)]); await p.waitForTimeout(250); }
+  }
   const r = await p.evaluate(() => {
     const t = document.querySelector('#t-order').cloneNode(true);
     t.querySelectorAll('.dmg-cell').forEach(c => c.remove());
