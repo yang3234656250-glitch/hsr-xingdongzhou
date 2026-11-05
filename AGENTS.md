@@ -38,7 +38,7 @@
 - **面板攻击常常没填**（配置里只有基础值 800 多），算出来的伤害会偏低，这是预期——不要为了“看着像游戏”去改公式或塞默认值；要更准就在卡片上填面板攻击/暴击/爆伤/增伤/欢愉度。
 - 数据缺口：星神★阿哈（1511）不在官方 dump 里，数据来自 nanoka.cc（`static.nanoka.cc/hsr/<版本>/zh/character/1511.json`，沙盒连不上，要用浏览器取），DMG / DMGX / XR 里的 1511 由 tools/aha_fix41.py 写入，重新生成这几张表时要保留；银狼的【头号补给盲盒】、击破、持续伤害不算。
 - **补充表 `const DMGX={...}`**（紧挨在 `const BGR=` 前面，由仓库里的 `tools/build_dmgx.py <官方json目录> index.html` 生成，别手改）：`lvup` = 每个角色几魂给普攻 / 战技 / 终结技 / 天赋 / 忆灵技加等级（官方 character_ranks）；`mem` = 忆灵 / 召唤物行动的伤害规格；`adj` = DMG 里扩散技能缺的相邻倍率（DMG 的 adj 为空时才用）。以后重新生成 DMG 时如果脚本已经补上了 adj，`adj` 会自动变空。
-- **强化战技按状态**（`S2ST`）：遐蝶看死龙在不在场（`rec.mIn`）、万敌看【血仇】、流萤看【完全燃烧】（`rec.sts`）；镜流的寒川映月是 fskill。
+- **强化战技按状态**（`S2ST`）：遐蝶看死龙在不在场（`rec.mIn`）、万敌看【血仇】、流萤看【完全燃烧】（`rec.sts`）、虎克看【强化战技】（终结技获得、施放战技时移除，tv 51）；镜流的寒川映月是 fskill。
 - **模拟里给伤害显示的只读记录**：`annRec(rec)` 在每个行动记录上写 `mIn / sts / oc（计数）/ hpm / ohpm（当时的生命上限）`，消耗生命值时写 `selfCost`（死龙连续施放几次、是否自爆），追击日志带 `fm`、开大日志带 `um`。这些只给渲染层读，不影响模拟。
 - 行迹面板只放**有说明的模板效果**（`inTr(e)`）；自己加的效果留在卡片上。
 - **伤害增益**（效果类型 `dbuf`，2026-10-29）：mode = 属性（atkP / atkF / defP / cr / cd / dmg / defIg / resPen / el / xtra（伤害倍乘：为原伤害的 100%+X%）/ lm（增笑，只乘欢愉伤害）/ vuln / defRed / resRed），`dsc` = 只对哪类伤害（"" / b / eb 只算强普 / s / es 只算强化战技 / u / f / m / e），`srcS` + `flat` = 数值按施放者某项属性的 % 算；duration / stack / count / bk 和加速一样。模拟里挂成 `kind "d"` 的增益（spdOf 不看它），敌人身上的挂在敌人卡上（没放敌人时挂在 `EV0`）。行动记录 `rec.db` / `rec.edb`（阿哈时刻 `rec.dbAll`）、开大 `ultMarks[].db`、追击标记 `marks[].db` 是快照：行动在“施放普攻 / 战技时”效果之后、开大在开大时效果之后重新记一次。`dmgCalc` 用 `dsum` 读快照。DB 缩写：y "dbuf"、m 属性、sc → dsc、ss → srcS、hf → flat、cap → dcap（按属性算时的上限）。目标可以写 `team` / `teamMem`（我方全体 / 全体忆灵，含之后登场的，挂在 `TEAM0` 上）。伤害增益按批补：第 1 批记忆队（tools/dmg_batch1.py，tv 21），角色 tools/dmg_batch2～11.py（tv 22～31），光锥 tools/dmg_lc1～3.py（tv 32～34），遗器 tools/dmg_relic.py（tv 35）；公共部分在 tools/dmgbatch.py，每批 tv +1。原则：游戏面板里已有的常驻属性（光锥 / 遗器的常驻攻击、暴击、暴伤、速度，属性伤害）不加，只加条件增益和面板看不到的；模板用【强化版】技能的角色按强化版原文；要额外条件的默认关闭（off）并在说明里写清楚。v / hf / cap 都可以写成 5 档叠影数组。
@@ -63,7 +63,7 @@
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 49）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 51）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 - 目标 `efirst` = 敌方单体（第一个敌人卡，tv 48：丹恒战技减速、银狼缺陷）；加速 / 减速挂在别人身上时“持续 N 回合”按持有者自己的回合用 `cnt: "own"`（艾丝妲终结技 tv 48 起这样，用户定的）。
 - 2026-10-31 新加（tv 43～44）：目标 `skpick`（每次施放战技时选，卡片“每次战技目标” u.skTargets）、`lowhp` / `hp50`（按当前生命值）、`elow`（能量 <50% 的一名其他角色）；条件 DB 缩写 `pm` / `px`（[命途或 "=", N]：除自己外该命途至少 / 最多 N 名）、`tge`（伤害增益只给能量上限 ≥N 的目标）、`so: "team"`（任意队友身上有该状态）、`acR: "ult"`（队友触发次数在自己施放终结技时重置）、`mv`（伤害增益只能有一个持有者）；伤害层 `U2ST`（开大时有某状态 = 第二种终结技 u2）、`F2K`（追加攻击用哪条倍率）。千冶•刃的结界状态叫【无量忿怒】（缇宝的叫【结界】，别重名）。
