@@ -36,6 +36,11 @@ class Fix:
         nz = lambda z: re.sub(r'\d+(\.\d+)?%?', '#', re.sub(r'#\d+\[\w+\]%?', '#', re.sub(r'<[^>]+>', '', z)))   # 数字和占位符都当成 #
         assert nz(frag) in nz(t), (frag, t[:300])
 
+    def hast(self, cid, name, frag):
+        """断言行迹原文里有这句话（数字和占位符都当成 #）；同名行迹取最后一个（强化版）"""
+        d = {self.TR[t]['name']: self.TR[t]['desc'] for t in self.CH[str(cid)]['skill_trees'] if self.TR[t].get('desc')}
+        self.has(d[name], frag)
+
     # ---- 模板 ----
     def eff(self, cid, frag, r=None):
         """按说明里的一段文字找模板效果（r = 几魂的星魂效果）"""
