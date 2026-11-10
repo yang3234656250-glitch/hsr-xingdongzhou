@@ -589,6 +589,90 @@ body.tr-lock{ overflow:hidden; }
 .dmg-chip{font-family:var(--f-num);color:var(--accent);font-size:11px}
 .dmgnum.np{opacity:.75}
 .dmg-cell .np{color:var(--muted)}
+
+/* ===== 界面第 1 轮：行迹节点图 ===== */
+.tr-sheet{ grid-template-columns:132px minmax(0,1fr); width:min(1000px,100%); }
+.tr-sum{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:-2px 0 8px; }
+.tr-sum-t{ font-size:11px; letter-spacing:.14em; color:#9fd7e4; margin-right:2px; }
+.tr-chip{ font-family:var(--f-num); font-size:12px; color:var(--gold); padding:1px 9px; border-radius:999px; border:1px solid rgba(232,200,138,.32); background:rgba(232,200,138,.07); white-space:nowrap; }
+.tr-chip b{ font-family:var(--f-body); font-weight:500; color:#d7e6ee; margin-right:4px; }
+.tr-tree{ position:relative; height:720px; border:1px solid rgba(122,206,224,.16); border-radius:12px; overflow:hidden;
+  background:radial-gradient(60% 46% at 50% 38%, rgba(64,110,170,.20), transparent 70%), linear-gradient(180deg, rgba(10,16,30,.72), rgba(5,9,18,.86)); }
+.tn-lines{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.tn-lines line{ stroke:rgba(150,214,232,.34); stroke-width:1.4; }
+.tn-halo{ position:absolute; left:50%; top:36%; width:min(46%,300px); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none;
+  border:1px solid rgba(150,214,232,.10); box-shadow:0 0 0 22px rgba(150,214,232,.025), inset 0 0 60px rgba(111,227,236,.05); }
+.tn{ position:absolute; width:92px; margin-left:-46px; padding:0; border:none; background:none; box-shadow:none; border-radius:0; clip-path:none;
+  display:flex; flex-direction:column; align-items:center; gap:3px; color:inherit; font:inherit; letter-spacing:0; text-align:center; }
+button.tn{ cursor:pointer; }
+button.tn:hover{ background:none; box-shadow:none; }
+.tn i{ font-style:normal; display:flex; align-items:center; justify-content:center; border-radius:50%; flex:none; transition:box-shadow .15s, border-color .15s, transform .15s; }
+.tn b{ font-size:12px; font-weight:600; color:#eef6fa; line-height:1.2; text-shadow:0 1px 3px #000; white-space:nowrap; }
+.tn span{ font-family:var(--f-num); font-size:10px; color:var(--muted); line-height:1.1; white-space:nowrap; min-height:11px; }
+.tn.sk i{ width:52px; height:52px; font:600 21px/1 var(--f-display); color:#fff; border:2px solid var(--gold);
+  background:radial-gradient(circle at 32% 26%, rgba(232,200,138,.34), rgba(14,20,36,.96) 70%); box-shadow:0 0 0 4px rgba(8,13,26,.9), 0 0 0 5px rgba(232,200,138,.22); }
+.tn.sk.big i{ width:60px; height:60px; font-size:24px; }
+.tn.ab i{ width:44px; height:44px; font-size:15px; color:#bff3e2; border:2px solid #5fd3b0;
+  background:radial-gradient(circle at 32% 26%, rgba(95,211,176,.30), rgba(12,20,34,.96) 70%); box-shadow:0 0 0 4px rgba(8,13,26,.9), 0 0 0 5px rgba(95,211,176,.2); }
+.tn.st{ width:64px; margin-left:-32px; gap:2px; }
+.tn.st i{ width:30px; height:30px; font-size:12px; color:#e6eef4; border:1.5px solid rgba(230,240,246,.8); background:#0c1424; box-shadow:0 0 0 3px rgba(8,13,26,.9); }
+.tn.st b{ font-size:10.5px; font-weight:500; color:#cfdde6; }
+.tn.st span{ font-size:10.5px; color:var(--gold); }
+.tn.idle i{ border-color:rgba(160,180,200,.42); background:#0b1220; color:#8fa2b4; box-shadow:0 0 0 4px rgba(8,13,26,.9); }
+.tn.idle b{ color:#9fb0c0; }
+button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9), 0 0 18px rgba(111,227,236,.5); }
+.tn.on i{ border-color:var(--accent); color:#fff; box-shadow:0 0 0 4px rgba(8,13,26,.9), 0 0 0 6px rgba(111,227,236,.55), 0 0 22px rgba(111,227,236,.55); }
+.tn.on b{ color:var(--accent); }
+.tn-none{ position:absolute; left:12px; right:12px; bottom:10px; margin:0; }
+.tr-tip{ margin:10px 2px 0; font-size:12px; line-height:1.6; color:#a9bccd; }
+.tr-tip b{ color:#bff3e2; margin-right:8px; font-weight:600; }
+@media (max-width:760px){
+  .tr-sheet{ grid-template-columns:1fr; }
+  .tr-tree{ height:740px; margin:0 -6px; }
+  .tn{ width:76px; margin-left:-38px; }
+  .tn.sk i{ width:46px; height:46px; font-size:19px; } .tn.sk.big i{ width:54px; height:54px; font-size:22px; }
+  .tn.ab i{ width:40px; height:40px; }
+  .tn b{ font-size:11px; } .tn.st{ width:54px; margin-left:-27px; } .tn.st i{ width:28px; height:28px; } .tn.st b, .tn.st span{ font-size:10px; }
+}
+.tn i{ position:relative; }
+.tn i svg{ width:56%; height:56%; }
+.tn.ab i svg{ width:46%; height:46%; }
+.tn i em{ position:absolute; right:-7px; top:-5px; min-width:17px; height:17px; padding:0 4px; border-radius:999px; font:600 10.5px/17px var(--f-num); font-style:normal; color:#04222b; background:var(--accent); box-shadow:0 0 0 2px #0a1222; }
+.tn.ab i em{ background:#7fe0c2; }
+.tr-en{ margin:10px 0 0; }
+.tr-chip.en{ color:#bfeaf2; border-color:rgba(122,206,224,.3); background:rgba(111,227,236,.06); }
+.tr-chip.en small{ font-family:var(--f-body); font-size:10.5px; color:var(--muted); margin-left:6px; }
+/* ===== 界面第 1 轮：角色卡 = 立绘 + 属性列表 + 装备栏位 ===== */
+.unit-head{ padding:12px 12px 10px; gap:14px; min-height:132px; }
+.unit-head .portrait{ width:96px; height:120px; border-radius:8px; object-position:50% 6%; }
+.unit-head .portrait.ph{ font-size:40px; }
+.unit-head .swatch{ left:92px; top:114px; }
+.uh-bot{ display:flex; align-items:flex-end; justify-content:space-between; gap:8px; }
+.uh-tags{ display:flex; flex-wrap:wrap; gap:5px; min-width:0; }
+.uh-tags span{ font-size:11px; padding:1px 8px; border-radius:999px; color:#e9f3f8; background:rgba(4,9,18,.5); border:1px solid rgba(255,255,255,.26); white-space:nowrap; }
+.sec-t{ display:flex; align-items:center; gap:8px; margin:6px 0 -2px; font-size:11px; font-weight:600; letter-spacing:.2em; color:#9fd7e4; }
+.sec-t em{ font-style:normal; font-weight:400; font-size:10px; letter-spacing:.08em; color:rgba(159,215,228,.5); }
+.sec-t::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(122,206,224,.34), transparent); }
+.unit .stat-row, .unit .dmg-row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 16px; align-items:stretch; }
+.unit .stat-row > label, .unit .dmg-row > label{ display:flex; justify-content:space-between; align-items:center; gap:6px; padding:4px 2px; font-size:13px; color:#d5e2ea; border-bottom:1px solid rgba(190,225,240,.10); }
+.unit .stat-row > label input[type=number], .unit .dmg-row > label input[type=number]{ width:86px !important; text-align:right; border:none; background:none; padding:1px 2px; font-size:15px; font-weight:600; color:#fff; border-radius:4px; }
+.unit .stat-row > label input[type=number]:focus, .unit .dmg-row > label input[type=number]:focus{ background:rgba(111,227,236,.10); box-shadow:none; }
+.unit .stat-row > label input::placeholder, .unit .dmg-row > label input::placeholder{ color:rgba(160,180,200,.55); font-weight:500; }
+.unit .dmg-row{ margin-top:-8px; }
+.unit .dmg-row > .lab{ display:none; }
+.unit .dmg-row > details{ grid-column:1 / -1; padding:5px 2px 0; }
+.unit .base-row label{ font-size:11.5px; }
+.unit .base-row input[type=number]{ font-size:12px; }
+.unit .eq-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)); gap:8px; align-items:stretch; }
+.unit .eq-row + .eq-row{ margin-top:-2px; }
+.unit .eq-row .pickwrap{ flex-direction:column; align-items:stretch; gap:3px; font-size:10.5px; letter-spacing:.12em; color:var(--muted); min-width:0; }
+.unit .eq-row .pickbtn{ max-width:none; width:100%; min-height:46px; padding:5px 8px; border-radius:8px; border:1px solid var(--line); letter-spacing:0; font-size:12.5px;
+  background:linear-gradient(120deg, rgba(232,200,138,.10), rgba(10,16,30,.6) 46%); justify-content:flex-start; }
+.unit .eq-row .pickbtn:hover{ border-color:var(--accent); }
+.unit .eq-row .pickbtn span{ white-space:normal; line-height:1.25; text-align:left; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.unit .eq-row .eqimg{ height:36px; } .unit .eq-row .eqimg.rel{ width:36px; }
+.unit .eq-row > label{ align-self:end; padding-bottom:4px; }
+@media (max-width:420px){ .unit-head .portrait{ width:84px; height:108px; } .unit-head .swatch{ left:80px; top:102px; } }
 </style>
 
 <!-- 校对记录（每日任务按此挑选最久未校对的项目）
@@ -828,7 +912,8 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-10（底层优化，模拟结果不变）</b>：只改代码怎么跑，不改任何规则和数据（tools/opt1.py、opt2.py）。① 模拟：模板查找改用索引、每个单位的效果按触发条件建索引（一次事件不再把所有效果扫一遍）、几处重复计算做缓存——记忆队 6 魂一次模拟从约 42 毫秒降到约 23 毫秒，配速助手、方案对比跟着变快。② 拖速度滑块 / 连续敲数字时，多次重算合并成每帧一次。③ 角色卡里光锥 / 遗器 / 敌人模板背后的隐藏下拉不再每张卡带全部选项（页面节点少了四分之一到三分之一），改星魂、换装备这类要重画左栏的操作快了三到四成。④ 手机上“行动轴 / 表格 / 设置”只画当前看得见的那一块，切过去时再补画。⑤ 修了效果摘要里的“回能 undefined”；“强化战技：…”的效果归到行迹面板的战技里。<b>验证</b>：全部 99 个角色模板（0 魂、6 魂、全部效果打开 + 敌人攻击）改前改后的行动顺序表、每轮表、行动轴、伤害逐字一致。<b>对已有配置</b>：没有影响。</li>
+<li><b>2026-11-10（界面：行迹节点图、角色卡第 1 步）</b>：只改界面，模拟结果不变。① <b>行迹面板改成节点连线图</b>：普攻 / 战技在上方两侧，终结技 → 天赋 → 秘技在中轴（有欢愉技 / 忆灵的放在最上面），三个额外能力和 10 个属性强化按游戏里行迹树的前后关系连出去（来自官方行迹数据，tools/build_trtree.py）；圆点右上角的数字 = 这个技能有几条需要模拟的效果，点圆点下面只看它的效果，点额外能力显示原文。上方是“额外属性加成”合计，下方新增“行动回能”一行（普攻 / 战技 / 强化普攻 / 追加攻击 / 终结技各回多少能量、战技点怎么变）。节点里的图案是自己画的通用线稿，不是游戏素材。② <b>角色卡</b>：立绘加大，卡头显示命途 / 属性 / 星魂 / 能量标签；面板属性排成两列的属性列表；光锥和遗器做成带缩略图的栏位。卡片下半部分（计数器、行动、能量）还是原来的表单，下一步再改。<b>对已有配置</b>：没有影响。</li>
+            <li><b>2026-11-10（底层优化，模拟结果不变）</b>：只改代码怎么跑，不改任何规则和数据（tools/opt1.py、opt2.py）。① 模拟：模板查找改用索引、每个单位的效果按触发条件建索引（一次事件不再把所有效果扫一遍）、几处重复计算做缓存——记忆队 6 魂一次模拟从约 42 毫秒降到约 23 毫秒，配速助手、方案对比跟着变快。② 拖速度滑块 / 连续敲数字时，多次重算合并成每帧一次。③ 角色卡里光锥 / 遗器 / 敌人模板背后的隐藏下拉不再每张卡带全部选项（页面节点少了四分之一到三分之一），改星魂、换装备这类要重画左栏的操作快了三到四成。④ 手机上“行动轴 / 表格 / 设置”只画当前看得见的那一块，切过去时再补画。⑤ 修了效果摘要里的“回能 undefined”；“强化战技：…”的效果归到行迹面板的战技里。<b>验证</b>：全部 99 个角色模板（0 魂、6 魂、全部效果打开 + 敌人攻击）改前改后的行动顺序表、每轮表、行动轴、伤害逐字一致。<b>对已有配置</b>：没有影响。</li>
             <li><b>2026-11-10（全面校对第 7 批：光锥 172 个、遗器 64 套）</b>：全部对照官方原文和 5 档叠影数值跑了一遍（数值都对得上），补上漏掉的效果，tv 63（tools/fix63.py）。<b>光锥</b>：① 漏掉的战技点：金血铭刻的时代（终结技攻击后 +1）、你将起身歌唱（终结技后 +1）、回到大地的飞行（每 2 次战技 / 终结技 +1）、向着不可追问处（终结技消耗 ≥140 能量 +1）、向浪花掷下盛夏（波次开始 +1、每 3 次欢愉技 +1）、花花世界迷人眼（每名欢愉角色战技点上限 +1，最多 +3）；勿忘她的火焰、镜中故我要条件，默认关闭。② 忍法帖•缭乱破魔【雷遁】：终结技后 2 次普攻行动提前 50%～70%（原来只写在备注里）。③ 没有回报的加冕：能量上限 ≥300 时终结技回 10% 能量、攻击力再提高一次。④ 邂逅于下一个花季：能量上限超过 120 的部分给的能量恢复效率。⑤ 片刻，留在眼底 / 今日亦是和平的一日：按装备者实际能量上限算（原来按 120 写死）。⑥ 黎明恰如此燃烧 / 将光阴织成黄金：基础速度 +12～20 加进卡片的基础速度（百分比加速会略高）。⑦ 向浪花掷下盛夏【风口】默认开；梦应归于何处【溃败】减速、驶向第二次生命的速度（默认关）。<b>遗器</b>：凯歌祝捷的英豪 4 件“忆灵在场时速度 +6%”按忆灵在不在场自动算（原来默认关）；戍卫风雪的铁卫 4 件按当前生命值 ≤50% 自动判断；流星追迹的怪盗 4 件默认开；太空封印站补“速度 ≥120 攻击力 +12%”；寰宇生研院按实际能量上限算。<b>对已有配置</b>：装备了上面这些光锥 / 遗器的卡片会自动换成新效果（原来关着的仍关着），战技点和个别行动提前会变；其他不变。</li>
 <li><b>2026-11-10（全面校对第 6 批：远坂凛、吉尔伽美什、姬子•启行、开拓者毁灭 / 存护 / 同谐）</b>：逐条对照原文，tv 62（tools/fix62.py）。① <b>远坂凛</b>：【宝石能量】做成计数（进入战斗 20 点、我方每消耗或恢复 1 点战技点 +1、终结技 +12、6 魂 +24、秘技 +10 默认关）；<b>≥15 点或战技点 ≥7 时战技自动强化为【第二魔法实验】</b>：不耗战技点，把战技点消耗到 2 点（每点 +2 宝石能量），每 3 点宝石能量多 1 次伤害直到不足 3 点，之后速度 +20% 3 回合；暴击伤害改成“我方目标消耗或恢复战技点时”给那个目标（原来只在施放战技 / 终结技时）；连携追加攻击按原文默认开（只认 Archer 的战技、战技点 ≤3）；行迹秉持优雅 Archer 也获得。② <b>吉尔伽美什</b>：<b>【来兴致了！】之前自动普攻、兴致首次到 10 点后只能战技</b>（不用再手动点）；兴致合并成一条（连携 +3、终结技 +2、E2 +5），行迹英雄的孤傲的暴击伤害按每次实际获得的兴致叠；Saber 的攻击也计数，连携后 Saber 回 120 能量、下一次终结技 200%；行迹史诗的源头按队友实际能量上限的 30%（原来固定 36）；行迹王霸的竞逐补“能量上限每超过 140 点 1 点 +1%，最多 +100%”；E2 战技倍率、E6 弹射倍率和【黄金律】进伤害。③ <b>姬子•启行</b>：【领航旗语】做成状态（3 回合，回合开始时 −1），增伤跟着状态；终结技伤害改成主目标 762% + 其他目标 252%（原来按全体 762%）。④ <b>开拓者•存护</b>：【灼热意志】做成计数（普攻 / 战技 / 受到攻击 +1，最多 8 层，E4 开局 4 层），<b>≥4 层时普攻自动变强化普攻</b>并消耗 4 层，终结技后下一次普攻免费强化；天赋护盾、强化普攻倍率 135% + 相邻 54%、终结技的 100% 攻击力部分补上。⑤ <b>开拓者•毁灭</b>：终结技算攻击、补战技倍率（125% 扩散）、行迹坚韧、E6。⑥ <b>开拓者•同谐</b>：E6 多 2 次伤害（多回 12 能量）。⑦ <b>卢卡</b>：【斗志】≥2 层时普攻自动变直冲碎天拳。新触发“我方消耗或恢复战技点时”。<b>对已有配置</b>：用到这些角色的方案行动顺序会变（远坂凛的战技点 / 速度、吉尔伽美什开局普攻、存护主强化普攻）；其他角色不变。</li>
 <li><b>2026-11-10（全面校对第 5 批：万敌、赛飞儿、白厄、海瑟音、刻律德菈、丹恒•腾荒、不死途）</b>：逐条对照原文，tv 61（tools/fix61.py）。① <b>不死途</b>：充能按原文（初始 2 点、最多 3 点、终结技 +3），<b>天赋追加攻击默认开启</b>（【饲饵】受到其他队友攻击后回 8 能量并消耗 1 点充能追击；原来默认关、而且任何队友攻击都回 8 能量两次）；补战技“目标已是饲饵时恢复 1 个战技点”、【婪酣】层数（追击 +2、战技 +1、终结技 +2，每层追击伤害 +10%，强化追击每 4 层消耗）、秘技 +1 充能（默认关）、E6 按获得过的层数叠。② <b>刻律德菈</b>：【军功】= “每次战技目标”；充能按原文（战技 +1、终结技 +2、军功持有者施放普攻 / 战技 +1、上限 8），<b>满 6 点升【爵位】，持有者施放战技时触发奇袭（立即再施放 1 次战技）并消耗 6 点</b>，爵位的暴伤 / 穿透跟着自动开关（原来默认关）；行迹征服者的 5 点能量、见者的 1 点充能自动判断。③ <b>丹恒•腾荒</b>：<b>补上【龙灵】（速度 165，战技选【同袍】时召唤）</b>，龙灵行动给全队护盾，终结技后 2 次行动发动追加攻击（E2 再 +2 次并拉条 100%）；【同袍】= “每次战技目标”，行迹葳蕤改成只看【同袍】的攻击（+6 能量、龙灵提前 15%；原来任何队友攻击都算）。老存档会自动补一张龙灵卡。④ <b>白厄</b>：变身结束的全队加速按各自回合 1 回合；E6 火种溢出不设上限自动处理。⑤ <b>海瑟音</b>：补战斗开始时的结界（减防、E4 减抗）。⑥ <b>万敌、赛飞儿</b>：核对无误。<b>对已有配置</b>：不死途 / 刻律德菈 / 丹恒•腾荒的方案行动轴会变。</li>
@@ -999,8 +1084,11 @@ body.tr-lock{ overflow:hidden; }
     </aside>
     <div class="tr-main">
       <section class="tr-sec">
-        <h4>技能 <em>SKILLS</em></h4>
-        <div class="tr-skills" id="tr-skills"></div>
+        <h4>行迹 <em>TRACES</em></h4>
+        <div class="tr-sum" id="tr-minor-sum"></div>
+        <div class="tr-tree" id="tr-skills"></div>
+        <div class="tr-sum tr-en" id="tr-en"></div>
+        <p class="tr-tip" id="tr-tip"></p>
       </section>
       <section class="tr-sec tr-effsec">
         <h4>技能与行迹效果 <em>SKILLS &amp; TRACES</em></h4>
@@ -1009,11 +1097,6 @@ body.tr-lock{ overflow:hidden; }
       <details class="tr-sec tr-fold" id="tr-major-box">
         <summary><h4>额外能力 <em>BONUS ABILITIES</em></h4></summary>
         <div class="tr-major" id="tr-major"></div>
-      </details>
-      <details class="tr-sec tr-fold" id="tr-minor-box">
-        <summary><h4>属性强化 <em>STAT BONUSES</em> <span class="tr-sumline" id="tr-minor-sum"></span></h4></summary>
-        <div class="tr-minor" id="tr-minor"></div>
-        <p class="hint" style="margin:8px 0 0">这些已经算在游戏面板里了：卡片上的速度、生命、攻击照面板填就行，不要再加一遍。</p>
       </details>
     </div>
   </div>
@@ -3414,7 +3497,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
               <button class="ghost" data-act="fold-card" data-k="${u.id}" title="折叠这张角色卡" aria-label="折叠角色卡" aria-expanded="true">▾</button>
               <button class="ghost" data-act="del-unit" data-u="${i}" aria-label="删除 ${esc(u.name)}">✕</button>
             </div>
-            <div class="spd-big"><input type="number" id="sn-${u.id}" min="1" step="0.1" value="${u.spd}" data-u="${i}" data-f="spd" aria-label="速度"><i>SPD</i></div>
+            <div class="uh-bot">
+              <div class="uh-tags">${(T => T && u.kind === "ally" && !u.sm ? [T.path, ELEMN[T.elem], num(u.eid) ? "星魂 " + num(u.eid) : "", T.sp ? "能量 " + T.sp : ""].filter(Boolean).map(t => `<span>${esc(t)}</span>`).join("") : u.sm ? `<span>召唤物</span>` : u.kind === "enemy" ? `<span>敌方</span>` : "")(tplOf(u))}</div>
+              <div class="spd-big"><input type="number" id="sn-${u.id}" min="1" step="0.1" value="${u.spd}" data-u="${i}" data-f="spd" aria-label="速度"><i>SPD</i></div>
+            </div>
           </div>
           <input type="color" class="swatch" id="c-${u.id}" value="${esc(u.color)}" data-u="${i}" data-f="color" aria-label="颜色">
         </div>
@@ -3422,7 +3508,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           <span class="lab">速度</span>
           <input type="range" id="sr-${u.id}" min="70" max="250" step="0.1" value="${u.spd}" data-u="${i}" data-f="spd" aria-label="速度滑块">
         </div>
-        ${u.kind === "ally" && !u.sm ? `<div class="row stat-row">${STATS.map(([k, l]) => `<label for="${k}p-${u.id}" title="面板${l}：照游戏里角色面板填；没填就按基础${l}">${l} <input type="number" id="${k}p-${u.id}" min="0" step="1" value="${u[k] ?? ""}" placeholder="${u[k + "B"] ?? ""}" data-u="${i}" data-f="${k}" style="width:76px"></label>`).join("")}<label for="hb-${u.id}" title="面板上的治疗量加成：行迹、遗器、常驻的光锥效果都算在里面，照游戏面板填">治疗加成 % <input type="number" id="hb-${u.id}" min="0" step="0.1" value="${u.hb ?? ""}" placeholder="0" data-u="${i}" data-f="hb" style="width:60px"></label></div>` : ""}
+        ${u.kind === "ally" && !u.sm ? `<div class="sec-t">属性 <em>照游戏面板填</em></div><div class="row stat-row">${STATS.map(([k, l]) => `<label for="${k}p-${u.id}" title="面板${l}：照游戏里角色面板填；没填就按基础${l}">${l} <input type="number" id="${k}p-${u.id}" min="0" step="1" value="${u[k] ?? ""}" placeholder="${u[k + "B"] ?? ""}" data-u="${i}" data-f="${k}" style="width:76px"></label>`).join("")}<label for="hb-${u.id}" title="面板上的治疗量加成：行迹、遗器、常驻的光锥效果都算在里面，照游戏面板填">治疗加成 % <input type="number" id="hb-${u.id}" min="0" step="0.1" value="${u.hb ?? ""}" placeholder="0" data-u="${i}" data-f="hb" style="width:60px"></label></div>` : ""}
         ${panelKey(u) ? `<div class="row"><label for="op-${u.id}" title="不勾：这些面板数值在所有方案里共用，改一处所有方案都跟着变；勾上：这张卡只在这个方案里用自己的面板（取消勾选会换回共用的面板）"><input type="checkbox" id="op-${u.id}" ${u.ownPanel ? "checked" : ""} data-u="${i}" data-f="ownPanel"> 本方案单独面板</label><span class="hint">${u.ownPanel ? "只在这个方案里用" : "生命 / 攻击 / 防御、治疗加成、暴击 / 爆伤 / 增伤 / 欢愉度、充能效率、手填倍率：所有方案共用"}</span></div>` : ""}
         ${u.kind === "ally" && !u.sm ? `<div class="row dmg-row">
           <span class="lab">伤害</span>
@@ -3439,7 +3525,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
             <p class="hint">附加伤害、额外几次伤害、欢愉附加段、真实伤害，加在对应那一下的伤害数字里（悬停能看到）。按官方原文，条件写在每条后面；不满足的取消勾选。</p>
           </details>` : ""}
         </div>` : ""}
-        <div class="row">
+        <div class="sec-t">基础 <em>模板 / 开局</em></div>
+        <div class="row base-row">
           <label for="b-${u.id}">基础速度 <input type="number" id="b-${u.id}" min="1" step="1" value="${u.base}" data-u="${i}" data-f="base"></label>
           ${u.kind === "ally" && !u.sm ? STATS.map(([k, l]) => `<label for="${k}b-${u.id}" title="${statTip(u, k)}">基础${l} <input type="number" id="${k}b-${u.id}" min="0" step="1" value="${u[k + "B"] ?? ""}" placeholder="—" data-u="${i}" data-f="${k}B" style="width:70px"></label>`).join("") : ""}
           <label for="o-${u.id}" title="负数 = 开局推后（有的敌人第一次行动比较晚）">开局拉条 % <input type="number" id="o-${u.id}" min="-200" max="100" step="1" value="${u.opening}" data-u="${i}" data-f="opening"></label>
@@ -3449,12 +3536,12 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           <label class="file-btn img-btn" for="im-${u.id}" title="用自己的图当立绘（会裁成上半身、压成小图，存进配置）">${u.img ? "换立绘" : "+ 立绘"}<input type="file" id="im-${u.id}" accept="image/*" data-img="${i}"></label>
           ${u.img ? `<button type="button" class="ghost" data-act="img-del" data-u="${i}">去掉自定义立绘</button>` : ""}
         </div>
-        ${u.kind !== "ally" ? "" : `<div class="row">
+        ${u.kind !== "ally" ? "" : `<div class="sec-t">装备 <em>光锥 / 遗器</em></div><div class="row eq-row">
           <div class="pickwrap">光锥 ${pickBtn("lc", i, u.lc)}<select hidden id="lc-${u.id}" data-u="${i}" data-eq="lc" aria-label="光锥">${lcOptions(u.lc)}</select></div>
           <label for="lr-${u.id}">叠影 <select id="lr-${u.id}" data-u="${i}" data-eq="lcR">${opt([1, 2, 3, 4, 5].map(n => [n, n]), u.lcR || 1)}</select></label>
           ${tplOf(u) ? `<label for="ei-${u.id}">星魂 <select id="ei-${u.id}" data-u="${i}" data-eq="eid">${opt([0, 1, 2, 3, 4, 5, 6].map(n => [n, n]), u.eid || 0)}</select></label>` : ""}
         </div>
-        <div class="row">
+        <div class="row eq-row">
           <div class="pickwrap">遗器 ${pickBtn("rA", i, u.rA)}<select hidden id="ra-${u.id}" data-u="${i}" data-eq="rA" aria-label="遗器套装">${relicOptions(u.rA, false)}</select></div>
           <label for="r4-${u.id}"><input type="checkbox" id="r4-${u.id}" ${u.r4 ? "checked" : ""} data-u="${i}" data-eq="r4">4件套</label>
           ${u.r4 ? "" : `<div class="pickwrap">+2件 ${pickBtn("rB", i, u.rB)}<select hidden id="rb-${u.id}" data-u="${i}" data-eq="rB" aria-label="另一套2件">${relicOptions(u.rB, false)}</select></div>`}
@@ -3792,7 +3879,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   $("ult-mode").addEventListener("change", e => { S.ultMode = e.target.value; update(); });
   // ---- 行迹面板 ----
   let trIdx = -1;
-  let trSkill = null;
+  let trSkill = null, trAb = -1;   // trAb = 点了第几个额外能力（只看这个能力的效果），-1 = 没点
   const ELEMN = { Physical: "物理", Fire: "火", Ice: "冰", Lightning: "雷", Wind: "风", Quantum: "量子", Imaginary: "虚数" };
   function openTrace(i) {
     const u = S.units[i], m = $("tr-modal");
@@ -3810,11 +3897,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (T && T.sp) tags.push(`能量 ${T.sp}`);
     $("tr-tags").innerHTML = tags.map(t => `<span class="tr-tag">${esc(t)}</span>`).join("");
     trIdx = i;
-    trSkill = null;
+    trSkill = null; trAb = -1;
     renderTraceSkills();
     if (!d) {
       $("tr-major").innerHTML = `<p class="tr-empty">这张卡没套用角色模板，没有额外能力 / 属性强化数据。</p>`;
-      $("tr-minor").innerHTML = ""; $("tr-minor-sum").textContent = "";
+      $("tr-minor-sum").innerHTML = "";
     } else {
       $("tr-major").innerHTML = d.m.map(([n, t]) =>
         `<div class="tr-mj"><i>◆</i><div><b>${esc(n)}</b><p>${esc(t)}</p></div></div>`).join("")
@@ -3822,10 +3909,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const ss = d.s.filter(([n, v]) => v);   // 数据里混进了忆灵技能名（没有数值），去掉
       const sum = new Map();
       for (const [n, v] of ss) { const m = /^\+?([\d.]+)(%?)$/.exec(v); if (!m) continue; const k = n.replace(/^伤害强化•(.+)$/, "$1伤害").replace(/强化$/, "") + m[2]; sum.set(k, (sum.get(k) || 0) + parseFloat(m[1])); }
-      $("tr-minor-sum").textContent = [...sum].map(([k, v]) => `${k.replace(/%$/, "")} +${fmt(v, 1)}${k.endsWith("%") ? "%" : ""}`).join(" · ");
-      $("tr-minor").innerHTML = ss.map(([n, v]) =>
-        `<div class="tr-mi"><b>${esc(n)}</b><span>${esc(v)}</span></div>`).join("")
-        || `<p class="tr-empty">没有属性强化数据</p>`;
+      $("tr-minor-sum").innerHTML = sum.size ? `<span class="tr-sum-t">额外属性加成</span>` + [...sum].map(([k, v]) => `<span class="tr-chip"><b>${esc(k.replace(/%$/, ""))}</b>+${fmt(v, 1).replace(/\.0$/, "")}${k.endsWith("%") ? "%" : ""}</span>`).join("") : "";
     }
     m.hidden = false;
     document.body.classList.add("tr-lock");
@@ -3842,19 +3926,77 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const k = { skill: "s", ult: "u", talent: "t" }[key]; if (!k) return key === "tech" ? 1 : 0;
     return 10 + (L[k] && e >= L[k] ? 2 : 0);
   };
+  // 行迹节点图。TRTREE：每个命途 10 个属性强化各接在谁后面（官方行迹树 pre_points；"-" = 接在核心技能上，A / B / C = 第 1 / 2 / 3 个额外能力，数字 = 第几个属性强化）
+  const TRTREE = { "存护": "-A1-B4-C77", "巡猎": "-A1-B4-C77", "智识": "-A11B44CC-", "毁灭": "-A12B45C77", "同谐": "-A10B40C77", "丰饶": "-A12B45CC-", "虚无": "-A12B45CC0", "记忆": "-00AABBC78", "欢愉": "--AAB45C78" };
+  const statGlyph = n => /^伤害强化/.test(n) ? "伤" : ({ "攻击": "攻", "防御": "防", "生命": "生", "速度": "速", "暴击率": "暴", "暴击伤害": "爆", "击破": "破", "效果命中": "命", "效果抵抗": "抗", "欢愉度": "欢" })[n.replace(/强化$/, "")] || n.slice(0, 1);
+  const statLabel = n => n.replace(/^伤害强化•(.+)$/, "$1伤害").replace(/强化$/, "").replace(/^(攻击|防御)$/, "$1力").replace(/^生命$/, "生命值");
+  // 节点里的图案：自己画的通用线稿（剑 / 四角星 / 迸发 / 六边形 / 罗盘 / 笑脸 / 晶体），不是游戏素材
+  const TR_ICON = {
+    basic: `<path d="M6 18 17.5 6.500M13.500 6H18v4.500M5.500 15.500l3 3M4 20l2.200-2.200"/>`,
+    skill: `<path d="M12 3c.8 5 3.200 7.600 9 9-5.800 1.400-8.200 4-9 9-.8-5-3.200-7.600-9-9 5.800-1.400 8.200-4 9-9z"/>`,
+    ult: `<circle cx="12" cy="12" r="3.200"/><path d="M12 2.500v4M12 17.500v4M2.500 12h4M17.500 12h4M5.300 5.300l2.800 2.800M15.900 15.900l2.800 2.800M18.700 5.300l-2.800 2.800M8.100 15.900l-2.800 2.800"/>`,
+    talent: `<path d="M12 3l7.800 4.500v9L12 21l-7.800-4.500v-9z"/><circle cx="12" cy="12" r="2.400"/>`,
+    tech: `<circle cx="12" cy="12" r="8.500"/><path d="M15.800 8.200l-2.300 5.300-5.300 2.300 2.300-5.300z"/>`,
+    elation: `<circle cx="12" cy="12" r="8.500"/><path d="M7.800 13.200c1.300 3.600 7.100 3.600 8.400 0M9 9.300v1.400M15 9.300v1.400"/>`,
+    memo: `<path d="M12 3l5.500 6.500L12 21 6.500 9.500z"/><path d="M6.500 9.500h11M12 3v18"/>`,
+    trace: `<path d="M12 4.500l7.500 7.500-7.500 7.500L4.500 12z" fill="currentColor"/>`,
+  };
+  const trIcon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.700" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TR_ICON[k] || TR_ICON.trace}</svg>`;
+  function trLayout(u, T, d) {
+    const hasMemo = u.effects.some(e => effSrc(e) === "memo" && inTr(e)) || (T && T.path === "记忆");
+    const P = { basic: [27, 10.5], skill: [73, 10.5], ult: [50, 23.5], talent: [50, 38], tech: [50, 52.5] };
+    const tops = [hasMemo && "memo", u.elation && "elation"].filter(Boolean);
+    tops.forEach((k, j) => { P[k] = [tops.length > 1 ? 42 + j * 16 : 50, 7]; });
+    const links = [["basic", "ult"], ["skill", "ult"], ["ult", "talent"], ["talent", "tech"]].concat(tops.map(k => [k, "ult"]));
+    const ab = d ? d.m.slice(0, 3) : [], st = d ? d.s.filter(([n, v]) => v).slice(0, 10) : [];
+    const AB = { A: [15, 24.5], B: [85, 24.5], C: [50, 67] };
+    ["A", "B", "C"].forEach((k, j) => { if (ab[j]) { P[k] = AB[k]; links.push([k === "A" ? "basic" : k === "B" ? "skill" : "tech", k]); } });
+    const code = (T && TRTREE[T.path]) || "-A1-B4-C77", kids = {};
+    st.forEach((x, j) => { let par = code[j] || "-"; if (/[ABC]/.test(par) && !P[par]) par = "-"; (kids[par] = kids[par] || []).push(j); });
+    const cl = v => Math.max(8, Math.min(92, v));
+    const grow = (par, at) => {   // 一层一层往外放：at(层, 第几个, 这层几个, 上一级的位置) → 位置
+      let layer = (kids[par] || []).map(j => [j, P[par]]), dep = 1;
+      while (layer.length && dep < 6) { const nx = []; layer.forEach(([j, pp], q) => { P["s" + j] = at(dep, q, layer.length, pp); links.push([/[ABC]/.test(par) || dep > 1 ? (dep > 1 ? "s" + code[j] : par) : par, "s" + j]); for (const c of kids[String(j)] || []) nx.push([c, P["s" + j]]); }); layer = nx; dep++; }
+    };
+    if (P.A) grow("A", (dp, q, n) => [cl(AB.A[0] + (q - (n - 1) / 2) * 14), AB.A[1] + 13.5 * dp]);
+    if (P.B) grow("B", (dp, q, n) => [cl(AB.B[0] + (q - (n - 1) / 2) * 14), AB.B[1] + 13.5 * dp]);
+    if (P.C) grow("C", (dp, q, n, pp) => dp <= 2 ? [50 + (q - (n - 1) / 2) * 26, AB.C[1] + 11 * dp] : [pp[0] + (pp[0] >= 50 ? 15 : -15), pp[1]]);
+    (kids["-"] || []).forEach((j, q) => {   // 直接接在核心技能上的：放在天赋 / 秘技两侧，再往下长
+      const side = q % 2 ? 1 : -1, row = Math.floor(q / 2); P["r" + j] = [50 + side * 22, 45.25 + row * 13.5]; P["s" + j] = P["r" + j]; links.push(["talent", "s" + j]);
+      let layer = (kids[String(j)] || []).map(c => [c, j]), dep = 1;
+      while (layer.length && dep < 5) { const nx = []; layer.forEach(([c, pj], q2) => { P["s" + c] = [cl(P["r" + j][0] + side * 5 * dep + (q2 - (layer.length - 1) / 2) * 14), P["r" + j][1] + 13.5 * dep]; links.push(["s" + pj, "s" + c]); for (const g of kids[String(c)] || []) nx.push([g, c]); }); layer = nx; dep++; }
+    });
+    return { P, links, ab, st, tops };
+  }
   function renderTraceSkills() {
     const u = S.units[trIdx];
     if (!u) return;
-    const T = tplOf(u), d = T ? TRACE[String(T.id)] : null;
-    const hasMemo = u.effects.some(e => effSrc(e) === "memo" && inTr(e)) || (T && T.path === "记忆");
-    $("tr-skills").innerHTML = TR_TILES.filter(([key]) => (key !== "memo" || hasMemo) && (key !== "elation" || u.elation)).map(([key, ic, label]) => {
-      const n = u.effects.filter(e => effSrc(e) === key && inTr(e)).length;
-      const lv = T && key !== "trace" ? trLv(u, key) : 0;
-      const sub = `${lv ? "Lv." + lv : ""}${lv && n ? " · " : ""}${n ? n + " 条" : ""}`;
-      return `<button type="button" class="tr-skill${trSkill === key ? " on" : ""}${n ? "" : " idle"}" data-skill="${key}" title="${esc(label)}：${n ? n + " 条需要模拟的效果，点开查看" : "没有需要模拟的效果"}">
-        <i>${esc(ic)}</i><b>${esc(label)}</b><span>${sub || "—"}</span>
-      </button>`;
-    }).join("");
+    const T = tplOf(u), d = T ? TRACE[String(T.id)] : null, L = trLayout(u, T, d), P = L.P;
+    const cnt = key => u.effects.filter(e => effSrc(e) === key && inTr(e)).length;
+    const pos = (k, r) => `left:${P[k][0]}%;top:calc(${P[k][1]}% - ${r}px)`;
+    const TL = Object.fromEntries(TR_TILES.map(([k, ic, lb]) => [k, [ic, lb]]));
+    let h = `<svg class="tn-lines" aria-hidden="true">${L.links.filter(([a, b]) => P[a] && P[b]).map(([a, b]) => `<line x1="${P[a][0]}%" y1="${P[a][1]}%" x2="${P[b][0]}%" y2="${P[b][1]}%"/>`).join("")}</svg><span class="tn-halo" aria-hidden="true"></span>`;
+    for (const key of ["basic", "skill", "ult", "talent", "tech"].concat(L.tops)) {
+      const n = cnt(key), lv = T ? trLv(u, key) : 0, [ic, lb] = TL[key];
+      h += `<button type="button" class="tn sk${key === "ult" ? " big" : ""}${trSkill === key ? " on" : ""}${n ? "" : " idle"}" style="${pos(key, key === "ult" ? 30 : 26)}" data-skill="${key}" title="${esc(lb)}${lv ? " Lv." + lv : ""}：${n ? n + " 条需要模拟的效果，点开查看" : "没有需要模拟的效果"}"><i>${trIcon(key)}${n ? `<em>${n}</em>` : ""}</i><b>${esc(lb)}</b><span>${lv ? "Lv." + lv : ""}</span></button>`;
+    }
+    L.ab.forEach(([nm, desc], j) => { const k = "ABC"[j]; if (!P[k]) return; const n = u.effects.filter(e => effSrc(e) === "trace" && inTr(e) && String(e.note || "").includes(nm)).length;
+      h += `<button type="button" class="tn ab${trSkill === "trace" && trAb === j ? " on" : ""}${n ? "" : " idle"}" style="${pos(k, 22)}" data-skill="trace" data-ab="${j}" title="${esc(nm)}：${esc(desc)}"><i>${trIcon("trace")}${n ? `<em>${n}</em>` : ""}</i><b>${esc(nm)}</b></button>`; });
+    L.st.forEach(([nm, v], j) => { if (!P["s" + j]) return; h += `<span class="tn st" style="${pos("s" + j, 15)}" title="${esc(nm)} ${esc(v)}（已经算在游戏面板里）"><i>${esc(statGlyph(nm))}</i><b>${esc(statLabel(nm))}</b><span>${esc(v)}</span></span>`; });
+    if (!d && T == null) h += `<p class="tr-empty tn-none">这张卡没套用角色模板，只有技能节点。</p>`;
+    $("tr-skills").innerHTML = h;
+    // 每种行动回多少能量、战技点怎么变（卡片上“能量”那几格的值；特殊资源的角色不列）
+    { const X = (T && T.x) || {}, eOf = k => u[k] != null && u[k] !== "" ? num(u[k]) : num(u.turnE), sg = v => (v > 0 ? "+" : v < 0 ? "−" : "±") + Math.abs(v), it = [];
+      if (T && u.kind === "ally" && !u.sm && !X.ne) {
+        const sk = u.skillSP != null && u.skillSP !== "" ? num(u.skillSP) : 1;
+        it.push(["普攻", eOf("basicE"), "战技点 +1"], ["战技", eOf("skillE"), sk ? "战技点 −" + sk : "不耗战技点"]);
+        if (u.ebasicE != null && u.ebasicE !== "") it.push(["强化普攻", num(u.ebasicE), u.ebSP ? "战技点 +1" : ""]);
+        if (num(u.fuaE) > 0) it.push(["追加攻击", num(u.fuaE), ""]);
+        it.push(["终结技", num(u.ultRefund, 5), "消耗 " + num(u.maxE)]);
+      }
+      $("tr-en").innerHTML = it.length ? `<span class="tr-sum-t">行动回能</span>` + it.map(([n, e, x]) => `<span class="tr-chip en"><b>${n}</b>能量 ${sg(e)}${x ? `<small>${x}</small>` : ""}</span>`).join("") : ""; }
+    const a = trSkill === "trace" && trAb >= 0 ? L.ab[trAb] : null;
+    $("tr-tip").innerHTML = a ? `<b>◆ ${esc(a[0])}</b>${esc(a[1])}` : `点技能或额外能力的圆点，下面只看它的效果；再点一次回到全部。小圆点是属性强化，已经算在游戏面板里，卡片上的速度、生命、攻击照面板填就行，不要再加一遍。`;
   }
   function closeTrace() {
     const m = $("tr-modal");
@@ -3875,9 +4017,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       return;
     }
     if (!trSkill) { box.innerHTML = all + `<p class="hint" style="margin:4px 0 0">自己加的效果（卡片上的「+ 每回合效果」）留在卡片上，不会搬到这里。</p>`; return; }   // 没选技能时看总览
-    const list = u.effects.map((e, j) => [e, j]).filter(([e]) => effSrc(e) === trSkill && inTr(e));
+    const abN = trSkill === "trace" && trAb >= 0 ? (((tplOf(u) && TRACE[String(tplOf(u).id)]) || { m: [] }).m[trAb] || [])[0] : null;   // 点了某个额外能力：只看说明里带这个名字的
+    const list = u.effects.map((e, j) => [e, j]).filter(([e]) => effSrc(e) === trSkill && inTr(e) && (!abN || String(e.note || "").includes(abN)));
     if (!list.length) {
-      box.innerHTML = `<p class="tr-empty">${SRCL[trSkill]}没有需要模拟的效果。</p>`;
+      box.innerHTML = `<p class="tr-empty">${abN ? "「" + esc(abN) + "」" : SRCL[trSkill]}没有需要模拟的效果${abN ? "（只影响页面不算的内容，或已经并进别的效果）" : ""}。</p><div class="eg-head tr-one"><button type="button" class="ghost" data-skill="__all" title="回到全部技能的列表">显示全部 ›</button></div>`;
       return;
     }
     const on = list.filter(([e]) => !e.off).length;
@@ -3894,8 +4037,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   $("tr-modal") && $("tr-modal").addEventListener("click", e => {
     const b = e.target.closest("[data-skill]");
     if (!b || trIdx < 0) return;
-    const k = b.dataset.skill;
-    trSkill = (k === "__all" || trSkill === k) ? null : k;
+    const k = b.dataset.skill, ab = b.dataset.ab != null ? +b.dataset.ab : -1;
+    trSkill = (k === "__all" || (trSkill === k && trAb === ab)) ? null : k; trAb = trSkill ? ab : -1;
     renderTraceSkills();
     renderTraceEffs();
   });
