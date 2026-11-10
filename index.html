@@ -828,7 +828,8 @@ body.tr-lock{ overflow:hidden; }
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-10（全面校对第 7 批：光锥 172 个、遗器 64 套）</b>：全部对照官方原文和 5 档叠影数值跑了一遍（数值都对得上），补上漏掉的效果，tv 63（tools/fix63.py）。<b>光锥</b>：① 漏掉的战技点：金血铭刻的时代（终结技攻击后 +1）、你将起身歌唱（终结技后 +1）、回到大地的飞行（每 2 次战技 / 终结技 +1）、向着不可追问处（终结技消耗 ≥140 能量 +1）、向浪花掷下盛夏（波次开始 +1、每 3 次欢愉技 +1）、花花世界迷人眼（每名欢愉角色战技点上限 +1，最多 +3）；勿忘她的火焰、镜中故我要条件，默认关闭。② 忍法帖•缭乱破魔【雷遁】：终结技后 2 次普攻行动提前 50%～70%（原来只写在备注里）。③ 没有回报的加冕：能量上限 ≥300 时终结技回 10% 能量、攻击力再提高一次。④ 邂逅于下一个花季：能量上限超过 120 的部分给的能量恢复效率。⑤ 片刻，留在眼底 / 今日亦是和平的一日：按装备者实际能量上限算（原来按 120 写死）。⑥ 黎明恰如此燃烧 / 将光阴织成黄金：基础速度 +12～20 加进卡片的基础速度（百分比加速会略高）。⑦ 向浪花掷下盛夏【风口】默认开；梦应归于何处【溃败】减速、驶向第二次生命的速度（默认关）。<b>遗器</b>：凯歌祝捷的英豪 4 件“忆灵在场时速度 +6%”按忆灵在不在场自动算（原来默认关）；戍卫风雪的铁卫 4 件按当前生命值 ≤50% 自动判断；流星追迹的怪盗 4 件默认开；太空封印站补“速度 ≥120 攻击力 +12%”；寰宇生研院按实际能量上限算。<b>对已有配置</b>：装备了上面这些光锥 / 遗器的卡片会自动换成新效果（原来关着的仍关着），战技点和个别行动提前会变；其他不变。</li>
+<li><b>2026-11-10（底层优化，模拟结果不变）</b>：只改代码怎么跑，不改任何规则和数据（tools/opt1.py、opt2.py）。① 模拟：模板查找改用索引、每个单位的效果按触发条件建索引（一次事件不再把所有效果扫一遍）、几处重复计算做缓存——记忆队 6 魂一次模拟从约 42 毫秒降到约 23 毫秒，配速助手、方案对比跟着变快。② 拖速度滑块 / 连续敲数字时，多次重算合并成每帧一次。③ 角色卡里光锥 / 遗器 / 敌人模板背后的隐藏下拉不再每张卡带全部选项（页面节点少了四分之一到三分之一），改星魂、换装备这类要重画左栏的操作快了三到四成。④ 手机上“行动轴 / 表格 / 设置”只画当前看得见的那一块，切过去时再补画。⑤ 修了效果摘要里的“回能 undefined”；“强化战技：…”的效果归到行迹面板的战技里。<b>验证</b>：全部 99 个角色模板（0 魂、6 魂、全部效果打开 + 敌人攻击）改前改后的行动顺序表、每轮表、行动轴、伤害逐字一致。<b>对已有配置</b>：没有影响。</li>
+            <li><b>2026-11-10（全面校对第 7 批：光锥 172 个、遗器 64 套）</b>：全部对照官方原文和 5 档叠影数值跑了一遍（数值都对得上），补上漏掉的效果，tv 63（tools/fix63.py）。<b>光锥</b>：① 漏掉的战技点：金血铭刻的时代（终结技攻击后 +1）、你将起身歌唱（终结技后 +1）、回到大地的飞行（每 2 次战技 / 终结技 +1）、向着不可追问处（终结技消耗 ≥140 能量 +1）、向浪花掷下盛夏（波次开始 +1、每 3 次欢愉技 +1）、花花世界迷人眼（每名欢愉角色战技点上限 +1，最多 +3）；勿忘她的火焰、镜中故我要条件，默认关闭。② 忍法帖•缭乱破魔【雷遁】：终结技后 2 次普攻行动提前 50%～70%（原来只写在备注里）。③ 没有回报的加冕：能量上限 ≥300 时终结技回 10% 能量、攻击力再提高一次。④ 邂逅于下一个花季：能量上限超过 120 的部分给的能量恢复效率。⑤ 片刻，留在眼底 / 今日亦是和平的一日：按装备者实际能量上限算（原来按 120 写死）。⑥ 黎明恰如此燃烧 / 将光阴织成黄金：基础速度 +12～20 加进卡片的基础速度（百分比加速会略高）。⑦ 向浪花掷下盛夏【风口】默认开；梦应归于何处【溃败】减速、驶向第二次生命的速度（默认关）。<b>遗器</b>：凯歌祝捷的英豪 4 件“忆灵在场时速度 +6%”按忆灵在不在场自动算（原来默认关）；戍卫风雪的铁卫 4 件按当前生命值 ≤50% 自动判断；流星追迹的怪盗 4 件默认开；太空封印站补“速度 ≥120 攻击力 +12%”；寰宇生研院按实际能量上限算。<b>对已有配置</b>：装备了上面这些光锥 / 遗器的卡片会自动换成新效果（原来关着的仍关着），战技点和个别行动提前会变；其他不变。</li>
 <li><b>2026-11-10（全面校对第 6 批：远坂凛、吉尔伽美什、姬子•启行、开拓者毁灭 / 存护 / 同谐）</b>：逐条对照原文，tv 62（tools/fix62.py）。① <b>远坂凛</b>：【宝石能量】做成计数（进入战斗 20 点、我方每消耗或恢复 1 点战技点 +1、终结技 +12、6 魂 +24、秘技 +10 默认关）；<b>≥15 点或战技点 ≥7 时战技自动强化为【第二魔法实验】</b>：不耗战技点，把战技点消耗到 2 点（每点 +2 宝石能量），每 3 点宝石能量多 1 次伤害直到不足 3 点，之后速度 +20% 3 回合；暴击伤害改成“我方目标消耗或恢复战技点时”给那个目标（原来只在施放战技 / 终结技时）；连携追加攻击按原文默认开（只认 Archer 的战技、战技点 ≤3）；行迹秉持优雅 Archer 也获得。② <b>吉尔伽美什</b>：<b>【来兴致了！】之前自动普攻、兴致首次到 10 点后只能战技</b>（不用再手动点）；兴致合并成一条（连携 +3、终结技 +2、E2 +5），行迹英雄的孤傲的暴击伤害按每次实际获得的兴致叠；Saber 的攻击也计数，连携后 Saber 回 120 能量、下一次终结技 200%；行迹史诗的源头按队友实际能量上限的 30%（原来固定 36）；行迹王霸的竞逐补“能量上限每超过 140 点 1 点 +1%，最多 +100%”；E2 战技倍率、E6 弹射倍率和【黄金律】进伤害。③ <b>姬子•启行</b>：【领航旗语】做成状态（3 回合，回合开始时 −1），增伤跟着状态；终结技伤害改成主目标 762% + 其他目标 252%（原来按全体 762%）。④ <b>开拓者•存护</b>：【灼热意志】做成计数（普攻 / 战技 / 受到攻击 +1，最多 8 层，E4 开局 4 层），<b>≥4 层时普攻自动变强化普攻</b>并消耗 4 层，终结技后下一次普攻免费强化；天赋护盾、强化普攻倍率 135% + 相邻 54%、终结技的 100% 攻击力部分补上。⑤ <b>开拓者•毁灭</b>：终结技算攻击、补战技倍率（125% 扩散）、行迹坚韧、E6。⑥ <b>开拓者•同谐</b>：E6 多 2 次伤害（多回 12 能量）。⑦ <b>卢卡</b>：【斗志】≥2 层时普攻自动变直冲碎天拳。新触发“我方消耗或恢复战技点时”。<b>对已有配置</b>：用到这些角色的方案行动顺序会变（远坂凛的战技点 / 速度、吉尔伽美什开局普攻、存护主强化普攻）；其他角色不变。</li>
 <li><b>2026-11-10（全面校对第 5 批：万敌、赛飞儿、白厄、海瑟音、刻律德菈、丹恒•腾荒、不死途）</b>：逐条对照原文，tv 61（tools/fix61.py）。① <b>不死途</b>：充能按原文（初始 2 点、最多 3 点、终结技 +3），<b>天赋追加攻击默认开启</b>（【饲饵】受到其他队友攻击后回 8 能量并消耗 1 点充能追击；原来默认关、而且任何队友攻击都回 8 能量两次）；补战技“目标已是饲饵时恢复 1 个战技点”、【婪酣】层数（追击 +2、战技 +1、终结技 +2，每层追击伤害 +10%，强化追击每 4 层消耗）、秘技 +1 充能（默认关）、E6 按获得过的层数叠。② <b>刻律德菈</b>：【军功】= “每次战技目标”；充能按原文（战技 +1、终结技 +2、军功持有者施放普攻 / 战技 +1、上限 8），<b>满 6 点升【爵位】，持有者施放战技时触发奇袭（立即再施放 1 次战技）并消耗 6 点</b>，爵位的暴伤 / 穿透跟着自动开关（原来默认关）；行迹征服者的 5 点能量、见者的 1 点充能自动判断。③ <b>丹恒•腾荒</b>：<b>补上【龙灵】（速度 165，战技选【同袍】时召唤）</b>，龙灵行动给全队护盾，终结技后 2 次行动发动追加攻击（E2 再 +2 次并拉条 100%）；【同袍】= “每次战技目标”，行迹葳蕤改成只看【同袍】的攻击（+6 能量、龙灵提前 15%；原来任何队友攻击都算）。老存档会自动补一张龙灵卡。④ <b>白厄</b>：变身结束的全队加速按各自回合 1 回合；E6 火种溢出不设上限自动处理。⑤ <b>海瑟音</b>：补战斗开始时的结界（减防、E4 减抗）。⑥ <b>万敌、赛飞儿</b>：核对无误。<b>对已有配置</b>：不死途 / 刻律德菈 / 丹恒•腾荒的方案行动轴会变。</li>
 <li><b>2026-11-10（全面校对第 4 批：大丽花、大黑塔、缇宝、那刻夏）</b>：逐条对照原文，tv 60（tools/fix60.py）。① <b>那刻夏</b>：<b>天赋“对【质性揭露】的目标施放普攻或战技后额外施放 1 次战技”原来漏了</b>，现在补上（不耗战技点、每回合 1 次、按战技回能并触发战技的全部效果；按目标已有 5 种弱点算，可关）；必要的留白按队伍里「智识」角色数量自动二选一，E6 两种都给；E1 首次战技回点自动只算第一次。② <b>大黑塔</b>：行迹冷漠的诚实改成<b>我方任意目标攻击后</b>按击中目标数回 3 点能量（最多 5 个；原来只算大黑塔自己的攻击、按 1 个），队伍有 2 名「智识」时至少按 3 个算并自动给全队 80% 暴伤；补【灵感】（终结技 +1 层、最多 4 层，持有时战技是强化战技并消耗 1 层）、E2（开局和终结技各多 1 层、强化战技后行动提前 35% 自动判断）、E4 只给「智识」角色加速、E6 终结技倍率按敌人数量。③ <b>大丽花</b>：【共舞者】做成状态，天赋追加攻击默认开启（另一位共舞者攻击后，每回合 1 次）并按 5 次伤害回 <b>10 点能量</b>（原来 2 点，E4 再 +10）；致哀，故人按每 2 次追击回 1 个战技点；补 E2 开局【败谢】、E4 额外 5 次伤害、E6 大丽花自己也提前 20%，补战技伤害倍率。④ <b>缇宝</b>：核对无误，只把“每击中 1 个目标 +1.5 能量”改成按敌人卡数量。新功能：击中数范围（phr）、加速按命途（tp）。<b>对已有配置</b>：那刻夏 / 大黑塔 / 大丽花的方案能量和行动会变。</li>
@@ -3240,14 +3241,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     return `<option value="">（选择）</option><optgroup label="手工模板">${Object.entries(PRESETS).map(([k, p]) => `<option value="${k}">${esc(p.label)}</option>`).join("")}</optgroup>`
       + Object.entries(groups).map(([p, l]) => `<optgroup label="${esc(p)}">${l.map(c => `<option value="db:${c.id}">${esc(c.name)}</option>`).join("")}</optgroup>`).join("");
   };
-  const lcOptions = sel => {
-    const groups = {};
-    for (const c of DB.lcs) (groups[c.path] = groups[c.path] || []).push(c);
-    return `<option value="">（无）</option>` + Object.entries(groups).map(([p, l]) =>
-      `<optgroup label="${esc(p)}">${l.map(c => `<option value="${c.id}"${c.id === sel ? " selected" : ""}>${"★".repeat(c.rar)} ${esc(c.name)}</option>`).join("")}</optgroup>`).join("");
-  };
-  const relicOptions = (sel, planar) => `<option value="">（无）</option>` + DB.relics.filter(r => r.planar === planar)
-    .map(r => `<option value="${r.id}"${r.id === sel ? " selected" : ""}>${esc(r.name)}</option>`).join("");
+  // 光锥 / 遗器 / 敌人模板的隐藏下拉：只是自定义选择列表（openPop）背后存值用的，放“（无）”和当前这一项就够（选别的时由 openPop 补上那一项）
+  const oneOpt = (v, label, ok) => `<option value="">（无）</option>` + (ok ? `<option value="${v}" selected>${esc(label)}</option>` : "");
+  const lcOptions = sel => { const c = DB.lcs.find(x => x.id === sel); return oneOpt(sel, c ? "★".repeat(c.rar) + " " + c.name : "", !!c); };
+  const relicOptions = (sel, planar) => { const r = DB.relics.find(x => x.id === sel && x.planar === planar); return oneOpt(sel, r ? r.name : "", !!r); };
 
   // 效果按来源分组：模板效果看说明开头（战技：…、天赋：…、E2…、行迹…），光锥 / 遗器 / 星魂看来源标记；
   // 没写说明的（自己加的）按触发条件归到普攻 / 战技 / 终结技，其余算“其他”。每组默认折成一行，点开才看到每条
@@ -3468,7 +3465,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${u.kind === "ally" ? cntSmHtml(u, i) : ""}
         ${u.kind === "ally" && !u.sm ? actRowHtml(u, i) : ""}
         ${u.kind === "enemy" ? `<div class="row">
-          <div class="pickwrap">敌人模板 ${pickBtn("mon", i, MON.m.findIndex(m => m.n === u.mon))}<select hidden id="mo-${u.id}" data-u="${i}" data-mon="1" aria-label="敌人模板"><option value="">（无）</option>${MON.m.map((m, k) => `<option value="${k}"${m.n === u.mon ? " selected" : ""}>${esc(m.n)}</option>`).join("")}</select></div>
+          <div class="pickwrap">敌人模板 ${pickBtn("mon", i, MON.m.findIndex(m => m.n === u.mon))}<select hidden id="mo-${u.id}" data-u="${i}" data-mon="1" aria-label="敌人模板">${(k => oneOpt(k, k >= 0 ? MON.m[k].n : "", k >= 0))(MON.m.findIndex(m => m.n === u.mon))}</select></div>
           ${u.mon ? `<label for="lv-${u.id}">等级 <input type="number" id="lv-${u.id}" min="1" max="150" step="1" value="${num(u.lv, 95)}" data-u="${i}" data-f="lv" style="width:56px"></label>
           ${u.stg ? `<span class="hint">来自 ${esc(u.stg)}</span>` : ""}<span class="hint">资料速度 ${fmt(num(u.monS))} × ${monRatio(u.lv)}${(m => m && m.w ? ` · 弱点 ${m.w}` : "")(MON.m.find(m => m.n === u.mon))}</span>` : ""}
         </div>
@@ -4048,7 +4045,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     draw(); q.addEventListener("input", draw);
     list.addEventListener("click", e => {
       const it = e.target.closest(".pickitem"); if (!it) return;
-      sel.value = it.dataset.v; closePop(); sel.dispatchEvent(new Event("change", { bubbles: true }));
+      const v = it.dataset.v; if (v !== "" && !Array.from(sel.options).some(o => o.value === v)) sel.add(new Option((it.querySelector("span") || it).textContent, v));   // 下拉里平时只有当前这一项，选别的先补上
+      sel.value = v; closePop(); sel.dispatchEvent(new Event("change", { bubbles: true }));
     });
     const r = btn.getBoundingClientRect(), w = Math.min(320, innerWidth - 16), maxH = Math.min(innerHeight * 0.6, 420);
     pop.style.width = w + "px"; pop.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + "px";
@@ -4190,7 +4188,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const on = !$("t-order").classList.contains("allcols");
     $("t-order").classList.toggle("allcols", on); $("ord-cols").setAttribute("aria-pressed", String(on)); $("ord-cols").textContent = on ? "精简列" : "显示全部列";
   });
-  $("mtabs").addEventListener("click", e => { const b = e.target.closest("[data-mt]"); if (b) { setMt(b.dataset.mt); window.scrollTo(0, 0); } });
+  $("mtabs").addEventListener("click", e => { const b = e.target.closest("[data-mt]"); if (b) { setMt(b.dataset.mt); paint(); window.scrollTo(0, 0); } });
   // 行动轴上方的快速调速（手机上显示）：和角色卡的速度是同一个值
   $("qspd").addEventListener("input", e => { const t = e.target; if (t.dataset.f === "spd") { updDefer = true; try { onField(t, false); } finally { updDefer = false; } } });
   $("qspd").addEventListener("change", e => { const t = e.target; if (t.dataset.f === "spd") onField(t, true); });
@@ -4676,6 +4674,14 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   const updFlush = () => { if (updRaf || updTo) { updClear(); update(); } };
   const updateSoon = () => { if (updRaf || updTo) return; updRaf = requestAnimationFrame(updFlush); updTo = setTimeout(updFlush, 80); };   // 标签页在后台时 rAF 不跑，靠定时器兜底
   window.addEventListener("pagehide", updFlush);
+  // 手机（≤920px）上“行动轴 / 表格 / 设置”一次只显示一块（body[data-mt]）：看不见的行动轴 / 表格先记成“待画”，切标签或窗口变宽时用上次的模拟结果补画。桌面上三块都在，照旧每次都画
+  function paneOn(k) { const narrow = window.matchMedia && window.matchMedia("(max-width: 920px)").matches; return !narrow || document.body.dataset.mt === k; }
+  function paint() {
+    const R = R_REF; if (!R) return;
+    if (paint.tl && paneOn("tl")) { paint.tl = false; renderTimeline(R); }
+    if (paint.tab && paneOn("tab")) { paint.tab = false; renderSummary(R); renderOrder(R); }
+  }
+  if (window.matchMedia) { const mq = window.matchMedia("(max-width: 920px)"); if (mq.addEventListener) mq.addEventListener("change", paint); else if (mq.addListener) mq.addListener(paint); }
   function update() {
     if (updDefer) { updateSoon(); return; }
     updClear();
@@ -4685,9 +4691,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const io = $("io"); if (document.activeElement !== io) io.value = sNow;
     const R = simulate();
     R_REF = R;
-    renderTimeline(R);
-    renderSummary(R);
-    renderOrder(R);
+    paint.tl = paint.tab = true; paint();   // 行动轴、两张表（手机上看不见的那块等切过去再画）
     renderSwStats(R);
     renderUltTargets(R);
     renderSkTargets(R);
