@@ -1078,8 +1078,8 @@ body.tr-lock{ overflow:hidden; }
   let localTs = 0; try { localTs = Number(localStorage.getItem(TSKEY)) || 0; } catch (e) {}
   let cloudSig = null, adopting = false, cloudPush = () => {};
   let lastSaved = JSON.stringify(S);   // 打开页面时载入的那份；没改过就不刷新修改时间
-  const save = () => {
-    const s = JSON.stringify(S);
+  const save = s0 => {
+    const s = typeof s0 === "string" ? s0 : JSON.stringify(S);
     try { localStorage.setItem(STORE, s); } catch (e) {}
     trackUndo(s);
     if (adopting || s === cloudSig) { lastSaved = s; return; }
@@ -1130,7 +1130,7 @@ body.tr-lock{ overflow:hidden; }
     const L = 0.2126 * lin(n >> 16) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
     return L > 0.35 ? "#000" : "#fff";
   };
-  const num = (v, d = 0) => { const n = parseFloat(v); return Number.isFinite(n) ? n : d; };
+  const num = (v, d = 0) => { if (typeof v === "number") return Number.isFinite(v) ? v : d; if (v == null) return d; const n = parseFloat(v); return Number.isFinite(n) ? n : d; };   // 数字和空值走快路（模拟里每条效果要判断几十个可选字段，绝大多数是没填）
   const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toFixed(d);
   const maxAV = () => S.c0 + S.cn * Math.max(0, S.cycles - 1);
   // energy settings with defaults: 120 max, 50% at battle start, +30 per turn (skill), 0% ER, auto ult when full
@@ -1328,7 +1328,13 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   };
   // 当前角色对应的资料：套过模板就按模板，否则按名字对（忽略点和空格）
   const normName = s => String(s || "").replace(/[.\s]/g, "");
-  const tplOf = u => DB.chars.find(c => c.id === u.tplId) || DB.chars.find(c => normName(c.name) === normName(u.name));
+  // 索引：按 id、按名字（都取数组里的第一个，和原来的 find 一样）；DB.chars 条数变了就重建
+  let TPLIX = null;
+  const tplIx = () => {
+    if (!TPLIX || TPLIX.n !== DB.chars.length) { const id = new Map(), nm = new Map(); for (const c of DB.chars) { if (!id.has(c.id)) id.set(c.id, c); const k = normName(c.name); if (!nm.has(k)) nm.set(k, c); } TPLIX = { n: DB.chars.length, id, nm }; }
+    return TPLIX;
+  };
+  const tplOf = u => { const X = tplIx(); return X.id.get(u.tplId) || X.nm.get(normName(u.name)); };
   // 角色的模板 id（字符串）：没套模板、但名字对得上的老角色（比如早期手动建的“银狼LV999”）也按模板认，召唤物不算
   const tidOf = u => !u ? "" : u.tplId != null && u.tplId !== "" ? String(u.tplId) : u.kind === "ally" && !u.sm ? String((tplOf(u) || {}).id || "") : "";
   // 共享面板（2026-10-30 用户要求）：同一个角色（按模板）在所有方案里共用一份面板数值，存在 S.panels[模板id]；
@@ -1489,6 +1495,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const U = allUnits().map(u => ({ ...u, effects: (u.effects || []).some(preEff) ? [...u.effects.filter(preEff), ...u.effects.filter(e => !preEff(e))] : u.effects,
       dist: 10000 * (1 - Math.min(100, Math.max(-200, num(u.opening))) / 100), turns: 0, buffs: [], st: {}, hots: [], pend: [] }));
     const byId = Object.fromEntries(U.map(u => [u.id, u]));
+    // 每个单位的效果按触发建索引（顺序和效果列表一致；关闭的不进）。一次模拟里效果列表不会变，事件分发直接取 fx(u, 触发)，等价于原来逐条 trig(e, 触发)
+    const NOFX = [];
+    const mkTk = u => { const m = new Map(); for (const e of u.effects || []) { if (e.off) continue; const ks = e.or && e.or !== e.trigger && (e.trigger !== "turn" || e.or === "xturn") ? [e.trigger, e.or] : [e.trigger]; for (const k of ks) { let a = m.get(k); if (!a) m.set(k, a = []); a.push(e); } } return m; };
+    const tkM = new Map();   // 放在这次模拟自己的 Map 里，不往单位对象上写东西（不会进存档）
+    const fx = (u, k) => { let m = tkM.get(u); if (!m) tkM.set(u, m = mkTk(u)); return m.get(k) || NOFX; };
     // 召唤物 / 忆灵 / 倒计时（u.sm = { owner, key, ratio, life, cd, start, pause }）：
     // 不是开局在场的先“离场”（gone，不跑条），靠“召唤”效果登场；life = 自己行动几次后离场（0 一直在）；
     // ratio > 0 时速度 = 本体当前速度 × ratio%；cd = 倒计时（不算队友：不被全体效果选中、行动不触发队友效果）；
@@ -1563,7 +1574,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const healFor = (tg, kind) => {
       if (healDepth > 3) return;
       healDepth++;
-      try { for (const e of tg.effects) if (trig(e, kind)) apply(e, tg, tg.color); } finally { healDepth--; }
+      try { for (const e of fx(tg, kind)) apply(e, tg, tg.color); } finally { healDepth--; }
     };
     // “弱点击破时 / 消灭敌人时 / 受到攻击时”：由手动事件触发。
     // 弱点击破：我方所有角色身上这个触发的效果都生效（事件对象 = 被击破的敌人）。
@@ -1581,7 +1592,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         const ids = u.pend.filter(id => byId[id] && !byId[id].gone); u.pend = [];   // 记下的目标都已离场（长夜施放迷梦后消失）就不结算
         if (u.gone || !ids.length) continue;
         const prev = u.pendNow; u.pendNow = ids;
-        try { for (const e of u.effects) if (trig(e, "tick")) apply(e, u, u.color); } finally { u.pendNow = prev; }
+        try { for (const e of fx(u, "tick")) apply(e, u, u.color); } finally { u.pendNow = prev; }
       }
     };
     // 谁的事件算：self 只算自己（默认）/ selfsm 自己或自己的忆灵 / exsm 除自己的忆灵外谁都算 / any 谁都算
@@ -1602,8 +1613,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       // 游戏规则：消灭敌人的角色固定回 10 点能量（吃充能效率）
       if (kind === "kill" && tg && tg.kind === "ally" && hasEnergy(tg) && !noStdE(tg)) { curWhy = "消灭敌人回能"; addEnergy(tg, 10, true); }
       try {
-        for (const u of U) if (u.kind === "ally") for (const e of u.effects) {
-          if (!trig(e, kind)) continue;
+        for (const u of U) if (u.kind === "ally") for (const e of fx(u, kind)) {
           if (kind !== "break" && !evOk(e, u, tg)) continue;
           // 每回合最多几次（停云 2 魂、寒鸦 1 魂这类），和队友触发共用计数，在效果持有者自己的回合开始清零
           const k = kind + "|" + u.id + "|" + e.id, lim = Math.round(num(e.allyCap));
@@ -1638,11 +1648,13 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const healTot = {};
     const statVal = (u, k) => { if (!u) return null; const v = u[k] ?? u[k + "B"]; return v == null || v === "" ? null : num(v); };
     const ownerOf = u => (u && u.sm && byId[u.sm.owner]) || u;
-    const tx = u => ((u && !u.sm && tplOf(u)) || {}).x || {};   // 模板里只在模拟时读的特殊规则（不写到卡片上，老存档不用迁移）
+    const NOX = {}, txC = new Map();
+    const tx = u => { if (!u || u.sm) return NOX; let x = txC.get(u); if (x === undefined) { x = (tplOf(u) || {}).x || NOX; txC.set(u, x); } return x; };   // 模板里只在模拟时读的特殊规则（不写到卡片上，老存档不用迁移）
     // 累计已损失生命值（刃终结技）：lossAcc = [上限占生命上限 %, 开大后保留 %, 受到治疗时治疗数值转化 %]
     const addLost = (u, a) => { const L = tx(u).lossAcc; if (!L || !(a > 0)) return; const H = hpNow(u); u.lost = Math.min(H != null ? H * num(L[0]) / 100 : Infinity, num(u.lost) + a); };
     // 忆灵的基础生命上限 = 主人面板生命上限 × 比例 + 固定值（按模板；主人身上的临时生命上限增益不算）
-    const smDef = u => { const o = u && u.sm && byId[u.sm.owner], T = o && tplOf(o); return (T && (T.sm || []).find(m => m.k === u.sm.key)) || null; };
+    const smC = new Map();
+    const smDef = u => { if (!u || !u.sm) return null; let d = smC.get(u); if (d === undefined) { const o = byId[u.sm.owner], T = o && tplOf(o); d = (T && (T.sm || []).find(m => m.k === u.sm.key)) || null; smC.set(u, d); } return d; };
     const isOut = u => !!(u && u.sm && (smDef(u) || {}).ow);   // 界外（德谬歌）：群体效果选不中
     const memHp = u => {
       const o = byId[u.sm.owner], d = smDef(u);
@@ -1659,7 +1671,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!u) return null;
       const h0 = u.sm ? memHp(u) : statVal(u, "hp"); if (h0 == null) return null;
       if (u.sm && (smDef(u) || {}).he) return h0;   // 死龙：固定生命上限（等同于新蕊上限），生命上限增益不算
-      return h0 + (u.buffs || []).filter(b => b.kind === "hp").reduce((s, b) => s + b.v, 0);
+      let h = h0; const B = u.buffs; if (B) for (let i = 0; i < B.length; i++) if (B[i].kind === "hp") h += B[i].v;
+      return h;
     };
     // ---------- 当前生命值：开局（忆灵登场时）满血；消耗生命值、治疗、恢复生命值会改，没有生命数值的单位不记（null） ----------
     // 生命上限变化时：S.hpMx "keep" = 当前生命值不变（不超过新上限），默认按比例（百分比不变）
@@ -2294,8 +2307,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!who || who.kind !== "ally" || isCd(who)) return;
       const prev = evTarget, prevA = evAmt; evTarget = who; evAmt = amt == null ? null : amt;
       try {
-        for (const u of U) if (u.kind === "ally" && !u.gone) for (const e of u.effects) {
-          if (!trig(e, key) || !okWho(e, u, who) || (filt && !filt(e))) continue;
+        for (const u of U) if (u.kind === "ally" && !u.gone) for (const e of fx(u, key)) {
+          if (!okWho(e, u, who) || (filt && !filt(e))) continue;
           if (e.aAct && [].concat(e.aAct).indexOf(who.lastAct) < 0) continue;                                        // 只算某种行动
           if (e.aTpl && ![].concat(e.aTpl).map(Number).includes((tplOf(who) || {}).id)) continue;                     // 只算某个角色
           if (e.aSt && !hasSt(who, String(e.aSt)) && !(who.sm && byId[who.sm.owner] && hasSt(byId[who.sm.owner], String(e.aSt)))) continue;   // 行动的人（或它的主人）身上要有这个状态
@@ -2313,17 +2326,17 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     // 全队都看的时刻（阿哈时刻结束 ahaEnd、敌方回合开始 eturn）：我方每个在场角色身上这个触发的效果都生效
     const fireAll = (key, tgt) => {
       const prev = evTarget; evTarget = tgt || null;
-      try { for (const u of U) if (u.kind === "ally" && !u.gone) for (const e of u.effects) if (trig(e, key)) apply(e, u, u.color); }
+      try { for (const u of U) if (u.kind === "ally" && !u.gone) for (const e of fx(u, key)) apply(e, u, u.color); }
       finally { evTarget = prev; }
     };
     // 计数器：u.cntAt = 满几点；“计数”效果往上加，满了扣掉 cntAt 并触发自己身上“计数满时”(cnt) 的效果
     let cntDepth = 0;
     // cntKeep = 满了不清零（只在从未满变成满时触发一次，比如晴歌气氛值），cntMax = 上限
-    const fireCnt = (u, key) => { for (const e of u.effects) if (trig(e, key)) apply(e, u, u.color); };
+    const fireCnt = (u, key) => { for (const e of fx(u, key)) apply(e, u, u.color); };
     const addCnt = (u, v) => {
       if (!u || !(v > 0)) return;
       try { addCnt0(u, v); } finally {
-        if (cntDepth <= 3 && u.effects.some(e => trig(e, "cntUp"))) { cntDepth++; try { fireCnt(u, "cntUp"); } finally { cntDepth--; } }   // 计数增加后（万敌：充能到 100 / 150 的门槛）
+        if (cntDepth <= 3 && fx(u, "cntUp").length) { cntDepth++; try { fireCnt(u, "cntUp"); } finally { cntDepth--; } }   // 计数增加后（万敌：充能到 100 / 150 的门槛）
       }
     };
     const addCnt0 = (u, v) => {
@@ -2344,7 +2357,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           if (tx(u).cntHp1 && hpCur(u) != null && hpCur(u) <= 1) { u.cnt = Math.min(u.cnt, at); if (!marks.some(m => m.t === t && m.uid === u.id && m.label === "生命值 1 点，充能先不用")) marks.push({ t, uid: u.id, label: "生命值 1 点，充能先不用", color: u.color, from: u.name }); break; }   // 千冶•刃：当前生命值大于 1 才能消耗充能
           u.cnt -= at;
           marks.push({ t, uid: u.id, label: (u.cntName || "计数") + "满", color: u.color, from: u.name });
-          for (const e of u.effects) if (trig(e, "cnt")) apply(e, u, u.color);
+          for (const e of fx(u, "cnt")) apply(e, u, u.color);
         }
       } finally { cntDepth--; }
     };
@@ -2374,7 +2387,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (u.sm.pause && o) o.paused = true;
       if (!was || u.sm.cd || num(u.sm.life) > 0) marks.push({ t, uid: u.id, label: was ? "刷新" : "登场", color: color || u.color, from: src ? src.name : "事件" });   // 一直在场的召唤物刷新不标
       // 不在场 → 登场时触发本体身上“召唤物登场时”(smOn) 的效果（刷新不算），事件对象 = 这个召唤物
-      if (!was && o) { const prev = evTarget; evTarget = u; try { for (const e of o.effects) if (trig(e, "smOn") && (!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; } }
+      if (!was && o) { const prev = evTarget; evTarget = u; try { for (const e of fx(o, "smOn")) if ((!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; } }
     };
     const summonOff = u => {
       if (!u || !u.sm || u.gone) return;
@@ -2384,7 +2397,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!o) return;
       if (u.sm.pause) o.paused = false;
       const prev = evTarget; evTarget = u;
-      try { for (const e of o.effects) if (trig(e, "smEnd") && (!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
+      try { for (const e of fx(o, "smEnd")) if ((!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
     };
     // 追加攻击（追击）：不是行动——不占回合、不耗战技点、不回每回合能量、不触发“队友行动后”；
     // 算一次攻击（触发“队友攻击后”），并触发自己（召唤物的追击也算本体的）“施放追加攻击时”和队友的“队友追加攻击后”。
@@ -2411,7 +2424,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const fuaHooks = (u, as) => {
       const prev = evTarget; evTarget = u;
       try {
-        for (const w of [u, u.sm ? byId[u.sm.owner] : null]) if (w && w.kind === "ally") for (const e of w.effects) if (trig(e, "fua")) apply(e, w, w.color);
+        for (const w of [u, u.sm ? byId[u.sm.owner] : null]) if (w && w.kind === "ally") for (const e of fx(w, "fua")) apply(e, w, w.color);
       } finally { evTarget = prev; }
       const la = u.lastAct; u.lastAct = "fua";
       try { teamFire("aFua", u); if (!as) atkAct(u, true); } finally { u.lastAct = la; }
@@ -2518,7 +2531,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         marks.push({ t, uid: u.id, label: k === "skill" ? "施放战技" : "施放普攻", color: u.color, from: src ? src.name : "事件" });
         if (k === "skill") { u.skN = num(u.skN) + 1; skMarks.push({ t, uid: u.id, n: u.skN }); }
         const was = u.acting; u.acting = true;
-        for (const e of u.effects) if (trig(e, k)) apply(e, u, u.color);
+        for (const e of fx(u, k)) apply(e, u, u.color);
         u.acting = was;
         if (k === "skill") teamFire("aSk", u);
         if (hasEnergy(u)) { curWhy = `${k === "skill" ? "战技" : "普攻"}回能（秘技 / 不占回合的施放）`; addEnergy(u, actE(u, k), true); }
@@ -2565,7 +2578,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const parts = [];
       if (usesPick) parts.push(`第${u.ultN}次大招目标：${nameOf(pickFor(u))}`);
       markHit(u, parts);
-      for (const e of u.effects) if (trig(e, "ult")) apply(e, u, u.color);
+      for (const e of fx(u, "ult")) apply(e, u, u.color);
       { const um = ultMarks[ultMarks.length - 1]; if (um && um.uid === u.id) { um.db = dbSnap(u); um.edb = edbSnap(); um.pAt = pool; } }   // 伤害增益：吃得到开大时自己给的
       { const L = tx(u).lossAcc, um = ultMarks[ultMarks.length - 1]; if (L && um && um.uid === u.id) { um.lost = num(u.lost); um.hpm = hpNow(u) ?? um.hpm; u.lost = num(u.lost) * num(L[1]) / 100; } }   // 刃：这次开大用的累计已损失生命值，开大后清掉一部分（强化版无尽形寿：只清空 50%）
       u.lastAct = "ult"; allyAct(u, true);
@@ -2651,7 +2664,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const hit = [];
       swU.ultN = (swU.ultN || 0) + 1;
       markHit(swU, hit);
-      for (const e of swU.effects) if (trig(e, "ult")) apply(e, swU, swU.color);
+      for (const e of fx(swU, "ult")) apply(e, swU, swU.color);
       swU.lastAct = "ult"; allyAct(swU, true);
       teamFire("aUlt", swU);
       if (swU.atkUlt !== false) atkAct(swU);
@@ -2714,7 +2727,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const se = num(S.aha.skillEnergy, 5);
       for (const u of U) if (u.kind === "ally" && u.elation) {
         if (se > 0 && !u.punchAt) { curWhy = "欢愉技回能（全局设置）"; addEnergy(u, se, true); }   // 通用的“欢愉技回能”不适用于愿力（星神★阿哈只有自己的 +1）
-        for (const e of u.effects) if (trig(e, "aha")) apply(e, u, u.color);
+        for (const e of fx(u, "aha")) apply(e, u, u.color);
         // 欢愉技造成伤害才算一次攻击：elDmg = "yes"（默认）/ "no" / "ult"（只有银狼无敌玩家期间才有伤害）
         const dmg = u.elDmg || "yes";
         if (dmg === "yes" || (dmg === "ult" && u === swU && sw.inUlt)) atkAct(u);
@@ -2733,7 +2746,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (gain) { setScore(sw.score + gain, rec.why || (rec.extra ? "额外阿哈时刻欢愉技" : "欢愉技")); checkE2(); }
     };
     if (swU && pool > 0) setScore(sw.score + pool, "开局笑点");
-    for (const u of U) for (const e of u.effects) if (trig(e, "start")) apply(e, u, u.color);
+    for (const u of U) for (const e of fx(u, "start")) apply(e, u, u.color);
     checkPunchE();
     checkUlts();
 
@@ -2760,7 +2773,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         rec.act = actOf(swU, "x" + xn, rec.ult); rec.nat = actOf.nat;
         rec.wx = wxActive(); annRec(rec); actions.push(rec);
         swU.acting = true;
-        for (const e of swU.effects) if (trig(e, "xturn")) apply(e, swU, swU.color);   // 银狼的额外回合同样只触发“额外回合时”的效果
+        for (const e of fx(swU, "xturn")) apply(e, swU, swU.color);   // 银狼的额外回合同样只触发“额外回合时”的效果
         swU.acting = false;
         rec.spShort = onAction(swU, rec.act); reSnap(rec, swU);
         if (rec.ult) spendCharge();
@@ -2788,11 +2801,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         rec.wx = wxActive(); annRec(rec); actions.push(rec);
         if (u.sm && byId[u.sm.owner]) {   // 忆灵的额外回合（德谬歌、小伊卡）也触发本体的“召唤物回合开始时”
           const o = byId[u.sm.owner], prev = evTarget; evTarget = u;
-          try { for (const e of o.effects) if (trig(e, "smTurn") && (!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
+          try { for (const e of fx(o, "smTurn")) if ((!e.smOnly || e.smOnly === u.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
         }
         if (hasEnergy(u)) { curWhy = `额外回合${actName[rec.act] || ""}回能`; addEnergy(u, actE(u, rec.act), true); }
         u.acting = true;
-        for (const e of u.effects) if (trig(e, "xturn")) apply(e, u, u.color);   // 额外回合只触发“额外回合时”的效果
+        for (const e of fx(u, "xturn")) apply(e, u, u.color);   // 额外回合只触发“额外回合时”的效果
         u.acting = false;
         rec.spShort = rec.act ? onAction(u, rec.act) : false; reSnap(rec, u);
         if (u === swU && !rec.ult && rec.act === "skill" && num(W.skillPunch) > 0) addPunch(num(W.skillPunch), "银狼战技");
@@ -2903,7 +2916,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       // 召唤物 / 倒计时的回合开始：触发本体身上“召唤物回合开始时”(smTurn)，事件对象 = 这个召唤物
       if (actor.sm && byId[actor.sm.owner]) {
         const o = byId[actor.sm.owner], prev = evTarget; evTarget = actor;
-        try { for (const e of o.effects) if (trig(e, "smTurn") && (!e.smOnly || e.smOnly === actor.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
+        try { for (const e of fx(o, "smTurn")) if ((!e.smOnly || e.smOnly === actor.sm.key)) apply(e, o, o.color); } finally { evTarget = prev; }
       }
       if (actor.kind === "aha") {
         rec.poolBefore = pool;   // 显示用：这一刻之前的笑点
@@ -3049,10 +3062,16 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (e.type === "count" && e.byAmt) return `${t} → 计数 +${e.amtHp ? "每损失 1% 生命值 " + num(e.value) / 100 + " 点" : num(e.value) + "% 事件数值"}${c}`;
     if (e.type === "energy" && e.byAmt) return `${t} → 回能 ${num(e.value)}% 事件数值${c}`;
     if (e.type === "energy" && e.mode === "full") return `${t} → 能量回满${c}`;
+    if (e.type === "energy" && e.mode === "zero") return `${t} → 清空溢出的能量${c}`;
+    if (e.type === "energy" && e.mode === "maxp") return `${t} → 回能 能量上限的 ${num(e.value)}%${c}`;
+    if (e.type === "energy" && e.mode === "evp") return `${t} → 回能 这次终结技消耗能量的 ${num(e.value)}%${c}`;
+    if (e.type === "sp" && e.mode === "to") return `${t} → 战技点消耗至 ${num(e.value)} 点${num(e.cntPer) > 0 ? `（每点计数 +${num(e.cntPer)}）` : ""}${c}`;
+    if (e.type === "count" && e.mode === "mod") return `${t} → 计数每 ${Math.abs(num(e.value))} 点消耗一轮${c}`;
+    if (e.type === "count" && e.mode === "set") return `${t} → 计数设为 ${num(e.value)}${c}`;
     if (e.type === "state" && e.stTick === "chg") return `${t} → 【${e.stKey || "?"}】${num(e.value) > 0 ? "+" : ""}${num(e.value)} 充能${c}`;
     if (e.type === "state") return `${t} → ${num(e.value) > 0 ? `获得【${e.stKey || "?"}】${num(e.duration) > 0 ? " " + num(e.duration) + " 回合" : ""}` : `移除【${e.stKey || "?"}】`}${c}`;
     const noVal = ["shield", "extra", "summon", "dismiss", "fua", "cast", "pend"].includes(e.type);
-    return `${t} → ${TYPEL[e.type] || e.type}${noVal ? "" : " " + e.value}${c}`;
+    return `${t} → ${TYPEL[e.type] || e.type}${noVal || e.value == null || e.value === "" ? "" : " " + e.value}${c}`;
   };
   const effFold = (e, i, j) => e.type === "info"
     ? `<div class="effect fold info" style="opacity:.9"><span class="hint" style="white-space:normal">${esc(e.note || "")}</span></div>`
@@ -3247,7 +3266,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (/^愿力|在场时/.test(n)) return "talent";
     if (/^秘技/.test(n)) return "tech";
     if (/^(强化普攻|普攻)/.test(n)) return "basic";
-    if (/^战技/.test(n)) return "skill";
+    if (/^(强化战技|战技)/.test(n)) return "skill";
     if (/^终结技/.test(n)) return "ult";
     if (/^忆灵/.test(n)) return "memo";
     if (/^欢愉技/.test(n)) return "elation";
@@ -3667,7 +3686,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     update();
   }
   const ed = document.querySelector(".rail");
-  ed.addEventListener("input", e => { const t = e.target; if ((t.dataset.f || t.dataset.a || t.dataset.s) && t.tagName !== "SELECT" && t.type !== "checkbox") onField(t, false); });
+  ed.addEventListener("input", e => { const t = e.target; if ((t.dataset.f || t.dataset.a || t.dataset.s) && t.tagName !== "SELECT" && t.type !== "checkbox") { updDefer = true; try { onField(t, false); } finally { updDefer = false; } } });
   ed.addEventListener("change", e => {
     const t = e.target;
     if (t.dataset.skt !== undefined) {
@@ -4173,7 +4192,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   });
   $("mtabs").addEventListener("click", e => { const b = e.target.closest("[data-mt]"); if (b) { setMt(b.dataset.mt); window.scrollTo(0, 0); } });
   // 行动轴上方的快速调速（手机上显示）：和角色卡的速度是同一个值
-  $("qspd").addEventListener("input", e => { const t = e.target; if (t.dataset.f === "spd") onField(t, false); });
+  $("qspd").addEventListener("input", e => { const t = e.target; if (t.dataset.f === "spd") { updDefer = true; try { onField(t, false); } finally { updDefer = false; } } });
   $("qspd").addEventListener("change", e => { const t = e.target; if (t.dataset.f === "spd") onField(t, true); });
   const G ={ "g-cycles": "cycles", "g-c0": "c0", "g-cn": "cn", "g-zoom": "zoom", "g-sps": "spStart", "g-spm": "spMax" };
   const GDEF = { spStart: 3, spMax: 5 };
@@ -4651,10 +4670,19 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   });
 
   // ---------- output ----------
+  // 拖滑块 / 连续敲数字时（input 事件）把多次重算合并成每帧一次；其他操作（change、点击、载入）照旧立即重算，并取消还没跑的那次
+  let updDefer = false, updRaf = 0, updTo = 0;
+  const updClear = () => { if (updRaf) cancelAnimationFrame(updRaf); if (updTo) clearTimeout(updTo); updRaf = updTo = 0; };
+  const updFlush = () => { if (updRaf || updTo) { updClear(); update(); } };
+  const updateSoon = () => { if (updRaf || updTo) return; updRaf = requestAnimationFrame(updFlush); updTo = setTimeout(updFlush, 80); };   // 标签页在后台时 rAF 不跑，靠定时器兜底
+  window.addEventListener("pagehide", updFlush);
   function update() {
+    if (updDefer) { updateSoon(); return; }
+    updClear();
     if (panelSync(S)) renderEditor();   // 刚换模板的卡片从共享面板拉数值
-    save();
-    const io = $("io"); if (document.activeElement !== io) io.value = JSON.stringify(S);
+    const sNow = JSON.stringify(S);
+    save(sNow);
+    const io = $("io"); if (document.activeElement !== io) io.value = sNow;
     const R = simulate();
     R_REF = R;
     renderTimeline(R);
