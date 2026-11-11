@@ -673,6 +673,32 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
 .unit .eq-row .eqimg{ height:36px; } .unit .eq-row .eqimg.rel{ width:36px; }
 .unit .eq-row > label{ align-self:end; padding-bottom:4px; }
 @media (max-width:420px){ .unit-head .portrait{ width:84px; height:108px; } .unit-head .swatch{ left:80px; top:102px; } }
+/* ===== 界面第 2 轮：角色卡下半部分（行动 / 能量 / 终结技 / 效果） ===== */
+.unit .en-row{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 16px; align-items:stretch; }
+.unit .en-row > label{ display:flex; justify-content:space-between; align-items:center; gap:6px; padding:4px 2px; font-size:12.5px; color:#d5e2ea; border-bottom:1px solid rgba(190,225,240,.10); min-width:0; }
+.unit .en-row > label input[type=number]{ width:72px !important; text-align:right; border:none; background:none; padding:1px 2px; font-size:14px; font-weight:600; color:#fff; border-radius:4px; }
+.unit .en-row > label input[type=number]:focus{ background:rgba(111,227,236,.10); box-shadow:none; }
+.unit .en-row > label input::placeholder{ color:rgba(160,180,200,.55); font-weight:500; }
+.unit .en-row > label:has(input[type=checkbox]){ justify-content:flex-start; color:#b9cad6; }
+.unit .act-row{ gap:6px 14px; }
+.unit .act-row > label{ font-size:12.5px; color:#d5e2ea; }
+.unit .act-row select{ border-radius:999px; padding:3px 10px; border-color:var(--line-2); background:rgba(18,30,52,.72); }
+.unit .turn-acts{ padding:6px 8px; border:1px solid rgba(122,206,224,.14); border-radius:8px; background:rgba(6,11,22,.45); }
+.unit .turn-acts:empty{ display:none; }
+.unit > details:not(.dmg-mult){ border:1px solid rgba(122,206,224,.16); border-radius:8px; background:rgba(8,13,26,.45); padding:0 10px; }
+.unit > details:not(.dmg-mult) > summary{ list-style:none; padding:6px 0; font-size:12px; letter-spacing:.04em; color:#a8dce8; display:flex; align-items:center; gap:6px; }
+.unit > details:not(.dmg-mult) > summary::-webkit-details-marker{ display:none; }
+.unit > details:not(.dmg-mult) > summary::before{ content:"▸"; color:var(--accent); font-size:10px; }
+.unit > details[open]:not(.dmg-mult) > summary::before{ content:"▾"; }
+.unit > details[open]:not(.dmg-mult){ padding-bottom:8px; }
+.unit .ult-when{ padding:6px 8px; border:1px solid rgba(183,156,255,.20); border-radius:8px; background:linear-gradient(90deg, rgba(183,156,255,.08), rgba(8,13,26,.4)); }
+.unit .ult-targets{ padding:4px 2px; }
+.unit .eff-head{ padding:2px 0 0; }
+.unit .eff-head button{ border-radius:999px; }
+.unit .add-effect{ border-style:dashed; color:#a8dce8; }
+.unit .en-mon > label{ align-self:end; padding-bottom:4px; }
+.unit.fold .sec-t{ display:none; }
+@media (max-width:420px){ .unit .en-row{ gap:0 12px; } .unit .en-row > label{ font-size:12px; white-space:nowrap; } .unit .en-row > label input[type=number]{ width:50px !important; font-size:13px; } .unit .stat-row > label, .unit .dmg-row > label{ white-space:nowrap; font-size:12.5px; } .unit .stat-row > label input[type=number], .unit .dmg-row > label input[type=number]{ width:64px !important; } }
 </style>
 
 <!-- 校对记录（每日任务按此挑选最久未校对的项目）
@@ -932,7 +958,8 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-11（击破第 3 批：雪衣、飞霄、黄泉、灵砂、Archer、那刻夏）</b>：tv 70（tools/fix70.py）。雪衣终结技（E2 追加攻击）、飞霄终结技、黄泉终结技（E6 普攻 / 战技）无视弱点属性削韧；飞霄终结技打没破韧的目标击破效率 +100%；灵砂【醇醉】受到的击破伤害 +25%、E1 击破效率 +50%、E2 全队击破特攻 +40%；Archer E2 终结技添加量子弱点；那刻夏终结技【升华】添加全部弱点（到目标回合开始）。只在放了带韧性的敌人时才有变化。</li>
+<li><b>2026-11-11（界面第 2 轮：角色卡下半部分）</b>：卡片下半部分分成「行动」「能量」「终结技」「效果」几段，能量那一排改成和属性一样的两列列表，折叠的几条（没识别的描述、计数器 · 召唤物）改成细条，敌人卡加「敌人」分段。只改样式和排版，数据和计算都没动。</li>
+              <li><b>2026-11-11（击破第 3 批：雪衣、飞霄、黄泉、灵砂、Archer、那刻夏）</b>：tv 70（tools/fix70.py）。雪衣终结技（E2 追加攻击）、飞霄终结技、黄泉终结技（E6 普攻 / 战技）无视弱点属性削韧；飞霄终结技打没破韧的目标击破效率 +100%；灵砂【醇醉】受到的击破伤害 +25%、E1 击破效率 +50%、E2 全队击破特攻 +40%；Archer E2 终结技添加量子弱点；那刻夏终结技【升华】添加全部弱点（到目标回合开始）。只在放了带韧性的敌人时才有变化。</li>
 <li><b>2026-11-11（击破第 2 步：超击破、击破效率、无视弱点削韧、添加弱点）</b>：tv 69（tools/fix69.py）。① <b>超击破</b>：攻击已经破韧的敌人后，把这次攻击的削韧值转成超击破伤害（80 级击破基础值 × 削韧点数 ÷ 10 × 倍率 × (1 + 击破特攻)），记在日志和伤害里。② <b>弱点击破效率</b>、<b>无视弱点属性削韧</b>（不叠加，取最大）、<b>给敌人添加弱点</b>（按敌人自己的回合数消失）、<b>直接造成击破伤害</b>的效果，都可以在效果里自己加。③ 角色：<b>阮•梅</b>【弦外音】击破效率 +50%、行迹全队击破特攻 +20%、天赋击破时 120% 冰属性击破伤害（E6 332%）、E4 击破特攻 +100%；<b>同谐主</b>【伴舞】（3 回合，击破特攻 +30%、超击破 100%，卫我起舞按敌人数量 +20%～60%）；<b>忘归人</b>【狐祈】击破特攻 +30% 和 50% 无视弱点削韧、终结技无视弱点、全队 100% 超击破、【云火昭】（破韧后还有 40% 额外韧性，削完再受一次击破伤害）、行迹和 E1 / E6；<b>流萤</b>「完全燃烧」击破效率 +50%、击破特攻 +25%、受到击破伤害 +20%、强化战技添加火弱点、击破特攻 ≥150% / 300% 时 100% / 150% 超击破、E6；<b>乱破</b>【结印】击破效率 +50%、击破特攻 +30%、强化普攻 50% 无视弱点削韧和 60% 超击破；<b>加拉赫</b>【酩酊】受到击破伤害 +12%、E6；<b>波提欧</b>终结技添加物理弱点、【优势口袋】每层强化普攻削韧 +50%、天赋击破伤害（70% / 120% / 170%）、E2 击破特攻、E6；<b>银狼</b>战技添加编队第一位属性的弱点。对已有方案：手动添加的敌人没有韧性，结果不变；用了怪物库敌人的方案，这些角色在场时破韧会更快、多出超击破伤害。还没做：阮•梅【残梅绽】、乱破天赋充能和第 3 段击破伤害、同谐主随波逐流、忘归人 E4 / E6 全队狐祈、流萤攻击力换算击破特攻，以及大丽花、那刻夏、雪衣、飞霄、黄泉、灵砂等其余角色的击破相关效果。</li>
 <li><b>2026-11-11（击破第 1 步：韧性条、弱点击破、击破伤害）</b>：tools/build_tgh.py、tools/brk1.py。① <b>敌人有韧性条了</b>：套了模板的敌人按官方数值带韧性（敌人卡上“韧性”可以改；471 个里 15 个没有数据，要自己填），自己加的空白敌人没有。② 我方攻击按官方削韧值削韧（每个技能主目标 / 全体 / 相邻各多少），<b>只对弱点属性有效</b>；削到 0 就是<b>击破</b>：行动轴上标“击破”，敌人行动延后 25%，并按击破者的属性附带效果——物理裂伤、火灼烧、雷触电、风风化（各 2 回合，敌人回合开始结算）、冰冻结（跳过 1 个回合，之后行动提前 50%）、量子纠缠（再延后 20% ×（1 + 击破特攻））、虚数禁锢（再延后 30% ×（1 + 击破特攻）、速度 −10%）；敌人下一个回合开始时韧性恢复。我方“弱点击破时”的效果现在会自动触发，不用再手动加事件。③ <b>击破伤害</b>进伤害合计：3767.55 × 属性系数 ×（0.5 + 韧性 ÷ 120）×（1 + 击破特攻），不暴击、不吃增伤；角色卡新增“击破特攻 %”。④ “韧性没破 ×0.9”改成按模拟里敌人当时破没破。⑤ 伤害设置里可以勾“不模拟韧性和击破”关掉这一整套。<b>对已有配置</b>：<b>套了模板的敌人会被击破、行动会被推后</b>，这类方案的行动顺序会变；没放敌人或只放空白敌人的方案不变。还没做：超击破、击破效率、无视弱点削韧、弱点植入（银狼、流萤等）、纠缠叠层。</li>
             <li><b>2026-11-11 每日校对（加拉赫、知更鸟、阿格莱雅，tv 68）</b>：对照官方技能 / 行迹 / 星魂原文和参数。
@@ -3294,7 +3321,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   const actRowHtml = (u, i) => {
     const ov = u.actOv ? Object.entries(u.actOv) : [];
     const swNow = S.sw.uid === u.id && u.elation;
-    return `<div class="row">
+    return `<div class="row act-row">
           <label for="ac-${u.id}">平时 <select id="ac-${u.id}" data-u="${i}" data-f="act">${opt([["skill", "战技"], ["basic", "普攻"], ["ebasic", "强化普攻（不回战技点）"]], u.act === "basic" || u.act === "ebasic" ? u.act : "skill")}</select></label>
           <label for="as-${u.id}"><input type="checkbox" id="as-${u.id}" ${u.atkSkill !== false ? "checked" : ""} data-u="${i}" data-f="atkSkill">战技算攻击</label>
           <label for="au2-${u.id}"><input type="checkbox" id="au2-${u.id}" ${u.atkUlt !== false ? "checked" : ""} data-u="${i}" data-f="atkUlt">开大算攻击</label>
@@ -3760,8 +3787,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${(n => n.length ? `<details><summary>光锥/遗器里没自动识别的描述（${n.length}）</summary>${n.map(x => `<p class="hint">${esc(x)}</p>`).join("")}</details>` : "")(equipNotes(u))}
         ${Array.isArray(u.tplNotes) && u.tplNotes.length ? `<details><summary>角色技能里没自动识别的描述（${u.tplNotes.length}）</summary>${u.tplNotes.map(x => `<p class="hint">${esc(x)}</p>`).join("")}</details>` : ""}`}
         ${u.kind === "ally" ? cntSmHtml(u, i) : ""}
-        ${u.kind === "ally" && !u.sm ? actRowHtml(u, i) : ""}
-        ${u.kind === "enemy" ? `<div class="row">
+        ${u.kind === "ally" && !u.sm ? `<div class="sec-t">行动 <em>普攻 / 战技</em></div>` + actRowHtml(u, i) : ""}
+        ${u.kind === "enemy" ? `<div class="sec-t">敌人 <em>模板 / 出招</em></div><div class="row eq-row en-mon">
           <div class="pickwrap">敌人模板 ${pickBtn("mon", i, MON.m.findIndex(m => m.n === u.mon))}<select hidden id="mo-${u.id}" data-u="${i}" data-mon="1" aria-label="敌人模板">${(k => oneOpt(k, k >= 0 ? MON.m[k].n : "", k >= 0))(MON.m.findIndex(m => m.n === u.mon))}</select></div>
           ${u.mon ? `<label for="lv-${u.id}">等级 <input type="number" id="lv-${u.id}" min="1" max="150" step="1" value="${num(u.lv, 95)}" data-u="${i}" data-f="lv" style="width:56px"></label>
           <label for="tg-${u.id}" title="韧性（官方数值，30 = 游戏里的 10 点；同名敌人不同关卡可能不一样，可以自己改；清空 = 用模板的）">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="${(m => m && m.tn ? m.tn : 0)(MON.m.find(m => m.n === u.mon))}" data-u="${i}" data-f="tough" style="width:60px"></label>
@@ -3789,7 +3816,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         </div>` : ""}
         ${u.kind !== "ally" || u.sm ? "" : S.sw.uid === u.id && u.elation
           ? swBlockHtml()
-          : (c => `<div class="row">
+          : (c => `<div class="sec-t">${eName(u)} <em>上限 / 回复</em></div><div class="row en-row">
           <label for="em-${u.id}">${eName(u)}上限 <input type="number" id="em-${u.id}" min="1" step="5" value="${c.maxE}" data-u="${i}" data-f="maxE"></label>
           ${u.capE != null || u.maxE2 != null ? `<label for="ecp-${u.id}" title="满了还能继续存到这么多，开大只扣开大所需的">最多存 <input type="number" id="ecp-${u.id}" min="1" step="1" value="${u.capE ?? ""}" placeholder="${c.maxE}" data-u="${i}" data-f="capE" style="width:56px"></label>
           <label for="em2-${u.id}" title="第 1 次开大后，之后每次开大所需（昔涟【往昔的涟漪】）">第 2 次起开大要 <input type="number" id="em2-${u.id}" min="0" step="1" value="${u.maxE2 ?? ""}" placeholder="${c.maxE}" data-u="${i}" data-f="maxE2" style="width:56px"></label>
@@ -3807,10 +3834,12 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         </div>
         ${u.punchAt ? `<p class="hint">愿力：这张卡的“能量”是愿力，满 ${c.maxE} 点可开大，最多存 ${c.capE} 点，开大只扣 ${c.maxE} 点、多出的保留，开大后不返还，也不吃充能效率。普攻/战技、欢愉技各 +1，我方笑点首次达到 ${num(u.punchAt)} +1（阿哈时刻结束后重置，笑点再次达到才能再触发），1 魂进战 +5。</p>` : ""}
         ${u.wxTurns ? `<p class="hint">欢愉万相：开大后持续 ${u.wxTurns} 个她自己的回合，期间我方欢愉角色“升格”，队友带“阿哈开大后才生效”标记的效果（固有行迹）才生效，阿哈时刻结束返还消耗笑点的 ${num(u.wxRegain)}%（爽点）。阿哈 2 魂起，这些效果用强化数值。</p>` : ""}
-        <div class="ult-list"><span class="hint">开大时机：</span>${ultChips(ultKeysOf(u), `data-act="del-uult" data-u="${i}"`, isSwTracked(u) ? "" : `data-act="add-uult" data-u="${i}"`)}</div>
+        <div class="sec-t">终结技 <em>开大时机</em></div>
+        <div class="ult-list ult-when"><span class="hint">开大时机：</span>${ultChips(ultKeysOf(u), `data-act="del-uult" data-u="${i}"`, isSwTracked(u) ? "" : `data-act="add-uult" data-u="${i}"`)}</div>
         ${u.effects.some(e => trig(e, "ult") && (e.target === "ultpick" || e.target === "ultpickm")) ? `<div class="ult-targets" id="ut-${u.id}" data-ui="${i}"></div>` : ""}
         ${u.effects.some(e => trig(e, "skill") && e.target === "skpick") ? `<div class="ult-targets sk-targets" id="skt-${u.id}" data-si="${i}"></div>` : ""}
         ${c.autoUlt && ultKeysOf(u).length ? `<p class="hint" style="color:var(--enemy)">已勾选自动开大，能量一满就会先开掉，手动安排的开大可能因能量不足失败。</p>` : ""}`)(eCfg(u))}
+        <div class="sec-t">效果 <em>${u.kind === "ally" && !u.sm ? "卡片上的 / 行迹面板" : "这张卡上的"}</em></div>
         <div class="effects">
           ${effHead(u, i)}
           ${FOLD["l:" + u.id] ? "" : effGroups(u, i, false)}
