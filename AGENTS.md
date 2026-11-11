@@ -115,3 +115,4 @@
 - 2026-11-11 界面第 2 轮（tools/ui2.py，只改排版）：角色卡下半部分分段（`.sec-t`：行动 / 能量 / 终结技 / 效果，敌人卡「敌人」），能量行 `.en-row` 两列列表，`.act-row`、`.ult-when`，卡片里的折叠条样式。样式在页面 `<style>` 末尾“界面第 2 轮”一段。
 - 2026-11-11 手动敌人的韧性（tools/brk3.py）：没选模板的敌人卡也有 `tough`（韧性）和 `wks`（弱点，属性首字组成的字符串，空 = 全部算弱点；`monOf` 没模板时返回 `{w: wks}`）。
 - 2026-11-11 击破第 4 批（tv 71，tools/fix71.py）：`weak` 的 `wel` 可写 "st:状态名"（持有该状态的我方角色的属性，大丽花【共舞者】）；模板 `x.cmz` {st, be, fl, v, lv}（阮•梅【残梅绽】：`toughHit` 里给被打的敌人记 `en.cmz`，主循环里敌人回合一开始、还没算回合数之前处理：不恢复、`dist = 延后 % × 100`、记一条击破伤害、`continue`；真正恢复时清 `cmzUsed`）。击破相关还没做：银狼LV.999 E6、遐蝶 E6、姬子•启行、乱破天赋、召唤物 / 忆灵削韧、弹射按段削韧、固定削韧类。
+- 2026-11-11 忆灵 / 召唤物削韧（tools/brk4.py + build_tgh.py）：`TGH[角色].m` = 忆灵技的削韧（`DimbreathBot/TurnBasedGameData` 的 `ExcelOutput/AvatarServantSkillConfig.json`，放进官方 json 目录再跑 build_tgh.py，按 DMGX.mem 里的技能名对应）；`toughHit` 没有键且是召唤物行动时：DMGX.mem 有这个角色 → `m`（k "owner" 的用它写的键），否则用本体的 `f`。弹射 / 多段的按段削韧没做：ShowStanceList 的“单体”值是每段还是合计，不同技能不一致，官方数据定不下来。

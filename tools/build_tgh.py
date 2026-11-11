@@ -1,4 +1,4 @@
-"""生成削韧表 const TGH（每个角色每类技能的削韧值，官方 AvatarSkillConfig.ShowStanceList = [主目标, 全体, 相邻]，30 = 游戏里显示的 10 点）
+"""生成削韧表 const TGH（每个角色每类技能的削韧值，官方 AvatarSkillConfig.ShowStanceList = [主目标, 全体, 相邻]，30 = 游戏里显示的 10 点；键 m = 忆灵技，来自 AvatarServantSkillConfig）
 并给 MON.m 每个敌人补韧性 tn（MonsterTemplateConfig.StanceBase × MonsterConfig.StanceModifyRatio，同名多个版本取最常见的）。
 用法：python3 tools/build_tgh.py index.html <官方 json 目录（StarRailRes + AvatarSkillConfig*.json）> <敌人数据目录（MonsterConfig / MonsterTemplateConfig / TextMapCHS）>
 """
@@ -41,6 +41,17 @@ for c in DB['chars']:
         if v and any(v): out[key] = v
         elif key in ('b', 's', 'u', 'b2', 's2', 'u2', 'f'): miss.append((cid, c['name'], key, e.get('n')))
     if out: TGH[cid] = out
+# 忆灵技的削韧（AvatarServantSkillConfig，有就读；键 m）：按 DMGX.mem 里忆灵技的名字对应
+import os
+if os.path.exists(off + '/AvatarServantSkillConfig.json'):
+    TMx = json.load(open(mon + '/TextMapCHS.json', encoding='utf-8')); _, DMGX = grab('DMGX'); SV = {}
+    for r in json.load(open(off + '/AvatarServantSkillConfig.json', encoding='utf-8')):
+        v = [int(round(x.get('Value', 0))) for x in r.get('ShowStanceList') or []]
+        if any(v): SV.setdefault(TMx.get(str(r['SkillName']['Hash'])), v)
+    for cid, d in (DMGX.get('mem') or {}).items():
+        for k, sp in d.items():
+            if sp.get('n') in SV: TGH.setdefault(cid, {})['m'] = SV[sp['n']]
+    print('忆灵削韧', {c: v['m'] for c, v in TGH.items() if 'm' in v})
 print('TGH 角色', len(TGH), '没找到削韧的条目', len(miss)); [print('  ', m) for m in miss]
 # 敌人韧性
 TM = json.load(open(mon + '/TextMapCHS.json', encoding='utf-8')); T = {t['MonsterTemplateID']: t for t in json.load(open(mon + '/MonsterTemplateConfig.json', encoding='utf-8'))}
