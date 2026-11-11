@@ -63,7 +63,7 @@
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 71）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 72）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 - 目标 `efirst` = 敌方单体（第一个敌人卡，tv 48：丹恒战技减速、银狼缺陷）；加速 / 减速挂在别人身上时“持续 N 回合”按持有者自己的回合用 `cnt: "own"`（艾丝妲终结技 tv 48 起这样，用户定的）。
 - 2026-10-31 新加（tv 43～44）：目标 `skpick`（每次施放战技时选，卡片“每次战技目标” u.skTargets）、`lowhp` / `hp50`（按当前生命值）、`elow`（能量 <50% 的一名其他角色）；条件 DB 缩写 `pm` / `px`（[命途或 "=", N]：除自己外该命途至少 / 最多 N 名）、`tge`（伤害增益只给能量上限 ≥N 的目标）、`so: "team"`（任意队友身上有该状态）、`acR: "ult"`（队友触发次数在自己施放终结技时重置）、`mv`（伤害增益只能有一个持有者）；伤害层 `U2ST`（开大时有某状态 = 第二种终结技 u2）、`F2K`（追加攻击用哪条倍率）。千冶•刃的结界状态叫【无量忿怒】（缇宝的叫【结界】，别重名）。
@@ -116,3 +116,4 @@
 - 2026-11-11 手动敌人的韧性（tools/brk3.py）：没选模板的敌人卡也有 `tough`（韧性）和 `wks`（弱点，属性首字组成的字符串，空 = 全部算弱点；`monOf` 没模板时返回 `{w: wks}`）。
 - 2026-11-11 击破第 4 批（tv 71，tools/fix71.py）：`weak` 的 `wel` 可写 "st:状态名"（持有该状态的我方角色的属性，大丽花【共舞者】）；模板 `x.cmz` {st, be, fl, v, lv}（阮•梅【残梅绽】：`toughHit` 里给被打的敌人记 `en.cmz`，主循环里敌人回合一开始、还没算回合数之前处理：不恢复、`dist = 延后 % × 100`、记一条击破伤害、`continue`；真正恢复时清 `cmzUsed`）。击破相关还没做：银狼LV.999 E6、遐蝶 E6、姬子•启行、乱破天赋、召唤物 / 忆灵削韧、弹射按段削韧、固定削韧类。
 - 2026-11-11 忆灵 / 召唤物削韧（tools/brk4.py + build_tgh.py）：`TGH[角色].m` = 忆灵技的削韧（`DimbreathBot/TurnBasedGameData` 的 `ExcelOutput/AvatarServantSkillConfig.json`，放进官方 json 目录再跑 build_tgh.py，按 DMGX.mem 里的技能名对应）；`toughHit` 没有键且是召唤物行动时：DMGX.mem 有这个角色 → `m`（k "owner" 的用它写的键），否则用本体的 `f`。弹射 / 多段的按段削韧没做：ShowStanceList 的“单体”值是每段还是合计，不同技能不一致，官方数据定不下来。
+- 2026-11-11 击破第 5 批（tv 72，tools/fix72.py）：效果类型 `tfix`（直接削韧，v = 游戏里的点数；`vpc` 每点计数另加、`cz` 读完计数后清零、`ig` 无视弱点、`pmx` [韧性上限 %, 最少, 最多]、`opt` 每个敌人 1 次；不吃击破效率、不转超击破），`brkd` 的 `vpc`。乱破【充能】是计数（上限 10，E6 15）；同一触发里先 brkd（读计数）再 tfix（cz 清零）。同谐主随波逐流、大丽花弃旧恋新、乱破 E2 / 秘技、弹射按段削韧仍没做。
