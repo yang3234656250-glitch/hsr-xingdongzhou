@@ -26,7 +26,7 @@
 
 旧的「伤害一律不做」已作废：用户要求在行动轴上显示伤害。以下是硬性规则，改动前务必看：
 
-- **只读、不进模拟**：伤害只在渲染层算（`renderTimeline` 前面的「伤害估算」段），读 `S` 和 `simulate()` 的结果，**不写回任何单位字段、不影响行动轴 / 能量 / 战技点**。改完必须用同一份配置跑改前 / 改后两版，逐行比对行动顺序（行动值 / 单位 / 回合 / 动作 / 战技点）完全一致，并把结果告诉用户。
+- **只读、不进模拟**（例外：2026-11-11 起「伤害设置」里的“我方伤害扣敌人生命值”开关，用户要求的，默认关；开了以后模拟每轮开头 `settleDmg()` 调用同一套伤害函数扣敌人生命值，算完删掉 `__dmg` 缓存，关着时必须和以前完全一样）：伤害只在渲染层算（`renderTimeline` 前面的「伤害估算」段），读 `S` 和 `simulate()` 的结果，**不写回任何单位字段、不影响行动轴 / 能量 / 战技点**。改完必须用同一份配置跑改前 / 改后两版，逐行比对行动顺序（行动值 / 单位 / 回合 / 动作 / 战技点）完全一致，并把结果告诉用户。
 - **不要动 hp / atk / def**：这三个是面板值（没填按基础值），治疗和遐蝶【新蕊】都靠它。伤害用的新数据单独放：`u.cr`（暴击率 %）、`u.cd`（暴击伤害 %）、`u.dmg`（增伤 %）、`u.el`（欢愉度 %）、`u.mult`（手填倍率，小数），一律“没有就是默认值”。
 - **倍率表**：`const DMG={...}`、`const BGR={...}` 紧挨在 `const DB = ` 前面，由本地脚本 `_src/build_dmg.py` 从官方 `character_skills.json` 生成（脚本和中间文件不进仓库）。手工修正写在脚本的 `OVR` 里，不要直接手改这两行。
 - **没有倍率就不算伤害**：辅助 / 纯 buff 技能在表里没有条目就显示「—」，不要编数字；“让我方下一次攻击额外造成伤害”这类是给别人的 buff，不算成自己的伤害（真珠的欢愉技就是这样被排除的）。
@@ -63,7 +63,7 @@
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 80）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 81）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 - 目标 `efirst` = 敌方单体（第一个敌人卡，tv 48：丹恒战技减速、银狼缺陷）；加速 / 减速挂在别人身上时“持续 N 回合”按持有者自己的回合用 `cnt: "own"`（艾丝妲终结技 tv 48 起这样，用户定的）。
 - 2026-10-31 新加（tv 43～44）：目标 `skpick`（每次施放战技时选，卡片“每次战技目标” u.skTargets）、`lowhp` / `hp50`（按当前生命值）、`elow`（能量 <50% 的一名其他角色）；条件 DB 缩写 `pm` / `px`（[命途或 "=", N]：除自己外该命途至少 / 最多 N 名）、`tge`（伤害增益只给能量上限 ≥N 的目标）、`so: "team"`（任意队友身上有该状态）、`acR: "ult"`（队友触发次数在自己施放终结技时重置）、`mv`（伤害增益只能有一个持有者）；伤害层 `U2ST`（开大时有某状态 = 第二种终结技 u2）、`F2K`（追加攻击用哪条倍率）。千冶•刃的结界状态叫【无量忿怒】（缇宝的叫【结界】，别重名）。
@@ -125,3 +125,4 @@
 - 2026-11-11（tv 78，tools/fix78.py）：模板 `x.ebSm`（ebSt 之外还要自己的某个忆灵在场）、`x.ebAll`（有 ebSt 状态时战技也变强普）、`x.stTurn` [A, B]（自己回合开始、actOf 之前：有状态 A 就换成 B；注意普通的 turn / aTurn 触发都在 actOf 之后，影响本回合动作的要用这个）；开拓者•记忆【史诗】用两个状态 史诗 / 史诗2 表示 1 / 2 层；spChg 的 `spr`（spR：只算恢复，含溢出）；伤害增益 `crO`（暴击率溢出转暴伤，取最大）。
 - 2026-11-11（tv 79，tools/fix79.py）姬子•启行【助战技】：模板 `x.sup` {st, hE, uE}，模拟里 `SUP`（每个角色的次数 n、上限 cap）；效果类型 `supR`（全部恢复）；在正常回合 actOf 之后、行动前按 `u.supOv[回合]` ?? `u.supAll` 使用：其他人 −1 次 +uE 能量，记一条 `R.dots`（`sup` = DMG 键 z / z2，dotDmgOf 走 dmgEntry + dmgCalc，会暴击）、`toughHit(H, z)`、`teamFire("aSup", 使用者)`；界面 `.ta-sup`（change 里 `data-tsup`）和卡片“有次数时都用助战技”（`hasSupT()` 有姬子•启行才显示）。DMG 的 z / z2 由 fix79 写入，TGH 的 z / z2 由 build_tgh.py 生成；LVK z → 天赋等级、SCK / DSC 的 z = 助战技伤害。
 - 2026-11-11（tv 80，tools/fix80.py）大黑塔：模板 `x.jd`，模拟里 `HT` / `en.jd` / `HT.md`、`jdHit`（atkAct 里 toughHit 之后；击中哪些敌人按 TGH 推断）、`jdSort`（开大前）；行动记录 `jd` / `jd0` / `jd2`、开大记录 `md`，伤害层在 dmgCalc 里按 tidOf "1401" 加倍率。效果类型 `twn`（时节不居，按 healTot 差值，R.dots 的 `fixed` 走 dotDmgOf 的固定数值分支：不暴击、不吃增伤）。修正：dmgCalc 传了 baseOv 时不再给基础值加攻击力% / 防御力%（以前击破伤害会吃攻击力%）；S2ST / U2ST 判断（toughHit、jdHit）用 `curRec.sts`（行动开始时的状态），不用当前状态。
+- 2026-11-11（tv 81，tools/fix81.py、tools/build_monstat.py）模拟敌我掉血，两个开关 `S.dg.eHit` / `S.dg.eHp`（默认关）。敌人数据：`MON.hl`（等级成长组 1 的 [攻击倍数, 生命倍数]，下标 = 等级 − 1）、`MON.m[].a` / `.h`（1 级攻击力 / 生命值 = 基础 × 修正 × 精英组）、`.x`（{技能下标: [主倍率, 相邻倍率, 段数]}，ParamList 推出来的），由 build_monstat.py 从 DimbreathBot ExcelOutput 的 MonsterConfig / MonsterTemplateConfig / EliteGroup / HardLevelGroup / MonsterSkillConfig + TextMapCHS 生成。敌人卡 `eatk` / `ehp` 覆盖。模拟：敌人模板技能的 hit 效果带 `dmg` → `takeHit`（dropHp，降到 0 → `fatalOf`：`teamFire("fatal", 目标)`，过滤 = 目标生命值还是 0，没救回 `gone = true` 倒下）；`settleDmg` 把 actions / ultMarks / marks（追击、欢愉技）/ dotRecs 的伤害按主目标 / 相邻 / 全体分到 `en.ehc`，打空 `killEnemy`（gone、`fireEv("kill", 击杀者)`）；敌人全灭或我方全员倒下时结束。效果字段 `lim`（每场最多 N 次）；目标 enemies / efirst / eadj 不再包含已消灭的敌人；checkUlts 跳过倒下的角色。
