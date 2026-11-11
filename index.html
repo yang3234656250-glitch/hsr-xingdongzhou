@@ -958,7 +958,8 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-11（界面第 2 轮：角色卡下半部分）</b>：卡片下半部分分成「行动」「能量」「终结技」「效果」几段，能量那一排改成和属性一样的两列列表，折叠的几条（没识别的描述、计数器 · 召唤物）改成细条，敌人卡加「敌人」分段。只改样式和排版，数据和计算都没动。</li>
+<li><b>2026-11-11（手动敌人也能填韧性）</b>：没选怪物库模板的敌人卡现在也有「韧性」和「弱点」两格（30 = 游戏里的 10 点；弱点写“火冰量”这样，不填 = 所有属性都算弱点）。韧性不填就和以前一样不模拟击破，已有方案不变。</li>
+              <li><b>2026-11-11（界面第 2 轮：角色卡下半部分）</b>：卡片下半部分分成「行动」「能量」「终结技」「效果」几段，能量那一排改成和属性一样的两列列表，折叠的几条（没识别的描述、计数器 · 召唤物）改成细条，敌人卡加「敌人」分段。只改样式和排版，数据和计算都没动。</li>
               <li><b>2026-11-11（击破第 3 批：雪衣、飞霄、黄泉、灵砂、Archer、那刻夏）</b>：tv 70（tools/fix70.py）。雪衣终结技（E2 追加攻击）、飞霄终结技、黄泉终结技（E6 普攻 / 战技）无视弱点属性削韧；飞霄终结技打没破韧的目标击破效率 +100%；灵砂【醇醉】受到的击破伤害 +25%、E1 击破效率 +50%、E2 全队击破特攻 +40%；Archer E2 终结技添加量子弱点；那刻夏终结技【升华】添加全部弱点（到目标回合开始）。只在放了带韧性的敌人时才有变化。</li>
 <li><b>2026-11-11（击破第 2 步：超击破、击破效率、无视弱点削韧、添加弱点）</b>：tv 69（tools/fix69.py）。① <b>超击破</b>：攻击已经破韧的敌人后，把这次攻击的削韧值转成超击破伤害（80 级击破基础值 × 削韧点数 ÷ 10 × 倍率 × (1 + 击破特攻)），记在日志和伤害里。② <b>弱点击破效率</b>、<b>无视弱点属性削韧</b>（不叠加，取最大）、<b>给敌人添加弱点</b>（按敌人自己的回合数消失）、<b>直接造成击破伤害</b>的效果，都可以在效果里自己加。③ 角色：<b>阮•梅</b>【弦外音】击破效率 +50%、行迹全队击破特攻 +20%、天赋击破时 120% 冰属性击破伤害（E6 332%）、E4 击破特攻 +100%；<b>同谐主</b>【伴舞】（3 回合，击破特攻 +30%、超击破 100%，卫我起舞按敌人数量 +20%～60%）；<b>忘归人</b>【狐祈】击破特攻 +30% 和 50% 无视弱点削韧、终结技无视弱点、全队 100% 超击破、【云火昭】（破韧后还有 40% 额外韧性，削完再受一次击破伤害）、行迹和 E1 / E6；<b>流萤</b>「完全燃烧」击破效率 +50%、击破特攻 +25%、受到击破伤害 +20%、强化战技添加火弱点、击破特攻 ≥150% / 300% 时 100% / 150% 超击破、E6；<b>乱破</b>【结印】击破效率 +50%、击破特攻 +30%、强化普攻 50% 无视弱点削韧和 60% 超击破；<b>加拉赫</b>【酩酊】受到击破伤害 +12%、E6；<b>波提欧</b>终结技添加物理弱点、【优势口袋】每层强化普攻削韧 +50%、天赋击破伤害（70% / 120% / 170%）、E2 击破特攻、E6；<b>银狼</b>战技添加编队第一位属性的弱点。对已有方案：手动添加的敌人没有韧性，结果不变；用了怪物库敌人的方案，这些角色在场时破韧会更快、多出超击破伤害。还没做：阮•梅【残梅绽】、乱破天赋充能和第 3 段击破伤害、同谐主随波逐流、忘归人 E4 / E6 全队狐祈、流萤攻击力换算击破特攻，以及大丽花、那刻夏、雪衣、飞霄、黄泉、灵砂等其余角色的击破相关效果。</li>
 <li><b>2026-11-11（击破第 1 步：韧性条、弱点击破、击破伤害）</b>：tools/build_tgh.py、tools/brk1.py。① <b>敌人有韧性条了</b>：套了模板的敌人按官方数值带韧性（敌人卡上“韧性”可以改；471 个里 15 个没有数据，要自己填），自己加的空白敌人没有。② 我方攻击按官方削韧值削韧（每个技能主目标 / 全体 / 相邻各多少），<b>只对弱点属性有效</b>；削到 0 就是<b>击破</b>：行动轴上标“击破”，敌人行动延后 25%，并按击破者的属性附带效果——物理裂伤、火灼烧、雷触电、风风化（各 2 回合，敌人回合开始结算）、冰冻结（跳过 1 个回合，之后行动提前 50%）、量子纠缠（再延后 20% ×（1 + 击破特攻））、虚数禁锢（再延后 30% ×（1 + 击破特攻）、速度 −10%）；敌人下一个回合开始时韧性恢复。我方“弱点击破时”的效果现在会自动触发，不用再手动加事件。③ <b>击破伤害</b>进伤害合计：3767.55 × 属性系数 ×（0.5 + 韧性 ÷ 120）×（1 + 击破特攻），不暴击、不吃增伤；角色卡新增“击破特攻 %”。④ “韧性没破 ×0.9”改成按模拟里敌人当时破没破。⑤ 伤害设置里可以勾“不模拟韧性和击破”关掉这一整套。<b>对已有配置</b>：<b>套了模板的敌人会被击破、行动会被推后</b>，这类方案的行动顺序会变；没放敌人或只放空白敌人的方案不变。还没做：超击破、击破效率、无视弱点削韧、弱点植入（银狼、流萤等）、纠缠叠层。</li>
@@ -2691,7 +2692,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const brkOn = !(S.dg && S.dg.noBrk);
     const ELW = { Physical: "物", Fire: "火", Ice: "冰", Thunder: "雷", Lightning: "雷", Wind: "风", Quantum: "量", Imaginary: "虚" };
     const BRKM = { 物: 2, 火: 2, 冰: 1, 雷: 1, 风: 1.5, 量: 0.5, 虚: 0.5 };
-    const monOf = en => { if (en.__mon === undefined) en.__mon = (en.mon && MON.m.find(m => m.n === en.mon)) || null; return en.__mon; };
+    const monOf = en => { if (en.__mon === undefined) en.__mon = (en.mon && MON.m.find(m => m.n === en.mon)) || (en.wks ? { w: String(en.wks) } : null); return en.__mon; };   // 手动敌人：卡片上填的弱点
     const toughMax = en => { if (en.__tm === undefined) { const m = monOf(en); en.__tm = !brkOn ? 0 : en.tough != null && en.tough !== "" ? Math.max(0, num(en.tough)) : m && m.tn ? m.tn : 0; } return en.__tm; };
     const ebkNow = () => { const en = U.find(x => x.kind === "enemy" && !x.gone && toughMax(x) > 0); return en ? !!en.broken : undefined; };   // 伤害显示用：主目标（第一个有韧性的敌人）现在破了没有
     const beOf = o => num(o.be) + (o.buffs || []).reduce((p, b) => p + (b.kind === "d" && b.st === "be" ? num(b.v) : 0), 0);   // 击破特攻 %（卡片 + 增益）
@@ -3792,7 +3793,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           <div class="pickwrap">敌人模板 ${pickBtn("mon", i, MON.m.findIndex(m => m.n === u.mon))}<select hidden id="mo-${u.id}" data-u="${i}" data-mon="1" aria-label="敌人模板">${(k => oneOpt(k, k >= 0 ? MON.m[k].n : "", k >= 0))(MON.m.findIndex(m => m.n === u.mon))}</select></div>
           ${u.mon ? `<label for="lv-${u.id}">等级 <input type="number" id="lv-${u.id}" min="1" max="150" step="1" value="${num(u.lv, 95)}" data-u="${i}" data-f="lv" style="width:56px"></label>
           <label for="tg-${u.id}" title="韧性（官方数值，30 = 游戏里的 10 点；同名敌人不同关卡可能不一样，可以自己改；清空 = 用模板的）">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="${(m => m && m.tn ? m.tn : 0)(MON.m.find(m => m.n === u.mon))}" data-u="${i}" data-f="tough" style="width:60px"></label>
-          ${u.stg ? `<span class="hint">来自 ${esc(u.stg)}</span>` : ""}<span class="hint">资料速度 ${fmt(num(u.monS))} × ${monRatio(u.lv)}${(m => m && m.w ? ` · 弱点 ${m.w}` : "")(MON.m.find(m => m.n === u.mon))}</span>` : ""}
+          ${u.stg ? `<span class="hint">来自 ${esc(u.stg)}</span>` : ""}<span class="hint">资料速度 ${fmt(num(u.monS))} × ${monRatio(u.lv)}${(m => m && m.w ? ` · 弱点 ${m.w}` : "")(MON.m.find(m => m.n === u.mon))}</span>` : `<label for="tg-${u.id}" title="韧性：30 = 游戏里的 10 点（小怪一般 60～120，精英 240～360，首领 360～720）；不填 = 不模拟这个敌人的韧性和击破">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="不模拟" data-u="${i}" data-f="tough" style="width:70px"></label>
+          <label for="wk-${u.id}" title="弱点属性，写属性的第一个字：物 火 冰 雷 风 量 虚，例如“火冰量”；不填 = 所有属性都算弱点">弱点 <input type="text" id="wk-${u.id}" value="${esc(u.wks || "")}" placeholder="全部" data-u="${i}" data-f="wks" style="width:76px"></label>`}
         </div>
         ${(m => m && m.v ? `<div class="ult-list"><span class="hint">这个敌人在不同关卡的资料速度：</span>${m.v.map(s => `<button type="button" class="${s === num(u.monS) ? "primary" : ""}" data-act="mon-v" data-u="${i}" data-k="${s}" style="font-size:12px;padding:1px 8px">${s}</button>`).join("")}</div>` : "")(MON.m.find(m => m.n === u.mon))}
         ${(m => !m || !m.k || !m.k.length ? "" : `<div class="effects">
@@ -4002,6 +4004,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       else u[f] = val;
       if (f === "ownPanel") { if (!val) delete u.ownPanel; delete u.pk; structural = true; }   // 取消单独面板 = 换回共用的面板
       if (["basicE", "skillE", "ebasicE", "fuaE", "hp", "atk", "def", "hpB", "atkB", "defB", "hb", "cr", "cd", "dmg", "el", "capE", "maxE2", "ultCost", "skillSP"].includes(f) && String(el.value).trim() === "") delete u[f];   // 清空 = 用默认 / 基础值   // 清空 = 用“每回合回能”
+      if (f === "wks") { u.wks = String(el.value || "").replace(/[^物火冰雷风量虚]/g, ""); if (!u.wks) delete u.wks; }
       if (f === "tough" && el.value === "") delete u.tough;   // 清空 = 用模板的韧性
       if (f === "be" && el.value === "") delete u.be;
       if (f === "lv" && u.mon) { u.spd = u.base = monSpeed(u); structural = true; }   // 敌人等级变了，速度跟着算
