@@ -63,7 +63,7 @@
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
-- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 106）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
+- 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 107）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。
 - 目标 `efirst` = 敌方单体（第一个敌人卡，tv 48：丹恒战技减速、银狼缺陷）；加速 / 减速挂在别人身上时“持续 N 回合”按持有者自己的回合用 `cnt: "own"`（艾丝妲终结技 tv 48 起这样，用户定的）。
 - 2026-10-31 新加（tv 43～44）：目标 `skpick`（每次施放战技时选，卡片“每次战技目标” u.skTargets）、`lowhp` / `hp50`（按当前生命值）、`elow`（能量 <50% 的一名其他角色）；条件 DB 缩写 `pm` / `px`（[命途或 "=", N]：除自己外该命途至少 / 最多 N 名）、`tge`（伤害增益只给能量上限 ≥N 的目标）、`so: "team"`（任意队友身上有该状态）、`acR: "ult"`（队友触发次数在自己施放终结技时重置）、`mv`（伤害增益只能有一个持有者）；伤害层 `U2ST`（开大时有某状态 = 第二种终结技 u2）、`F2K`（追加攻击用哪条倍率）。千冶•刃的结界状态叫【无量忿怒】（缇宝的叫【结界】，别重名）。
@@ -149,3 +149,4 @@
 - 2026-11-13（tv 104，tools/fix104.py）貊泽离场：状态字段 `ps`（持有期间 `u.paused`，`u.stP` 记状态名，`endSt` 里解除）、`ce`（chg 型状态减到 0 立刻 `endSt`）、敌方增益 `lst`（目标被消灭时结束施放者的状态）；暂停中的单位不吃 advance / delay。貊泽【猎物】= 自己身上的 chg 状态 9 点，队友攻击 −1，`stEnd` + `se` 触发回场拉条 20%。
 - 2026-11-13（tv 105，tools/fix105.py）远坂凛 1 魂【影子宝石】：count 方式 mod 的 `shd: [状态名, 门槛]`（chg 型状态存数量，`tg.eid >= 1` 才给）；效果字段 `xst`（自己持有这个状态时不生效）。临时工作目录改到 `/home/claude/hsrwork`（w/ 测试脚本、off47/ 官方数据、publish/）。
 - 2026-11-13（tv 106，tools/fix106.py）阿哈【欢愉负债】：`hurtEnemy` 里（队里有 1511 且开了敌人生命值）累积 `en.debt`，剩余生命值 ≤ 负债时 `killEnemy`。效果是用户说的（原文没写）。
+- 2026-11-13（tv 107，tools/fix107.py）卡厄斯兰那：召唤物模板字段 `dom`（在场时其他我方 `paused` + `domP`，不能开大）、`now`（登场 dist 0）、`spb`（速度 = 本体 base × ratio，固定）、`rot: [初始, 普攻+N, 满时伤害键, 需要点数]`（`actor.rot` = 毁伤，行动时写 `rec.smk`：`s3` / 空 / `-` 最后一击；memDmgOf 的 owner 分支按 `a.smk` 取伤害表）；count 方式 `rot`；伤害表键 `s3`（SCK / LVK 已加）。
