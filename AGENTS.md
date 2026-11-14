@@ -79,7 +79,7 @@
 
 每日校对的流程（定时任务也按这个做）：
 1. 先跑一遍全页检查：`git show HEAD:index.html > /tmp/old.html`，`node tools/regress.js /tmp/old.html index.html` 看页面能不能正常打开、有没有报错、伤害有没有 NaN。
-2. 挑 3～4 个最久没校对（或从没校对过）的角色，或者一组光锥 / 遗器 / 机制。官方数据：`curl -sL https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/index_new/cn/<文件>.json`（characters、character_skills、character_skill_trees、character_ranks、light_cones、light_cone_ranks、relic_sets），技能参数在 `params[等级-1]`。
+2. **先做 `差异清单.md` 里没勾的条目**（第二～五类，每次 2～4 条；第一类随机 / 概率按用户规则不动；原文没写清要取舍的写“等用户确认”留着）。清单做完或只剩等确认的，才挑 3～4 个最久没校对（或从没校对过）的角色，或者一组光锥 / 遗器 / 机制。官方数据：`curl -sL https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/index_new/cn/<文件>.json`（characters、character_skills、character_skill_trees、character_ranks、light_cones、light_cone_ranks、relic_sets），技能参数在 `params[等级-1]`。
 3. 逐条对照：技能 / 天赋 / 行迹 / 星魂 / 秘技 / 忆灵技能，每一个效果都要在模板里（影响行动轴的：拉条推条、能量、战技点、额外回合、加速、计数、召唤；只影响伤害的：伤害增益、XR 额外伤害、DMG 倍率），数值用官方参数（3 / 5 魂升级后的等级也要对）。以游戏原文为准，不确定的不改，记成存疑。
 4. 改模板数据写成 tools/ 下的脚本（参考 dmg_fix39.py：BASE 新加、DROP 删掉、PATCH 原地改、星魂直接改 DB），涉及老存档就把 tv +1 并加迁移。
 5. 再跑 `tools/regress.js`（包含改到的角色的队伍，星魂 0 和 6 各一次），行动顺序的每处变化都要能用这次的改动解释；`node --check` 页面脚本。
