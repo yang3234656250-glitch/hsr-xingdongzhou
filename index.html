@@ -1101,6 +1101,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-16（4.7 王棋关卡效果修正，没改 tv）</b>。实战截图：裁决象限是<b>三选一</b>（终结之吻 / 无上喜悦 / 锤砧战术），以前三条都开着；现在按钮只默认开无上喜悦，另两条加上但关着，想换就在卡片上切。新加【阿哈帮大忙了】（敌人有贪饕时我方全体）：速度 +12（会改行动顺序）、暴伤 +30%、攻击力 +300、生命上限 +600（防御力 +240 没做）。</li>
 <li><b>2026-11-16（按施放者欢愉度给的增益，没改 tv）</b>。实战截图（战斗中属性详情）：爻光欢愉度 182.4%，结界【十方光映】给阿哈 +30.4% = 爻光除结界外 152% 的 20%。以前“按施放者某项属性”的增益只读卡片上的欢愉度（填的是战斗外面板，爻光只有 10%），结界只给全队 +2%；现在欢愉度按卡片 + 自身欢愉度增益（速度换欢愉度等）+ 全队欢愉度增益算，不含这条自己。改后爻光结界期间约 +28%，四人欢愉度和截图对得上（阿哈 188% / 210%、银狼 202% / 192%、爻光 168% / 182%、真珠 115% / 117%）。只影响伤害显示。</li>
 <li><b>2026-11-16（转阶段时的欢愉负债，没改 tv）</b>。官方原文（阿哈正传：敌方目标阶段转换时会保留【欢愉负债】，最高不超过目标生命上限的 10%；【欢愉负债】说明：欢愉负债会占据生命上限，占据部分若包含当前生命值，则该部分当前生命值立即流失）+ 用户说明：负债按<b>生命上限的比例</b>记（每次伤害加 损失生命值 × 25% ÷ 生命上限，最多 10%），转阶段时按比例带到新的一条血，所以新阶段一开始就少这个比例（实战录像：归寂「住」从 90% 开始）。以前按绝对数值记，转到血更厚的阶段时会少算。转阶段日志里写出“相当于从 X% 开始”。</li>
 <li><b>2026-11-16（4.7 王棋的赛季效果 / 关卡效果，没改 tv，tools/stg47fx.py）</b>。依据 nanoka 隐藏关卡截图。“按关卡放敌人”里新按钮「加上 / 去掉 4.7 王棋的关卡效果」：给每个我方角色卡加一组「关卡·」开头的效果（再点一次全部去掉）：终结之吻（战技、终结技伤害 +40%；25% 能量按每人开局算）、无上喜悦（开大后 +30 笑点，每人一次）、锤砧战术（受到治疗 / 护盾后抗性穿透 +20%，2 回合；分不出是谁给的，自己给自己的也算）、残秽（开局损失 50% 最大生命值）。没做：滋扰（敌人攻击后随机 5% / 10% 行动延后）、无上喜悦里“机铠剑斧·破空斩”恢复 2% 能量、锤砧战术的减伤 25%、我方受到的伤害（敌人伤害没做）。不点按钮时和以前完全一样。</li>
@@ -5201,11 +5202,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     renderEditor(); update();
   };
   const FX47 = [
-    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "s", value: 40, duration: 0, note: "关卡·终结之吻：我方战技伤害 +40%" },
-    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "u", value: 40, duration: 0, note: "关卡·终结之吻：我方终结技伤害 +40%" },
-    { trigger: "start", type: "energy", mode: "maxp", value: 25, duration: 0, note: "关卡·终结之吻：恢复 25% 能量（官方是我方任意目标回合开始时全场一次，这里按每人开局算）" },
-    { trigger: "ult", type: "aha", value: 30, once: true, duration: 0, note: "关卡·无上喜悦：施放终结技后获得 30 个笑点（每位角色只一次）" },
-    { trigger: "heal", or: "shield", type: "dbuf", mode: "resPen", value: 20, duration: 2, note: "关卡·锤砧战术：受到治疗 / 护盾后 全属性抗性穿透 +20%（2 回合；官方是“别人施加的”，这里自己给自己的也算）" },
+    { trigger: "start", type: "spd", mode: "flat", value: 12, duration: 0, note: "关卡·阿哈帮大忙了（敌人有贪饕时）：速度 +12" },
+    { trigger: "start", type: "dbuf", mode: "cd", value: 30, duration: 0, note: "关卡·阿哈帮大忙了：暴击伤害 +30%" },
+    { trigger: "start", type: "dbuf", mode: "atkF", value: 300, duration: 0, note: "关卡·阿哈帮大忙了：攻击力 +300（防御力 +240 没做）" },
+    { trigger: "start", type: "hpup", mode: "flat", value: 0, flat: 600, duration: 0, pre: true, note: "关卡·阿哈帮大忙了：生命上限 +600" },
+    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "s", value: 40, duration: 0, off: true, note: "关卡·终结之吻（裁决象限三选一，默认关）：我方战技伤害 +40%" },
+    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "u", value: 40, duration: 0, off: true, note: "关卡·终结之吻（三选一，默认关）：我方终结技伤害 +40%" },
+    { trigger: "start", type: "energy", mode: "maxp", value: 25, duration: 0, off: true, note: "关卡·终结之吻（三选一，默认关）：恢复 25% 能量（官方是全场一次，这里按每人开局算）" },
+    { trigger: "ult", type: "aha", value: 30, once: true, duration: 0, note: "关卡·无上喜悦（三选一，默认选这个）：施放终结技后获得 30 个笑点（每位角色只一次）" },
+    { trigger: "heal", or: "shield", type: "dbuf", mode: "resPen", value: 20, duration: 2, off: true, note: "关卡·锤砧战术（三选一，默认关）：受到治疗 / 护盾后 全属性抗性穿透 +20%（2 回合；自己给自己的也算）" },
     { trigger: "start", type: "hpcost", mode: "set", value: 50, duration: 0, note: "关卡·残秽：战斗开始时损失自身最大生命值的 50%" },
   ];
   $("stg-fx47").onclick = () => {
