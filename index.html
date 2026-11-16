@@ -1100,6 +1100,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-16（敌人转阶段，没改 tv）</b>。新：敌人卡（开了“我方伤害扣敌人生命值”时）多一个<b>分阶段生命值</b>（逗号分隔，如 4.7 王棋归寂 16768365,16768365,31859894）。一条血打空就转阶段：生命值换成下一条、<b>溢出的伤害不继承</b>、<b>敌人身上的减益全部清除</b>（易伤 / 减抗 / 减速 / 持续伤害 / 植入弱点 / 状态 / 欢愉负债；用户说的“boss 的 debuff 不继承”）、韧性回满，行动轴标“转阶段”，日志写清溢出多少。转阶段时敌人行动条怎么变、BOSS 自己的阶段机制原文没有，没做（等用户给）。没填就和以前一样。顺手修了一个老问题：敌人生命值打空就消灭那一行被 // 注释吞掉了，没带星神★阿哈的队伍里敌人其实打不死，现在修好了（带阿哈的队伍不受影响，靠【欢愉负债】消灭的照旧）。依据：用户说明 + nanoka 4.7 隐藏关卡归寂三条血量。</li>
 <li><b>2026-11-16（差异清单第 22 批）：tv 138（tools/fix138.py）</b>。依据官方原文（Mar-7th character_ranks / skill_trees）。① <b>卢卡 E2</b>「若战技击中的敌方目标弱点为物理属性，获得 1 层【斗志】」原来两条默认关，现在按主目标有没有物理弱点判断、默认开（没放敌人卡时不触发）。② <b>卢卡 E1</b>「当卢卡行动时，若指定的敌方目标处于裂伤状态，造成的伤害提高 15%，持续 2 回合」原来是出手时即时判断、没有持续 2 回合；现在施放普攻 / 战技时（先于这次战技挂裂伤）看目标有没有裂伤，有就 +15% 持续 2 回合；终结技算不算“行动”原文没写，另加一条默认关的。③ 卢卡模板说明（【斗志】≥2 普攻自动强化）更新。④ <b>托帕行迹金融动荡</b>（托帕和账账对火弱点敌人伤害 +15%）原来默认关，现在按主目标弱点判断、默认开。⑤ <b>驭空行迹迟彝</b>（我方全体虚数属性伤害 +12%）原来默认关、开了对所有属性都加，现在只对虚数属性的攻击、默认开；引擎：自己身上带属性限定的增益现在也按攻击者属性过滤（以前只有敌人身上的减益看属性）。⑥ <b>驭空 E4</b>（持有【鸣弦号令】时伤害 +30%）补上秘技进战获得【鸣弦号令】的情况。<b>对已有配置</b>：行动顺序只在卢卡 2 魂以上、敌人有物理弱点时变（多 1 层【斗志】和 3 能量）；其余只影响伤害显示。老存档里这几条原来关着的会按新默认打开（用户自己加的效果不动）。</li>
 <li><b>2026-11-15（差异清单第 21 批收尾）：tv 137（tools/fix137.py）</b>。<b>椒丘</b>天赋「【烬煨】1 层受到的伤害 +15%，每多 1 层 +5%，最多 5 层」原来按叠满 5 层（35%）写死。现在拆成「第 1 层 15%（目标身上有【烬煨】才算）+ 每多 1 层 5%（按实际层数，最多 9 层）」，6 魂把上限抬到 9 层时自然到 55%；同时删掉上一批加的那条「超过 5 层每层 +5%」——天赋本身已经算到 9 层，留着会重复。<b>对已有配置</b>：带椒丘的方案，【烬煨】不到 5 层时易伤按实际层数少算（伤害略降），9 层时仍是 55%。</li>
 <li><b>2026-11-15（差异清单第 21 批）：tv 136（tools/fix136.py）</b>。<b>椒丘 E6</b>「【烬煨】层数上限提升至 9，每层使目标全属性抗性 −3%」原来按「叠满 9 层」写死（抗性 −27%、多出的 4 层易伤 +22%）。现在新增「按某种持续伤害的实际层数」这个条件：抗性那条 = 3% × 实际层数（最多 9 层）；易伤那条 = 5% × 超过 5 层的部分（最多 4 层），和天赋「5 层 35%」相加，9 层时正好 55%。<b>对已有配置</b>：带椒丘且开了 6 魂的方案，烬煨层数不足时抗性 / 易伤会按实际层数少算（伤害略降），叠满时不变。</li>
@@ -3140,6 +3141,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const eHitOn = !!(S.dg && S.dg.eHit), eHpOn = !!(S.dg && S.dg.eHp);   // 模拟敌我掉血
     const eLvOf = en => Math.max(1, Math.min(MON.hl ? MON.hl.length : 1, Math.round(num(en.lv, 95))));
     const eAtkOf = en => { if (num(en.eatk) > 0) return num(en.eatk); const m = monOf(en); return m && m.a && MON.hl ? m.a * MON.hl[eLvOf(en) - 1][0] : 0; };
+    const phOf = en => String(en.phs || "").split(/[,，\s\/]+/).map(Number).filter(x => x > 0);   // 分阶段生命值（逗号分隔）
     const eHpMaxOf = en => { if (num(en.ehp) > 0) return num(en.ehp); const m = monOf(en); return m && m.h && MON.hl ? m.h * MON.hl[eLvOf(en) - 1][1] : 0; };
     const allyDefM = (tg, en) => { const d0 = num(statVal(tg, "def")) + num(statVal(tg, "defB")) * dsum(dbSnap(tg), "defP", "") / 100; return 1 - d0 / (d0 + 200 + 10 * eLvOf(en)); };   // 我方防御区
     // ---------- 护盾（tv 82）：u.shd = { "施放者id:组": { v, left } }；几个护盾同时在时按最大的抵挡，受到伤害时每个护盾都扣；持有者回合结束时 −1 回合 ----------
@@ -3750,7 +3752,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     // 我方伤害扣敌人生命值：每轮开头把新出现的伤害记录（行动 / 开大 / 追击 / 欢愉技 / 持续伤害等）算出来扣到敌人身上
     let iA = 0, iU = 0, iM = 0, iD = 0;
     const SU = eHpOn ? Object.fromEntries(allUnits().map(z => [z.id, z])) : null;
-    if (eHpOn) for (const z of U) if (z.kind === "enemy") { const mx = eHpMaxOf(z); if (mx > 0) { z.ehx = mx; z.ehc = mx; } }
+    if (eHpOn) for (const z of U) if (z.kind === "enemy") { let mx = eHpMaxOf(z); const ph = phOf(z); if (ph.length) { z.phs = ph; z.ph = 0; mx = ph[0]; } if (mx > 0) { z.ehx = mx; z.ehc = mx; } }
     const killEnemy = (en, killer) => {
       en.ehc = 0; en.gone = true; marks.push({ t, uid: en.id, label: "被消灭", color: "var(--enemy)", from: killer ? killer.name : "" });
       addLog(`${en.name} 被${killer ? " " + killer.name + " " : ""}消灭`, false, killer ? killer.color : "var(--enemy)");
@@ -3760,12 +3762,22 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (nx && mv.length) { for (const b of mv) if (!nx.buffs.some(x => x.key === b.key)) nx.buffs.push(b); en.buffs = en.buffs.filter(b => !b.mvd); } }
       fireAll("ekill", en);   // 敌人被消灭时（事件对象 = 这个敌人）
     };
+    const endBar = (en, killer) => {   // 这一条血打空（或达到欢愉负债）：还有下一阶段 → 转阶段；否则消灭
+      if (!(en.phs && en.ph < en.phs.length - 1)) { killEnemy(en, killer); return; }
+      const over = Math.max(0, -en.ehc), old = en.ph + 1, nd = (en.buffs || []).length + (en.dots || []).length + (en.wk || []).length + Object.keys(en.st || {}).length; en.ph++;
+      en.ehx = en.ehc = en.phs[en.ph]; en.debt = 0;
+      en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0;   // 敌人身上的减益（易伤 / 减抗 / 减速 / 持续伤害 / 弱点 / 状态 / 欢愉负债）不继承
+      en.broken = false; en.tcur = toughMax(en);   // 韧性回满
+      marks.push({ t, uid: en.id, label: "转阶段", color: "var(--enemy)", from: killer ? killer.name : "" });
+      addLog(`${en.name} 第 ${old} 阶段生命值打空，转入第 ${en.ph + 1} 阶段（生命值 ${Math.round(en.ehx)}；上一阶段溢出的 ${Math.round(over)} 点伤害不继承；敌人身上的减益全部清除，共 ${nd} 项）`, false, "var(--enemy)");
+    };
     const ahaU = U.find(z => z.kind === "ally" && !z.sm && tidOf(z) === "1511");   // 星神★阿哈在队：【欢愉负债】
     const hurtEnemy = (en, a, killer) => { if (!en || en.gone || !(en.ehx > 0) || !(a > 0)) return;
-      const lost = Math.min(a, Math.max(0, en.ehc)); const wasHp = en.ehc; en.ehc -= a; if (en.ehx > 0 && wasHp > en.ehx * 0.5 && en.ehc <= en.ehx * 0.5 && en.ehc > 1e-6) fireEv("ehp50", en);   // 生命值跌破 50%（黑塔天赋） if (en.ehc <= 1e-6) { killEnemy(en, killer); return; }
+      const lost = Math.min(a, Math.max(0, en.ehc)); const wasHp = en.ehc; en.ehc -= a; if (en.ehx > 0 && wasHp > en.ehx * 0.5 && en.ehc <= en.ehx * 0.5 && en.ehc > 1e-6) fireEv("ehp50", en);   // 生命值跌破 50%（黑塔天赋）
+      if (en.ehc <= 1e-6) { endBar(en, killer); return; }
       if (ahaU) {   // 我方造成伤害时累积损失生命值 25% 的【欢愉负债】（上限 = 生命上限 10%；6 魂始终至少 20%），剩余生命值不高于它时被消灭
         en.debt = Math.min(en.ehx * 0.1, num(en.debt) + lost * 0.25); const d = num(ahaU.eid) >= 6 ? Math.max(en.ehx * 0.2, en.debt) : en.debt;
-        if (en.ehc <= d) { addLog(`${en.name} 剩余生命值（${Math.round(en.ehc)}）不高于【欢愉负债】（${Math.round(d)}）`, false, ahaU.color, ahaU.id); killEnemy(en, killer); }
+        if (en.ehc <= d) { addLog(`${en.name} 剩余生命值（${Math.round(en.ehc)}）不高于【欢愉负债】（${Math.round(d)}）`, false, ahaU.color, ahaU.id); endBar(en, killer); }
       } };
     const settleDmg = () => {
       if (!eHpOn) return;
@@ -4561,10 +4573,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           ${u.mon ? `<label for="lv-${u.id}">等级 <input type="number" id="lv-${u.id}" min="1" max="150" step="1" value="${num(u.lv, 95)}" data-u="${i}" data-f="lv" style="width:56px"></label>
           <label for="tg-${u.id}" title="韧性（官方数值，30 = 游戏里的 10 点；同名敌人不同关卡可能不一样，可以自己改；清空 = 用模板的）">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="${(m => m && m.tn ? m.tn : 0)(MON.m.find(m => m.n === u.mon))}" data-u="${i}" data-f="tough" style="width:60px"></label>
           ${S.dg && (S.dg.eHit || S.dg.eHp) ? (m => { const L = MON.hl ? MON.hl[Math.max(1, Math.min(MON.hl.length, Math.round(num(u.lv, 95)))) - 1] : null; return `<label for="ea-${u.id}" title="敌人攻击力（官方：1 级攻击力 × 等级成长；清空 = 用官方的）">攻击力 <input type="number" id="ea-${u.id}" min="0" step="1" value="${u.eatk ?? ""}" placeholder="${m && m.a && L ? Math.round(m.a * L[0]) : 0}" data-u="${i}" data-f="eatk" style="width:70px"></label>
-          <label for="eh-${u.id}" title="敌人生命值（官方：1 级生命值 × 等级成长；深渊等关卡另有加成，可以自己改；清空 = 用官方的）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="${m && m.h && L ? Math.round(m.h * L[1]) : 0}" data-u="${i}" data-f="ehp" style="width:96px"></label>`; })(MON.m.find(m => m.n === u.mon)) : ""}
+          <label for="eh-${u.id}" title="敌人生命值（官方：1 级生命值 × 等级成长；深渊等关卡另有加成，可以自己改；清空 = 用官方的）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="${m && m.h && L ? Math.round(m.h * L[1]) : 0}" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除，韧性回满；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label>` : ""}`; })(MON.m.find(m => m.n === u.mon)) : ""}
           ${u.stg ? `<span class="hint">来自 ${esc(u.stg)}</span>` : ""}<span class="hint">资料速度 ${fmt(num(u.monS))} × ${monRatio(u.lv)}${(m => m && m.w ? ` · 弱点 ${m.w}` : "")(MON.m.find(m => m.n === u.mon))}</span>` : `<label for="tg-${u.id}" title="韧性：30 = 游戏里的 10 点（小怪一般 60～120，精英 240～360，首领 360～720）；不填 = 不模拟这个敌人的韧性和击破">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="不模拟" data-u="${i}" data-f="tough" style="width:70px"></label>
           <label for="wk-${u.id}" title="弱点属性，写属性的第一个字：物 火 冰 雷 风 量 虚，例如“火冰量”；不填 = 所有属性都算弱点">弱点 <input type="text" id="wk-${u.id}" value="${esc(u.wks || "")}" placeholder="全部" data-u="${i}" data-f="wks" style="width:76px"></label>
-          ${S.dg && S.dg.eHp ? `<label for="eh-${u.id}" title="敌人生命值（手动敌人没有官方数据，填了才会被打死）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="不模拟" data-u="${i}" data-f="ehp" style="width:96px"></label>` : ""}`}
+          ${S.dg && S.dg.eHp ? `<label for="eh-${u.id}" title="敌人生命值（手动敌人没有官方数据，填了才会被打死）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="不模拟" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除，韧性回满；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label>` : ""}` : ""}`}
         </div>
         ${(m => m && m.v ? `<div class="ult-list"><span class="hint">这个敌人在不同关卡的资料速度：</span>${m.v.map(s => `<button type="button" class="${s === num(u.monS) ? "primary" : ""}" data-act="mon-v" data-u="${i}" data-k="${s}" style="font-size:12px;padding:1px 8px">${s}</button>`).join("")}</div>` : "")(MON.m.find(m => m.n === u.mon))}
         ${(m => !m || !m.k || !m.k.length ? "" : `<div class="effects">
@@ -4776,6 +4788,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (f === "ownPanel") { if (!val) delete u.ownPanel; delete u.pk; structural = true; }   // 取消单独面板 = 换回共用的面板
       if (["basicE", "skillE", "ebasicE", "fuaE", "hp", "atk", "def", "hpB", "atkB", "defB", "hb", "cr", "cd", "dmg", "el", "capE", "maxE2", "ultCost", "skillSP"].includes(f) && String(el.value).trim() === "") delete u[f];   // 清空 = 用默认 / 基础值   // 清空 = 用“每回合回能”
       if (f === "wks") { u.wks = String(el.value || "").replace(/[^物火冰雷风量虚]/g, ""); if (!u.wks) delete u.wks; }
+      if (f === "phs") { u.phs = String(el.value || "").replace(/[^0-9.,，\s\/]/g, "").trim(); if (!u.phs) delete u.phs; }   // 分阶段生命值
       if (f === "tough" && el.value === "") delete u.tough;
       if ((f === "eatk" || f === "ehp") && el.value === "") delete u[f];   // 清空 = 用模板的韧性
       if (f === "be" && el.value === "") delete u.be;
