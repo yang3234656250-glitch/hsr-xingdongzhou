@@ -12,7 +12,7 @@ NAME = '异相仲裁·4.7 王棋（隐藏关卡）归寂'
 phs = '16768365,16768365,31859894,6707346'
 # 喜剧学家（MonsterID 801204002，HardLevelGroup 3 Lv.100 生命 247919 × 关卡倍率 6.2 = 1537100；nanoka 贪饕 +614840 = 40%）开场 4 只；被消灭后【粉墨登场】再召唤没做
 cm = {'n': '喜剧学家', 'i': 312, 's': 167.0, 'lv': 100, 'ehp': 1537100}
-grp = {'g': NAME, 'f': [{'f': 1, 'h': [[[cm, cm, {'n': '万色返空主，归寂', 'i': 5, 's': 140.0, 'lv': 100, 'phs': phs}, cm, cm]]]}]}
+grp = {'g': NAME, 'f': [{'f': 1, 'h': [[[{'n': '万色返空主，归寂', 'i': 5, 's': 140.0, 'lv': 100, 'phs': phs}, cm, cm, cm, cm]]]}]}   # 归寂排第一 = 主目标
 stg = [x for x in stg if x['g'] != NAME] + [grp]
 new = 'const STG = ' + json.dumps(stg, ensure_ascii=False, separators=(',', ':')) + ';' + tail
 s = s[:i] + new + s[j:]

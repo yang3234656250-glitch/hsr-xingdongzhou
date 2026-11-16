@@ -12,7 +12,7 @@ code = r'''  const FX47 = [
     { trigger: "start", type: "dbuf", mode: "dmg", dsc: "s", value: 40, duration: 0, note: "关卡·终结之吻：我方战技伤害 +40%" },
     { trigger: "start", type: "dbuf", mode: "dmg", dsc: "u", value: 40, duration: 0, note: "关卡·终结之吻：我方终结技伤害 +40%" },
     { trigger: "start", type: "energy", mode: "maxp", value: 25, duration: 0, note: "关卡·终结之吻：恢复 25% 能量（官方是我方任意目标回合开始时全场一次，这里按每人开局算）" },
-    { trigger: "ult", type: "aha", value: 30, once: true, duration: 0, note: "关卡·无上喜悦：施放终结技后获得 30 个笑点（每位角色只一次）" },
+    { trigger: "ult", type: "punch", value: 30, once: true, duration: 0, note: "关卡·无上喜悦：施放终结技后获得 30 个笑点（每位角色只一次）" },
     { trigger: "heal", or: "shield", type: "dbuf", mode: "resPen", value: 20, duration: 2, note: "关卡·锤砧战术：受到治疗 / 护盾后 全属性抗性穿透 +20%（2 回合；官方是“别人施加的”，这里自己给自己的也算）" },
     { trigger: "start", type: "hpcost", mode: "set", value: 50, duration: 0, note: "关卡·残秽：战斗开始时损失自身最大生命值的 50%" },
   ];
