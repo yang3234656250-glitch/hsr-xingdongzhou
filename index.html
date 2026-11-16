@@ -1032,6 +1032,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
           <label for="stg-h" class="ult-pick"><select id="stg-h"><option value="0">上半</option><option value="1">下半</option></select></label>
           <label for="stg-w" class="ult-pick">波次 <select id="stg-w"></select></label>
           <button type="button" id="stg-go" class="primary">换上这一波敌人</button>
+          <button type="button" id="stg-fx47" title="给每个我方角色卡加 / 去掉 4.7 王棋隐藏关卡的赛季效果和关卡效果（效果说明都以「关卡·」开头，在卡片的“其他”里，可以单独关掉）">加上 / 去掉 4.7 王棋的关卡效果</button>
           <div class="stg-list" id="stg-list"></div>
           <p class="hint">数据来自官方关卡配置（最近两期）：速度已按关卡等级算好。会替换掉现在所有的敌人卡；敌人的出招顺序按模板默认，技能的推条 / 减速需要自己填。</p>
         </div>
@@ -1100,6 +1101,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-16（4.7 王棋的赛季效果 / 关卡效果，没改 tv，tools/stg47fx.py）</b>。依据 nanoka 隐藏关卡截图。“按关卡放敌人”里新按钮「加上 / 去掉 4.7 王棋的关卡效果」：给每个我方角色卡加一组「关卡·」开头的效果（再点一次全部去掉）：终结之吻（战技、终结技伤害 +40%；25% 能量按每人开局算）、无上喜悦（开大后 +30 笑点，每人一次）、锤砧战术（受到治疗 / 护盾后抗性穿透 +20%，2 回合；分不出是谁给的，自己给自己的也算）、残秽（开局损失 50% 最大生命值）。没做：滋扰（敌人攻击后随机 5% / 10% 行动延后）、无上喜悦里“机铠剑斧·破空斩”恢复 2% 能量、锤砧战术的减伤 25%、我方受到的伤害（敌人伤害没做）。不点按钮时和以前完全一样。</li>
 <li><b>2026-11-16（4.7 王棋归寂，没改 tv）</b>。新：“按关卡放敌人”最后多一组「异相仲裁·4.7 王棋（隐藏关卡）归寂」，单独放这个关卡的万色返空主，归寂（普通，Lv.100，速度 184.8，弱点 火 / 风 / 虚数，韧性 1200 按模板）。依据官方数据：ChallengePeak 1104 → 关卡 30511021，基础生命 14880 × 484.69 × 0.375 = 2704575，三条血 = ×6.2 / ×6.2 / ×11.78（16768365 / 16768365 / 31859894），贪婪（污染 4 级）= ×2.48（6707346），和 nanoka 截图一致；“换上这一波敌人”会把这四条填进「分阶段」并带上 100 级。喜剧学家、归寂·「坏」的贪婪加血和这个关卡的赛季 / 关卡效果（终结之吻等）、敌人招式（爆梗、好戏开场）没做进去，数值没有官方原文。困难（Lv.120）没放。对已有配置没有影响。</li>
 <li><b>2026-11-16（敌人转阶段，没改 tv）</b>。新：敌人卡（开了“我方伤害扣敌人生命值”时）多一个<b>分阶段生命值</b>（逗号分隔，如 4.7 王棋归寂 16768365,16768365,31859894）。一条血打空就转阶段：生命值换成下一条、<b>溢出的伤害不继承</b>、<b>敌人身上的减益全部清除</b>（易伤 / 减抗 / 减速 / 持续伤害 / 植入弱点 / 状态；用户说的“boss 的 debuff 不继承”，<b>欢愉负债不清除</b>，它写在阿哈的效果里）、韧性回满，行动轴标“转阶段”，日志写清溢出多少。污染关卡的「贪婪生命值」（受到致命伤害时回血、压制生命上限）按用户说法相当于多一次转阶段，填成最后多一条血就行（归寂：16768365,16768365,31859894,6707346）。转阶段时敌人行动条怎么变、BOSS 自己的阶段机制原文没有，没做（等用户给）。没填就和以前一样。顺手修了一个老问题：敌人生命值打空就消灭那一行被 // 注释吞掉了，没带星神★阿哈的队伍里敌人其实打不死，现在修好了（带阿哈的队伍不受影响，靠【欢愉负债】消灭的照旧）。依据：用户说明 + nanoka 4.7 隐藏关卡归寂三条血量。</li>
 <li><b>2026-11-16（差异清单第 22 批）：tv 138（tools/fix138.py）</b>。依据官方原文（Mar-7th character_ranks / skill_trees）。① <b>卢卡 E2</b>「若战技击中的敌方目标弱点为物理属性，获得 1 层【斗志】」原来两条默认关，现在按主目标有没有物理弱点判断、默认开（没放敌人卡时不触发）。② <b>卢卡 E1</b>「当卢卡行动时，若指定的敌方目标处于裂伤状态，造成的伤害提高 15%，持续 2 回合」原来是出手时即时判断、没有持续 2 回合；现在施放普攻 / 战技时（先于这次战技挂裂伤）看目标有没有裂伤，有就 +15% 持续 2 回合；终结技算不算“行动”原文没写，另加一条默认关的。③ 卢卡模板说明（【斗志】≥2 普攻自动强化）更新。④ <b>托帕行迹金融动荡</b>（托帕和账账对火弱点敌人伤害 +15%）原来默认关，现在按主目标弱点判断、默认开。⑤ <b>驭空行迹迟彝</b>（我方全体虚数属性伤害 +12%）原来默认关、开了对所有属性都加，现在只对虚数属性的攻击、默认开；引擎：自己身上带属性限定的增益现在也按攻击者属性过滤（以前只有敌人身上的减益看属性）。⑥ <b>驭空 E4</b>（持有【鸣弦号令】时伤害 +30%）补上秘技进战获得【鸣弦号令】的情况。<b>对已有配置</b>：行动顺序只在卢卡 2 魂以上、敌人有物理弱点时变（多 1 层【斗志】和 3 能量）；其余只影响伤害显示。老存档里这几条原来关着的会按新默认打开（用户自己加的效果不动）。</li>
@@ -5192,6 +5194,20 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       u.monS = m.s; u.lv = m.lv; u.spd = u.base = monSpeed(u); u.name = m.n; if (m.phs) u.phs = m.phs;
       S.units.push(u);
     }
+    renderEditor(); update();
+  };
+  const FX47 = [
+    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "s", value: 40, duration: 0, note: "关卡·终结之吻：我方战技伤害 +40%" },
+    { trigger: "start", type: "dbuf", mode: "dmg", dsc: "u", value: 40, duration: 0, note: "关卡·终结之吻：我方终结技伤害 +40%" },
+    { trigger: "start", type: "energy", mode: "maxp", value: 25, duration: 0, note: "关卡·终结之吻：恢复 25% 能量（官方是我方任意目标回合开始时全场一次，这里按每人开局算）" },
+    { trigger: "ult", type: "aha", value: 30, once: true, duration: 0, note: "关卡·无上喜悦：施放终结技后获得 30 个笑点（每位角色只一次）" },
+    { trigger: "heal", or: "shield", type: "dbuf", mode: "resPen", value: 20, duration: 2, note: "关卡·锤砧战术：受到治疗 / 护盾后 全属性抗性穿透 +20%（2 回合；官方是“别人施加的”，这里自己给自己的也算）" },
+    { trigger: "start", type: "hpcost", mode: "set", value: 50, duration: 0, note: "关卡·残秽：战斗开始时损失自身最大生命值的 50%" },
+  ];
+  $("stg-fx47").onclick = () => {
+    const al = S.units.filter(u => u.kind === "ally" && !u.sm), has = al.some(u => u.effects.some(e => String(e.note || "").startsWith("关卡·")));
+    for (const u of S.units) u.effects = u.effects.filter(e => !String(e.note || "").startsWith("关卡·"));
+    if (!has) for (const u of al) for (const x of FX47) u.effects.push({ id: nid(), every: 1, target: "self", ...x });
     renderEditor(); update();
   };
   $("add-enemy").onclick = () => addUnit("enemy");
