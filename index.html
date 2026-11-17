@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（修正，没改 tv；tools/openspan.py）</b>。开了“我方伤害扣敌人生命值”时，模拟中途结算伤害看不到银狼<b>还没结束的那段无敌玩家</b>（以前只在退出时才记下来），所以无敌玩家期间：阿哈时刻里银狼的【崩坏级伤害演示】没算伤害、1 魂“结界中的敌人受到伤害 +20%”这类按结界判断的都没算，敌人掉血偏少；阿哈时刻的伤害还被缓存住，行动轴和表格里也一直少了银狼那份。拿 4.7 王棋录像对出来的（录像里 58 行动值那次阿哈时刻约 305 万，页面以前只有 138 万）。对已有配置：有银狼的队伍在无敌玩家期间的阿哈时刻伤害变高；开了敌人生命值时敌人掉血变快。</li>
 <li><b>2026-11-17：tv 144 补（tools/trace1511.py）</b>。星神★阿哈的行迹面板：以前行迹表里没有阿哈，点“迹”看不到三条额外能力和属性强化（模拟里这三条一直都在算：盒中蕴藏的世界开局提前 30% 和速度门槛欢愉度、戏中人的异想国受到队友治疗 / 护盾 +1 愿力、愚弄众神的玩笑追加攻击 +1 战技点和额外 20% 欢愉伤害）。现在按官方行迹数据补上；戏中人的异想国那条效果的说明带上行迹名，卡片上的旧说明迁移时换掉（开关不变）。</li>
 <li><b>2026-11-17：tv 144（tools/fix144.py）</b>。拿 4.7 王棋实战录像逐段对出来的两处。① 位面饰品<b>神的瞬息欢愉</b> 2 件“装备者欢愉度 ≥40% 时进战行动提前 40%”：以前按卡片上的欢愉度判断，阿哈卡片 20%（行迹盒中蕴藏的世界的 +150% 战斗里才加）就不提前；录像里阿哈第一次行动在 18 行动值（= 行迹 30% + 饰品 40%）。现在按战斗中的欢愉度（卡片 + 自身 / 全队的欢愉度增益）判断。② <b>真珠卡片上【终结技额外回合】重复了两条</b>（旧说明那条在以前的模板更新里没换掉），美学底本每次得到 2 个额外回合、2 × 60 临时笑点；官方只有 1 个，录像里银狼隐藏分也只涨一次 60。迁移时去掉旧说明那条。对已有配置：装了这件饰品的欢愉角色开局可能提前；有重复那条的真珠队伍，银狼第一次无敌玩家不再在开大那一刻把强普全部打完。</li>
 <li><b>2026-11-17（银狼强普打断：按“场上所有敌人受到致命伤害”，没改 tv；tools/swcut2.py）</b>。用户说明：归寂生命值打到 0，但场上还有别的敌人没死时，强普期间不会转阶段。现在有下一阶段的敌人在强普里被打到 0 后先不转阶段、不再挨弹射，剩下的弹射打其他敌人；场上敌人全部受到致命伤害才结束技能、在额外回合再次施放剩下的部分；这次强普结束（打完或被打断）后它才转阶段。上一条“BOSS 转阶段就打断”的写法作废。</li>
@@ -3154,6 +3155,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     // 固有行迹升格后隐藏分上限可以溢出（阿哈 2 魂起更高）
     const scap = () => (W.jh && wxActive()) ? Math.max(SC, num(upLvl() === 2 ? W.capUp2 : W.capUp, SC)) : SC;
     const setScore = (v, why) => { sw.score = Math.max(0, Math.min(scap(), v)); scoreH.push({ t, v: sw.score, why }); };
+    const spansNow = () => sw.inUlt ? [...spans, { a: sw.from, b: END, open: true }] : spans;   // 模拟中途：当前这段无敌玩家还没记进 spans
     // 强化普攻被打断（打到转阶段 / 全部打倒）后等着再次施放的：{ re: 剩下的比例, sc: 施放时的隐藏分 }
     const swRe = [];
     // 自身所有增益延长 1 回合；全队增益在她身上留一份（原来那份还在时不算，到期后她多算 1 回合）
@@ -3231,7 +3233,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       let gd = 0; const GZ = U.find(z => z.kind === "ally" && !z.sm && !z.gone && tx(z).guard) || null;   // 真珠：消耗【好活当赏】（抵御值）抵挡一部分伤害
       if (GZ && tg.kind === "ally" && d > 0) {
         const g = tx(GZ).guard, keep = R_REF; let have = 0;
-        R_REF = { actions, marks, ultMarks, punch, scoreH, log, spans, dots: dotRecs, heal: healTot, END, bgUse };
+        R_REF = { actions, marks, ultMarks, punch, scoreH, log, spans: spansNow(), dots: dotRecs, heal: healTot, END, bgUse };
         try { have = bangerAt(GZ, { t, seq }); } catch (e) { have = 0; } finally { R_REF = keep; }
         gd = Math.min(d * num(g[0]) / 100, have * num(g[1]));
         if (gd > 1e-6) { d -= gd; bgUse.push({ uid: GZ.id, t, seq, amt: gd / num(g[1]) }); } else gd = 0;
@@ -3861,7 +3863,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       } };
     const settleDmg = () => {
       if (!eHpOn) return;
-      const keep = R_REF; R_REF = { actions, marks, ultMarks, punch, scoreH, log, spans, dots: dotRecs, heal: healTot, END };
+      // 当前还没结束的无敌玩家也算进 spans（结界内的判断：银狼欢愉技、1 魂易伤等）
+      const keep = R_REF; R_REF = { actions, marks, ultMarks, punch, scoreH, log, spans: spansNow(), dots: dotRecs, heal: healTot, END };
       let goRec = null;
       // 银狼强化普攻【狼尊时刻】：对场上所有敌方造成致命伤害就结束本次技能，剩下的弹射 / 盲盒 / 最后一击在 1 个额外回合里再次施放；
       // 每回合首次触发时自身所有增益延长 1 回合。有下一阶段的敌人（归寂）被打到 0 时先不转阶段、不再挨弹射，
@@ -3914,7 +3917,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         const adjs = d.tg === 2 ? others.slice(0, 2) : d.tg === 4 ? others : [];
         for (const z of adjs.slice(0, Math.max(0, Math.round(num(d.adjN))))) hurtEnemy(z, per * num(d.adj), killer);
       };
-      const one = (rec, f) => { try { return f(); } catch (e) { return null; } finally { delete rec.__dmg; } };
+      const one = (rec, f) => { try { return f(); } catch (e) { return null; } finally { delete rec.__dmg; delete rec.__el; } };
       killK = "a";
       try {
         for (; iA < actions.length; iA++) { const x = actions[iA]; if (x.uid === "aha") { go(one(x, () => elationDmgOf(x)), null); continue; } const w = SU[x.uid]; if (!w || w.kind !== "ally") continue; goRec = x; try { go(one(x, () => dmgOf(x, w)), x.uid); } finally { goRec = null; } }
