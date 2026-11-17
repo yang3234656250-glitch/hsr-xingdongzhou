@@ -45,4 +45,5 @@ rep('  function fixTpl141(s) { const keep = S; S = s; try { fixTpl(s, TPLFIX141)
 rep('    fixTpl141(s);\n    s.tv = 141;', '    fixTpl141(s);\n    fixTpl142(s);\n    s.tv = 142;')
 rep('    if (s.tv >= 141) return;', '    if (s.tv >= 142) return;')
 rep('  if (!(S.tv >= 141)) { migrateTpl(S);', '  if (!(S.tv >= 142)) { migrateTpl(S);')
+rep('if (!(s.tv >= 141)) fixTpl141(s); } finally { S = keep; } s.tv = 141; return; }', 'if (!(s.tv >= 141)) fixTpl141(s); if (!(s.tv >= 142)) fixTpl142(s); } finally { S = keep; } s.tv = 142; return; }')   # tv 141 起老存档走这条路径
 open(p, 'w', encoding='utf8', newline='').write(s)
