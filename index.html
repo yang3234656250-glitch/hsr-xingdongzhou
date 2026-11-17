@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（银狼强普打断：按“场上所有敌人受到致命伤害”，没改 tv；tools/swcut2.py）</b>。用户说明：归寂生命值打到 0，但场上还有别的敌人没死时，强普期间不会转阶段。现在有下一阶段的敌人在强普里被打到 0 后先不转阶段、不再挨弹射，剩下的弹射打其他敌人；场上敌人全部受到致命伤害才结束技能、在额外回合再次施放剩下的部分；这次强普结束（打完或被打断）后它才转阶段。上一条“BOSS 转阶段就打断”的写法作废。</li>
 <li><b>2026-11-17（银狼强化普攻：施放时的隐藏分、转阶段打断后再次施放，没改 tv；tools/swcut.py）</b>。① <b>修正</b>：强普伤害改按<b>施放时</b>的【隐藏分】算。以前行动记录的隐藏分是扣完这次强普次数后记的，每次无敌玩家的最后一次强普退出时隐藏分已清空（1 魂留 20%），伤害按清空后的算，只有正常的一半左右。② 官方原文「若对场上所有敌方造成了致命伤害则结束本次技能，当存在可攻击的敌方目标后获得 1 个额外回合并基于剩余弹射段数和【头号补给盲盒】次数再次施放。每回合首次触发该效果时，使自身所有增益效果延长 1 回合」，用户说明 BOSS 转阶段也算：开了“我方伤害扣敌人生命值”时，银狼的强普按均分着打，打到有分阶段的敌人转阶段（场上还有别的敌人也算）或敌人全部倒下就结束，剩下的比例在 1 个额外回合里再次施放（不再扣强普次数，伤害按剩下的比例、新阶段的减益重新算），被打断的那次只算打出去的部分；自身所有增益（含全队增益，原来的到期后她多算 1 回合）延长 1 回合。日志和伤害提示里写了比例。对已有配置：有银狼无敌玩家的方案伤害变高；行动顺序只在开了敌人生命值、强普打到转阶段时多出“再次施放”的额外回合。</li>
 <li><b>2026-11-17：tv 143（tools/swup143.py）</b>。银狼LV.999 两条漏算的行迹（依据官方原文）：① 固有行迹（阿哈升格后）“当「欢愉」命途升格时……<b>暴击伤害提高 40%</b>”：以前只做了隐藏分溢出到 360 和绝活共赏转隐藏分，漏了这 40% 暴伤；现在阿哈欢愉万相期间银狼的所有伤害暴伤 +40%（银狼设置里勾了这条固有行迹才算；阿哈 2 魂时的数值没查到，先按 40%，可改）。② 行迹【隐藏关卡全成就】“进入【无敌玩家】状态后，获得 20 点【隐藏分】”：以前没建模，现在每次开大进入无敌玩家后隐藏分 +20（开大日志里写；2 魂按新的一档再加强普；银狼设置里可关）。对已有配置：有银狼的队伍伤害变高，隐藏分变多可能让自动开大、2 魂的额外强普提前；卡片上这条行迹的说明从“没建模”换成“已算”。</li>
 <li><b>2026-11-17（差异清单第 23 批）：tv 141（tools/fix141.py）</b>。依据官方原文（Mar-7th character_skills / character_ranks）。① <b>卢卡裂伤</b>「每回合开始时受到等同于自身 24% 生命上限的物理属性持续伤害，最多不超过卢卡攻击力的 338%」：以前一律按 338% 攻击力，现在取敌人生命上限 24% 和攻击力 338%（3 魂 371.8%）里较小的（敌人生命上限：开了「我方伤害扣敌人生命值」按当前阶段的上限，否则按敌人卡填的 / 官方资料；都没有时仍按攻击力上限），【碎天拳】引爆 85% 也一样。② <b>罗刹 E1</b>（结界生效时我方全体攻击力 +20%）原来是展开结界时给 2 回合，现在跟着【结界】走（结界结束或罗刹倒下时消失）；E1、<b>E4</b>（虚弱 12%）补上秘技进战展开的结界。③ <b>罗刹 E2</b>「目标当前生命值 &lt;50% 时罗刹提供的治疗量提高 30%」原来是另外多回复一次 30%（相当于治疗量 ×1.3），改成治疗加成 +30%、和卡片治疗加成相加（卡片治疗加成为 0 时数值不变）。④ <b>停云【赐福】</b>「攻击力提高 50%，最高不超过停云当前攻击力的 25%」以前一律按停云攻击力 25%，现在和目标基础攻击力 × 50% 取较小的（5 魂 55% / 27%）。⑤ 修正：tv 139 / 140 没加进老存档的迁移路径，老存档每次打开都重跑迁移、tv 139 的光锥 / 遗器重建没生效，这次一起补上。<b>对已有配置</b>：行动顺序不变（这几条只影响伤害显示和罗刹 E2 的治疗量）；罗刹 E1 在结界被提前刷新 / 结束时攻击力加成的持续时间会变。</li>
@@ -3858,26 +3859,33 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!eHpOn) return;
       const keep = R_REF; R_REF = { actions, marks, ultMarks, punch, scoreH, log, spans, dots: dotRecs, heal: healTot, END };
       let goRec = null;
-      // 银狼强化普攻【狼尊时刻】：对场上所有敌方造成致命伤害（或有分阶段的敌人被打到转阶段）就结束本次技能，
-      // 剩下的弹射 / 盲盒 / 最后一击在 1 个额外回合里再次施放；每回合首次触发时自身所有增益延长 1 回合
+      // 银狼强化普攻【狼尊时刻】：对场上所有敌方造成致命伤害就结束本次技能，剩下的弹射 / 盲盒 / 最后一击在 1 个额外回合里再次施放；
+      // 每回合首次触发时自身所有增益延长 1 回合。有下一阶段的敌人（归寂）被打到 0 时先不转阶段、不再挨弹射，
+      // 场上还有别的敌人没倒下就继续打它们；技能结束（打完或被打断）后才转阶段（用户说明）
       const swCut = (d, rec, main, killer) => {
         let left = d.total, why = "";
+        const pend = [];   // 这次强普里被打到 0、等技能结束再转阶段的
         let L = (Array.isArray(d.tw) && d.tw.length ? d.tw.map(([id, sh]) => [byId[id], sh]) : [[main, 1]]).filter(([z, sh]) => z && !z.gone && z.ehx > 0 && sh > 0);
         for (let k = 0; k < 40 && left > 1e-6 && L.length; k++) {
           const S2 = L.reduce((p, x) => p + x[1], 0);
           let xm = Infinity; for (const [z, sh] of L) xm = Math.min(xm, Math.max(0, z.ehc) * S2 / sh);   // 下一个被打到致命的目标（均分着打）
-          const step = Math.min(left, xm), ph0 = L.map(([z]) => z.ph);
-          for (const [z, sh] of L) { const a = step * sh / S2, cap = Math.max(0, z.ehc); hurtEnemy(z, a >= cap - 1e-6 ? cap + 1e-6 : a, killer); }
+          const step = Math.min(left, xm);
+          for (const [z, sh] of L) {
+            const a = step * sh / S2, cap = Math.max(0, z.ehc);
+            if (a < cap - 1e-6) hurtEnemy(z, a, killer);
+            else if (z.phs && z.ph < z.phs.length - 1) pend.push(z);   // 致命伤害，转阶段等技能结束
+            else hurtEnemy(z, cap + 1e-6, killer);
+          }
           left -= step;
-          const ended = L.find(([z], i) => z.phs && z.ph !== ph0[i]);
-          L = L.filter(([z]) => !z.gone);
-          if (left > 1e-6 && (ended || !L.length)) { why = ended ? `${ended[0].name}转阶段` : "敌人全部倒下"; break; }
+          L = L.filter(([z]) => !z.gone && !pend.includes(z));
+          if (left > 1e-6 && !L.length) { why = "场上敌人全部受到致命伤害"; break; }
         }
+        for (const z of pend) if (!z.gone) hurtEnemy(z, Math.max(0, z.ehc) + 1e-6, killer);   // 技能结束：转阶段
         if (!why || !U.some(z => z.kind === "enemy" && !z.gone)) return;   // 没打断，或者已经没有可攻击的敌人（战斗结束）
         const f = left / d.total; rec.cut = f;
         swRe.push({ re: num(rec.re ?? 1, 1) * f, sc: rec.scU ?? rec.score });
         const n = rec.swExt ? 0 : extSelf(swU); rec.swExt = true;
-        addLog(`${swU.name} 强化普攻打到${why}，本次技能结束（剩 ${Math.round(f * 100)}% 没打），获得 1 个额外回合再次施放剩下的部分${n ? `；自身 ${n} 个增益延长 1 回合` : ""}`, false, swU.color, swU.id);
+        addLog(`${swU.name} 强化普攻打到${why}${pend.length ? `（${[...new Set(pend.map(z => z.name))].join("、")}随后转阶段）` : ""}，本次技能结束（剩 ${Math.round(f * 100)}% 没打），获得 1 个额外回合再次施放剩下的部分${n ? `；自身 ${n} 个增益延长 1 回合` : ""}`, false, swU.color, swU.id);
       };
       const go = (d, uid, en1) => {
         if (!d || !(d.total > 0)) return;
@@ -6740,7 +6748,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       swBox = 3 * dmgCalc(u, ent, Object.assign({}, rec, { __box: true, __eb: true })).total * (1 + 0.2 / 3);
     }
     const reF = tidOf(u) === "1506" && e.key === "b2" && rec && !rec.__box ? num(rec.re ?? 1, 1) * (1 - num(rec.cut, 0)) : 1;   // 强化普攻被打断（只打出一部分）/ 再次施放剩下的部分
-    const reTxt = reF < 1 ? (rec.re != null ? `再次施放剩下的 ${fmt(num(rec.re) * 100, 1)}%` : "") + (num(rec.cut) > 0 ? `${rec.re != null ? "，" : ""}打到转阶段 / 全部倒下时结束，打出 ${fmt((1 - num(rec.cut)) * 100, 1)}%` : "") : "";
+    const reTxt = reF < 1 ? (rec.re != null ? `再次施放剩下的 ${fmt(num(rec.re) * 100, 1)}%` : "") + (num(rec.cut) > 0 ? `${rec.re != null ? "，" : ""}场上敌人全部受到致命伤害时结束，打出 ${fmt((1 - num(rec.cut)) * 100, 1)}%` : "") : "";
     const total = ((mainDmg + rider + yaoDmg + (xr ? xr.sum : 0)) * swScoreM + swBox) * reF;
     return { total, reF, reTxt, xr, swBox, swScoreM, b2el, noPanel: noPanel && !b2el, panelLab: lab, buffTxt, rider, riderV, yaoN, yaoV, yaoEl, yaoDmg, bg, inAha, laughB, base, cr, cd, bonus, critM, defM, resM, vulnM, dmgM, toughM, stat: b2el ? "欢愉基础值（80 级）" : lab, isLv, el: !!(e.el || b2el), elM, elStat, punch: bg, punchM,
       mult, multOne: e.v + e.rnd, v: e.v, adj: e.adj, rnd: e.rnd, adjN: nAdj, tg: e.tg, targets: nAll + nAdj, name: e.n, lv: e.lv, key: e.key, adjF, tw, spread: spread && !!tw };
