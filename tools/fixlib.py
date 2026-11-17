@@ -97,7 +97,7 @@ class Fix:
             f'  function fixTpl{TV}(s) {{ const keep = S; S = s; try {{ fixTpl(s, TPLFIX{TV}); }} finally {{ S = keep; }} }}\n') + s[a.start():]
         self.s = s
         self.rep(f'if (s.tv >= {TV - 1}) return;', f'if (s.tv >= {TV}) return;')
-        self.rep(f'fixTpl{TV - 1}(s); }} finally {{ S = keep; }} s.tv = {TV - 1}; return; }}', f'fixTpl{TV - 1}(s); fixTpl{TV}(s); }} finally {{ S = keep; }} s.tv = {TV}; return; }}')
+        self.rep(f'fixTpl{TV - 1}(s); }} finally {{ S = keep; }} s.tv = {TV - 1}; return; }}', f'fixTpl{TV - 1}(s); if (!(s.tv >= {TV})) fixTpl{TV}(s); }} finally {{ S = keep; }} s.tv = {TV}; return; }}')   # tv 141 起老存档路径按版本判断，只跑存档之后的
         self.rep(f'    fixTpl{TV - 1}(s);\n    s.tv = {TV - 1};', f'    fixTpl{TV - 1}(s);\n    fixTpl{TV}(s);\n    s.tv = {TV};')
         self.rep(f'if (!(S.tv >= {TV - 1})) {{ migrateTpl(S);', f'if (!(S.tv >= {TV})) {{ migrateTpl(S);')
         ul = '<ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">\n'
@@ -106,7 +106,8 @@ class Fix:
         head = '<!-- 校对记录（每日任务按此挑选最久未校对的项目）\n'
         i = self.s.index(head) + len(head)
         self.s = self.s[:i] + record.strip() + '\n' + self.s[i:]
-        open(self.P, 'w', encoding='utf-8').write(self.s)
+        crlf = '\r\n' in open(self.P, encoding='utf-8', newline='').read(200000)   # 仓库里是 CRLF：写回时保持
+        open(self.P, 'w', encoding='utf-8', newline='').write(self.s.replace('\r\n', '\n').replace('\n', '\r\n') if crlf else self.s)
         print('ok tv', TV, {k: len(v['add']) for k, v in self.FIX.items()})
 
 
