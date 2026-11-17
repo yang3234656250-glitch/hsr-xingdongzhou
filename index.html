@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（没改 tv；tools/rec47b.py）</b>。4.7 王棋录像对照第 2 批（按你的回复）：① 银狼<b>每次强普算 1 个【怪怪怪味豆】</b>（+3 笑点，银狼设置里可改个数，0 = 不算）。② <b>额外阿哈时刻</b>（爻光终结技 / 秘技 / 骰子给的）的伤害以前在欢愉技效果之前记，吃不到这次爻光欢愉技给的【凶星低语】和“首次施放欢愉技全队欢愉度 +10%”；现在之后再记（普通阿哈时刻本来就是这样）。③ 爻光固有行迹【欢愉万相★心灵感应】升格时【大吉大利】倍率 +20%（阿哈 2 魂 +40%）以前漏了。④ 会重新登场的敌人（喜剧学家）<b>开局不在场，0 行动值在进战秘技之后才召唤</b>（敌人卡开关「秘技之后才登场」，默认开）。对已有配置：有银狼的队伍笑点 / 隐藏分变多；只影响开了敌人掉血、放了喜剧学家的方案（④）；②③ 只影响伤害。</li>
 <li><b>2026-11-17：tv 145（tools/fix145.py）</b>。银狼开大时隐藏分按录像核对：录像里开大前 122（阿哈时刻结束 +4 笑点后 126），开大后 136，期间笑点 +50（专武 20 + 开大 30），所以开大本身净 −40，就是设置里的“开大消耗 40”。tv 143 又加了【隐藏关卡全成就】+20，算了两遍：页面开大后 156，第一次无敌玩家里 2 魂多给了 1 个额外回合和 1 次强普。现在这条行迹默认不另加（设置里可勾，勾上时把开大消耗改成 60）。对已有配置：开大消耗还是 40 的存档自动关掉这条，有银狼的队伍开大后隐藏分少 20，2 魂额外回合可能变少。</li>
 <li><b>2026-11-17（没改 tv；tools/lastr47.py）</b>。4.7 王棋归寂<b>最后一管血</b>出现时的机制（用户说明，录像下半 5:24 那段）：按 R 键击破归寂的韧性条（按弱点击破：行动延后 25%、之后不吃“未击破 ×0.9”，没有击破伤害），我方全体行动提前 100%。敌人卡「转阶段骰子」旁边新开关「最后一管血按 R」，没设过就跟着骰子开关（4.7 王棋的归寂默认开）。对已有配置：只影响开了敌人掉血、放了 4.7 王棋归寂的方案，最后一条血开始后行动顺序会变。</li>
 <li><b>2026-11-17（修正，没改 tv；tools/ahasplit.py）</b>。“我方伤害扣敌人生命值”两处：① <b>阿哈时刻</b>的伤害以前整个扣在第一个敌人（BOSS）身上，群攻部分没按敌人分，5 个敌人时 BOSS 多扣 4 倍；现在每个人的欢愉技按自己的目标分，星神★阿哈【满月】的真实伤害由敌方全体均分。② 群攻的目标数以前按敌人卡数量，打死 / 还没重新登场的敌人也算，剩下的敌人每个都多扣；现在按当时在场的敌人数。对已有配置：没开敌人掉血时伤害不变；开了的，有群攻 / 阿哈时刻、并且有敌人倒下时伤害变少。</li>
@@ -3647,6 +3648,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       checkPunchE();
     }
     // each 银狼 action inside 无敌玩家 spends one 强普; the last one ends the state
+    // 每次强普按 W.bean 个【怪怪怪味豆】算（各 +3 笑点；用户定的，盲盒本来是随机的）
+    const beanP = rec => { const n = num(W.bean, 1); if (n > 0 && rec && rec.act === "ebasic") addPunch(3 * n, "怪味豆"); };
     const spendCharge = () => {
       sw.left--;
       if (sw.left > 0) return;
@@ -3692,6 +3695,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (gain) { setScore(sw.score + gain, rec.why || (rec.extra ? "额外阿哈时刻欢愉技" : "欢愉技")); checkE2(); }
     };
     if (swU && pool > 0) setScore(sw.score + pool, "开局笑点");
+    if (eHpOn) for (const z of U) if (z.kind === "enemy" && num(z.rev) > 0 && (z.rv0 ?? true)) { z.gone = true; z.rv0Q = true; }   // 召唤出来的（喜剧学家）：进战秘技之后、0 行动值才登场
     {   // 战斗开始：先所有人“先生效”的（阿哈帮大忙了的速度、治疗加成等），再其他被动，最后“进战自动施放战技”（爻光秘技），这样按速度 / 欢愉度算的效果拿到的是进战后的数值
       const S0 = U.map(u => [u, fx(u, "start")]);
       for (const [u, L] of S0) for (const e of L) if (preEff(e) && e.type !== "cast") apply(e, u, u.color);
@@ -3749,7 +3753,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         for (const e of fx(swU, "xturn")) apply(e, swU, swU.color);   // 银狼的额外回合同样只触发“额外回合时”的效果
         swU.acting = false;
         rec.spShort = onAction(swU, rec.act); reSnap(rec, swU);
-        if (rec.ult) { rec.scU = sw.score; spendCharge(); }   // scU：施放时的隐藏分（伤害按它算；最后一次强普扣完次数后隐藏分会被清空）
+        if (rec.ult) { rec.scU = sw.score; beanP(rec); spendCharge(); }   // scU：施放时的隐藏分（伤害按它算；最后一次强普扣完次数后隐藏分会被清空）
         rec.pool = pool; rec.score = sw.score; rec.sp = sp;
         if (isAtk(swU, rec.act)) atkAct(swU, false, rec.act);
         allyAct(swU, false);
@@ -3782,7 +3786,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         u.acting = false;
         rec.spShort = rec.act ? onAction(u, rec.act) : false; reSnap(rec, u);
         if (u === swU && !rec.ult && rec.act === "skill" && num(W.skillPunch) > 0) addPunch(num(W.skillPunch), "银狼战技");
-        if (rec.ult) { rec.scU = sw.score; spendCharge(); }
+        if (rec.ult) { rec.scU = sw.score; beanP(rec); spendCharge(); }
         rec.pool = pool; rec.score = sw.score;
         if (hasEnergy(u)) { rec.energy = u.e; if (u.capE != null) rec.capE = eCfg(u).capE; }
         if (q.temp) addPunch(-Math.round(q.temp * (1 - num(q.keep) / 100)), `${q.from}额外回合结束${q.keep ? `（保留 ${q.keep}%）` : ""}`);
@@ -3808,6 +3812,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         rec.poolBefore = pool;   // 显示用：这一刻之前的笑点
         ahaSkill(rec);
         onAha(); // 欢愉技 effects still happen here, but their punchlines go to the pool instead of this instant's fixed count
+        reSnap(rec, A);   // 伤害吃得到这次欢愉技给的【凶星低语】、首次欢愉技的欢愉度等（普通阿哈时刻也是之后再记）
         if (S.aha.endPunch && S.aha.endPunchExtra) ahaEnd();
         fireAll("ahaEnd");
         jhGain(swU, q.n, "额外阿哈时刻结束");
@@ -3828,6 +3833,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const aha6 = U.some(z => z.kind === "ally" && !z.sm && tidOf(z) === "1511" && num(z.eid) >= 6);   // 阿哈 6 魂：敌人始终至少有生命上限 20% 的【欢愉负债】（开局就占掉）
     if (eHpOn) for (const z of U) if (z.kind === "enemy") { let mx = eHpMaxOf(z); const ph = phOf(z); if (ph.length) { z.phs = ph; z.ph = 0; mx = ph[0]; } if (mx > 0) { z.ehx = mx; z.ehc = aha6 ? mx * 0.8 : mx; } }
     const revQ = [];   // 等着重新登场的敌人（【粉墨登场】）
+    for (const z of U) if (z.rv0Q) { revQ.push({ at: 0, en: z }); delete z.rv0Q; z.rv0F = true; }
     const killEnemy = (en, killer) => {
       en.ehc = 0; en.gone = true; if (num(en.rev) > 0) { const P = num(en.rev); revQ.push({ at: Math.ceil((t + 1e-6) / P) * P, en }); } marks.push({ t, uid: en.id, label: "被消灭", color: "var(--enemy)", from: killer ? killer.name : "" });
       addLog(`${en.name} 被${killer ? " " + killer.name + " " : ""}消灭`, false, killer ? killer.color : "var(--enemy)");
@@ -3862,8 +3868,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!en.gone) return;
       en.gone = false; en.dist = 10000; en.ehc = aha6 ? en.ehx * 0.8 : en.ehx; en.debt = 0; en.debtP = 0;
       en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0; en.broken = false; en.tcur = toughMax(en);
-      marks.push({ t, uid: en.id, label: "重新登场", color: "var(--enemy)", from: "" });
-      addLog(`${en.name} 重新登场（每 ${fmt(num(en.rev), 1)} 行动值一次；生命值 ${Math.round(en.ehc)}）`, false, "var(--enemy)");
+      const first = en.rv0F; en.rv0F = false;
+      marks.push({ t, uid: en.id, label: first ? "登场" : "重新登场", color: "var(--enemy)", from: "" });
+      addLog(first ? `${en.name} 登场（进战秘技之后召唤；之后被消灭每 ${fmt(num(en.rev), 1)} 行动值重新登场）` : `${en.name} 重新登场（每 ${fmt(num(en.rev), 1)} 行动值一次；生命值 ${Math.round(en.ehc)}）`, false, "var(--enemy)");
     };
     const debtOf = en => !ahaU ? 0 : num(ahaU.eid) >= 6 ? Math.max(en.ehx * 0.2, num(en.debt)) : num(en.debt);   // 【欢愉负债】占据的生命上限（6 魂始终至少 20%）
     const hurtEnemy = (en, a, killer) => { if (!en || en.gone || !(en.ehx > 0) || !(a > 0)) return;
@@ -4076,7 +4083,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (hasEnergy(actor)) { curWhy = `${actName[rec.act] || "每回合"}回能（卡片设置）`; addEnergy(actor, actE(actor, rec.act), true); }
       // 未开大时银狼的行动是战技，给队伍加笑点；无敌玩家中是强普，没有这一项
       if (actor === swU && !rec.ult && rec.act === "skill" && num(W.skillPunch) > 0) addPunch(num(W.skillPunch), "银狼战技");
-      if (actor === swU && rec.ult) { rec.scU = sw.score; spendCharge(); }
+      if (actor === swU && rec.ult) { rec.scU = sw.score; beanP(rec); spendCharge(); }
       endTurn(actor);
       if (rec.frz) pull(actor, 5000);   // 冻结解除后行动提前 50%
       if (actor.kind === "ally") for (const e of fx(actor, "tend")) apply(e, actor, actor.color);   // 自己回合结束时
@@ -4415,6 +4422,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${sn("tierBonus", "每档阈值 +", 'step="1"')}
         ${sn("charges", "强普次数", 'min="1" step="1"')}
         ${sn("skillPunch", "未开大战技笑点 +", 'min="0" step="1"')}
+        <label for="s-bean" title="【狼尊时刻】里的头号补给盲盒是随机的；这里按每次强普出 N 个【怪怪怪味豆】算，每个 +3 笑点（用户定的，默认 1）">每次强普怪味豆 <input type="number" id="s-bean" value="${W.bean ?? 1}" data-s="bean" min="0" step="1" style="width:50px"> 个（各 +3 笑点）</label>
         ${sn("adv", "开大自身拉条 %", 'min="0" max="100" step="1"')}
       </div>
       <div class="row">
@@ -4719,10 +4727,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           ${u.mon ? `<label for="lv-${u.id}">等级 <input type="number" id="lv-${u.id}" min="1" max="150" step="1" value="${num(u.lv, 95)}" data-u="${i}" data-f="lv" style="width:56px"></label>
           <label for="tg-${u.id}" title="韧性（官方数值，30 = 游戏里的 10 点；同名敌人不同关卡可能不一样，可以自己改；清空 = 用模板的）">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="${(m => m && m.tn ? m.tn : 0)(MON.m.find(m => m.n === u.mon))}" data-u="${i}" data-f="tough" style="width:60px"></label>
           ${S.dg && (S.dg.eHit || S.dg.eHp) ? (m => { const L = MON.hl ? MON.hl[Math.max(1, Math.min(MON.hl.length, Math.round(num(u.lv, 95)))) - 1] : null; return `<label for="ea-${u.id}" title="敌人攻击力（官方：1 级攻击力 × 等级成长；清空 = 用官方的）">攻击力 <input type="number" id="ea-${u.id}" min="0" step="1" value="${u.eatk ?? ""}" placeholder="${m && m.a && L ? Math.round(m.a * L[0]) : 0}" data-u="${i}" data-f="eatk" style="width:70px"></label>
-          <label for="eh-${u.id}" title="敌人生命值（官方：1 级生命值 × 等级成长；深渊等关卡另有加成，可以自己改；清空 = 用官方的）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="${m && m.h && L ? Math.round(m.h * L[1]) : 0}" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除（欢愉负债不清除），韧性回满；污染关卡的贪婪生命值可以当成最后多一条血；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label><label for="dc-${u.id}" title="归寂【收束命运的博弈】：每次转阶段掷骰子，三选一给我方，其余归敌人。勾上 = 每次都选「阿哈时刻」：阿哈立即获得 1 个固定计入 20 笑点的额外回合（另两项【屏障】/ 对我方伤害没做）"><input type="checkbox" id="dc-${u.id}" ${u.dice ? "checked" : ""} data-u="${i}" data-f="dice">转阶段骰子选阿哈时刻</label><label for="lr-${u.id}" title="4.7 王棋归寂：最后一管血出现时按 R 键，击破归寂的韧性条（弱点击破：行动延后 25%，没有击破伤害），我方全体行动提前 100%（用户说明）。只在开了敌人掉血、有分阶段生命值时有用"><input type="checkbox" id="lr-${u.id}" ${(u.lastR ?? !!u.dice) ? "checked" : ""} data-u="${i}" data-f="lastR">最后一管血按 R</label><label for="rv-${u.id}" title="被消灭后在下一个“周期的整数倍”行动值重新登场（满血、减益清空、从头跑条）。4.7 王棋的喜剧学家：【粉墨登场】速度 115 × 1.32 = 151.8，每 65.9 行动值召唤一次（第一次在 0）。不填 = 不会重新登场。召唤出来的敌人在主要敌人都被消灭后一起消失">被消灭后每 <input type="number" id="rv-${u.id}" min="0" step="0.1" value="${u.rev ?? ""}" data-u="${i}" data-f="rev" style="width:64px"> 行动值重新登场</label>` : ""}`; })(MON.m.find(m => m.n === u.mon)) : ""}
+          <label for="eh-${u.id}" title="敌人生命值（官方：1 级生命值 × 等级成长；深渊等关卡另有加成，可以自己改；清空 = 用官方的）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="${m && m.h && L ? Math.round(m.h * L[1]) : 0}" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除（欢愉负债不清除），韧性回满；污染关卡的贪婪生命值可以当成最后多一条血；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label><label for="dc-${u.id}" title="归寂【收束命运的博弈】：每次转阶段掷骰子，三选一给我方，其余归敌人。勾上 = 每次都选「阿哈时刻」：阿哈立即获得 1 个固定计入 20 笑点的额外回合（另两项【屏障】/ 对我方伤害没做）"><input type="checkbox" id="dc-${u.id}" ${u.dice ? "checked" : ""} data-u="${i}" data-f="dice">转阶段骰子选阿哈时刻</label><label for="lr-${u.id}" title="4.7 王棋归寂：最后一管血出现时按 R 键，击破归寂的韧性条（弱点击破：行动延后 25%，没有击破伤害），我方全体行动提前 100%（用户说明）。只在开了敌人掉血、有分阶段生命值时有用"><input type="checkbox" id="lr-${u.id}" ${(u.lastR ?? !!u.dice) ? "checked" : ""} data-u="${i}" data-f="lastR">最后一管血按 R</label><label for="rv-${u.id}" title="被消灭后在下一个“周期的整数倍”行动值重新登场（满血、减益清空、从头跑条）。4.7 王棋的喜剧学家：【粉墨登场】速度 115 × 1.32 = 151.8，每 65.9 行动值召唤一次（第一次在 0）。不填 = 不会重新登场。召唤出来的敌人在主要敌人都被消灭后一起消失">被消灭后每 <input type="number" id="rv-${u.id}" min="0" step="0.1" value="${u.rev ?? ""}" data-u="${i}" data-f="rev" style="width:64px"> 行动值重新登场</label><label for="r0-${u.id}" title="勾上 = 开局不在场，0 行动值在进战秘技（爻光战技、阿哈的额外阿哈时刻等）之后才召唤（4.7 王棋的喜剧学家，用户说明）"><input type="checkbox" id="r0-${u.id}" ${(u.rv0 ?? true) ? "checked" : ""} data-u="${i}" data-f="rv0">秘技之后才登场</label>` : ""}`; })(MON.m.find(m => m.n === u.mon)) : ""}
           ${u.stg ? `<span class="hint">来自 ${esc(u.stg)}</span>` : ""}<span class="hint">资料速度 ${fmt(num(u.monS))} × ${monRatio(u.lv)}${(m => m && m.w ? ` · 弱点 ${m.w}` : "")(MON.m.find(m => m.n === u.mon))}</span>` : `<label for="tg-${u.id}" title="韧性：30 = 游戏里的 10 点（小怪一般 60～120，精英 240～360，首领 360～720）；不填 = 不模拟这个敌人的韧性和击破">韧性 <input type="number" id="tg-${u.id}" min="0" step="30" value="${u.tough ?? ""}" placeholder="不模拟" data-u="${i}" data-f="tough" style="width:70px"></label>
           <label for="wk-${u.id}" title="弱点属性，写属性的第一个字：物 火 冰 雷 风 量 虚，例如“火冰量”；不填 = 所有属性都算弱点">弱点 <input type="text" id="wk-${u.id}" value="${esc(u.wks || "")}" placeholder="全部" data-u="${i}" data-f="wks" style="width:76px"></label>
-          ${S.dg && S.dg.eHp ? `<label for="eh-${u.id}" title="敌人生命值（手动敌人没有官方数据，填了才会被打死）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="不模拟" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除（欢愉负债不清除），韧性回满；污染关卡的贪婪生命值可以当成最后多一条血；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label><label for="dc-${u.id}" title="归寂【收束命运的博弈】：每次转阶段掷骰子，三选一给我方，其余归敌人。勾上 = 每次都选「阿哈时刻」：阿哈立即获得 1 个固定计入 20 笑点的额外回合（另两项【屏障】/ 对我方伤害没做）"><input type="checkbox" id="dc-${u.id}" ${u.dice ? "checked" : ""} data-u="${i}" data-f="dice">转阶段骰子选阿哈时刻</label><label for="lr-${u.id}" title="4.7 王棋归寂：最后一管血出现时按 R 键，击破归寂的韧性条（弱点击破：行动延后 25%，没有击破伤害），我方全体行动提前 100%（用户说明）。只在开了敌人掉血、有分阶段生命值时有用"><input type="checkbox" id="lr-${u.id}" ${(u.lastR ?? !!u.dice) ? "checked" : ""} data-u="${i}" data-f="lastR">最后一管血按 R</label><label for="rv-${u.id}" title="被消灭后在下一个“周期的整数倍”行动值重新登场（满血、减益清空、从头跑条）。4.7 王棋的喜剧学家：【粉墨登场】速度 115 × 1.32 = 151.8，每 65.9 行动值召唤一次（第一次在 0）。不填 = 不会重新登场。召唤出来的敌人在主要敌人都被消灭后一起消失">被消灭后每 <input type="number" id="rv-${u.id}" min="0" step="0.1" value="${u.rev ?? ""}" data-u="${i}" data-f="rev" style="width:64px"> 行动值重新登场</label>` : ""}` : ""}`}
+          ${S.dg && S.dg.eHp ? `<label for="eh-${u.id}" title="敌人生命值（手动敌人没有官方数据，填了才会被打死）">生命值 <input type="number" id="eh-${u.id}" min="0" step="1000" value="${u.ehp ?? ""}" placeholder="不模拟" data-u="${i}" data-f="ehp" style="width:96px"></label>${S.dg && S.dg.eHp ? `<label for="ph-${u.id}" title="分阶段生命值，逗号分隔（比如 16768365,16768365,31859894）。填了就按这几条血依次打：打空一条转下一阶段，溢出的伤害不继承，敌人身上的减益全部清除（欢愉负债不清除），韧性回满；污染关卡的贪婪生命值可以当成最后多一条血；清空 = 不分阶段（用左边的生命值）">分阶段 <input type="text" id="ph-${u.id}" value="${esc(u.phs || '')}" placeholder="如 1000000,2000000" data-u="${i}" data-f="phs" style="width:210px"></label><label for="dc-${u.id}" title="归寂【收束命运的博弈】：每次转阶段掷骰子，三选一给我方，其余归敌人。勾上 = 每次都选「阿哈时刻」：阿哈立即获得 1 个固定计入 20 笑点的额外回合（另两项【屏障】/ 对我方伤害没做）"><input type="checkbox" id="dc-${u.id}" ${u.dice ? "checked" : ""} data-u="${i}" data-f="dice">转阶段骰子选阿哈时刻</label><label for="lr-${u.id}" title="4.7 王棋归寂：最后一管血出现时按 R 键，击破归寂的韧性条（弱点击破：行动延后 25%，没有击破伤害），我方全体行动提前 100%（用户说明）。只在开了敌人掉血、有分阶段生命值时有用"><input type="checkbox" id="lr-${u.id}" ${(u.lastR ?? !!u.dice) ? "checked" : ""} data-u="${i}" data-f="lastR">最后一管血按 R</label><label for="rv-${u.id}" title="被消灭后在下一个“周期的整数倍”行动值重新登场（满血、减益清空、从头跑条）。4.7 王棋的喜剧学家：【粉墨登场】速度 115 × 1.32 = 151.8，每 65.9 行动值召唤一次（第一次在 0）。不填 = 不会重新登场。召唤出来的敌人在主要敌人都被消灭后一起消失">被消灭后每 <input type="number" id="rv-${u.id}" min="0" step="0.1" value="${u.rev ?? ""}" data-u="${i}" data-f="rev" style="width:64px"> 行动值重新登场</label><label for="r0-${u.id}" title="勾上 = 开局不在场，0 行动值在进战秘技（爻光战技、阿哈的额外阿哈时刻等）之后才召唤（4.7 王棋的喜剧学家，用户说明）"><input type="checkbox" id="r0-${u.id}" ${(u.rv0 ?? true) ? "checked" : ""} data-u="${i}" data-f="rv0">秘技之后才登场</label>` : ""}` : ""}`}
         </div>
         ${(m => m && m.v ? `<div class="ult-list"><span class="hint">这个敌人在不同关卡的资料速度：</span>${m.v.map(s => `<button type="button" class="${s === num(u.monS) ? "primary" : ""}" data-act="mon-v" data-u="${i}" data-k="${s}" style="font-size:12px;padding:1px 8px">${s}</button>`).join("")}</div>` : "")(MON.m.find(m => m.n === u.mon))}
         ${(m => !m || !m.k || !m.k.length ? "" : `<div class="effects">
@@ -6734,6 +6742,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     if (YG && !rec.__box && !e.dot && (e.key !== "e" || rec.uid === "aha") && bangerAt(YG, rec) > 0) {
       yaoN = rec.act === "skill" && rec.uid === u.id ? 2 : 1;
       yaoV = [0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.1625, 0.175, 0.1875, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25][dmgLv(YG, "f") - 1] || 0.2;
+      if (rec.wx) { const AH = S.units.find(x => x.kind === "ally" && !x.sm && tidOf(x) === "1511"); yaoV *= 1 + (AH && num(AH.eid) >= 2 ? 0.4 : 0.2); }   // 固有行迹【欢愉万相★心灵感应】：升格时倍率提高原倍率的 20%（阿哈 2 魂 40%）
       yaoEl = Math.max(elStat, num(YG.el, 0));
       const bgA = inAha ? bangerAt(u, rec) : bg;
       yaoDmg = yaoN * LVBASE * yaoV * (1 + yaoEl / 100) * (1 + 5 * bgA / (bgA + 240)) * (1 + laughB / 100) * critM * defM * resM * vulnM * toughM;
