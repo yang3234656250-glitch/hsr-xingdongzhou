@@ -168,3 +168,4 @@
 - 2026-11-17 tv 142（tools/fix142.py）：【欢愉负债】从上面占生命上限：`debtOf(en)`（6 魂至少 20%），hurtEnemy 里 `ehc` 封顶到 `ehx − debtOf`，endBar 转阶段后同样封顶，开局 6 魂敌人 `ehc = 0.8·ehx`；不再“剩余生命值 ≤ 负债就消灭”。tools/swauto.py：`S.sw.auto` / `S.sw.autoAt`，checkUlts 里银狼隐藏分 ≥ max(gate, autoAt) 且不在无敌玩家时 castUlt。
 - 2026-11-17（tools/minion47.py）：敌人字段 `rev`（被消灭后每 rev 行动值的整数倍重新登场，`revQ` + `reviveEnemy`，主循环里和手动事件一样插队；有非 rev 敌人时，非 rev 的都被消灭就结束战斗、rev 的随之消失）和 `zr`（滋扰：攻击标签 `ZRT` 的技能 / 非模板敌人的攻击后对每个被打目标 delay zr%）。STG 4.7 王棋：喜剧学家 rev 65.88、全体 zr 7.5。
 - 2026-11-17（tools/startord.py）：simulate 开局的 start 效果分 3 轮：所有人 preEff → 其他 → type cast（进战自动施放）。
+- 2026-11-17（tools/swspread.py）：dmgCalc `spread`（银狼 1506 的 b2 / box）多目标时按在场敌人均分进 `tw`，返回 `spread`；settleDmg `go` 里 spread 的按 tw 分、没有分阶段的目标打死后剩下的转给其他在场的（最多 6 轮）。
