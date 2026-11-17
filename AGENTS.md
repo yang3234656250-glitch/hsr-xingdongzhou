@@ -169,3 +169,4 @@
 - 2026-11-17（tools/minion47.py）：敌人字段 `rev`（被消灭后每 rev 行动值的整数倍重新登场，`revQ` + `reviveEnemy`，主循环里和手动事件一样插队；有非 rev 敌人时，非 rev 的都被消灭就结束战斗、rev 的随之消失）和 `zr`（滋扰：攻击标签 `ZRT` 的技能 / 非模板敌人的攻击后对每个被打目标 delay zr%）。STG 4.7 王棋：喜剧学家 rev 65.88、全体 zr 7.5。
 - 2026-11-17（tools/startord.py）：simulate 开局的 start 效果分 3 轮：所有人 preEff → 其他 → type cast（进战自动施放）。
 - 2026-11-17（tools/swspread.py）：dmgCalc `spread`（银狼 1506 的 b2 / box）多目标时按在场敌人均分进 `tw`，返回 `spread`；settleDmg `go` 里 spread 的按 tw 分、没有分阶段的目标打死后剩下的转给其他在场的（最多 6 轮）。
+- 2026-11-17（tv 143，tools/swup143.py）：银狼LV.999 两条漏算的行迹。`S.sw.cdUp` / `cdUp2`（固有行迹·阿哈升格后的暴击伤害 +40%，dmgCalc 里 `rec.wx && S.sw.jh` 时加，2 魂数值没查到官方数据，先同 40）；`S.sw.ach` / `achV`（行迹隐藏关卡全成就：castUlt 进入无敌玩家后隐藏分 +20 并 checkE2，`ach !== false` 就算）。fixTpl143 只换卡片上这条行迹的说明文字。
