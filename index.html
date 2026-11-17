@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（行动顺序底层规则，没改 tv；tools/pullord.py）</b>。几个单位被拉条到同一时刻时，<b>按拉条前的先后行动</b>：拉条前谁先轮到，拉条后还是谁先（你说的）。以前是“后被拉条的先走”。“登场立刻行动”和直接给的额外回合照旧排最前。对已有配置：同一时刻有两个以上单位被拉满的地方，先后可能变。</li>
 <li><b>2026-11-17（没改 tv；tools/turn47.py）</b>。4.7 王棋录像对照第 3 批。① <b>真珠欢愉技</b>“我方全体下一次攻击后额外造成欢愉伤害”：阿哈时刻里真珠的欢愉技最先放（官方欢愉技优先级 104，录像一致），后面其他人的欢愉技就是这“下一次攻击”，现在每个有伤害的欢愉技对每个击中的目标加这一段（银狼只在无敌玩家里）；这些人之后的普通攻击不再有这段（以前是阿哈时刻里不算、留给之后到真珠下回合前的所有攻击）。录像开场爻光欢愉技 10.2 万，页面现在约 10 万。② 归寂<b>【转面】</b>（你说的）：每次转阶段归寂拉条 100%（按行动顺序多一次正常行动；掷骰子不算它的行动，转阶段时直接给），【粉墨登场】也拉条 100%（不是立即行动，排在已在等的额外回合之后）：轮到时召唤被消灭的喜剧学家，之后从这一刻起每 65.88 行动值召唤。敌人卡开关「转面拉条」，没设就跟骰子开关。对已有配置：有真珠的欢愉队伤害分布变了（阿哈时刻变高、普通攻击变低）；②只影响放了 4.7 王棋归寂、开了敌人掉血的方案。</li>
 <li><b>2026-11-17（没改 tv；tools/rec47b.py）</b>。4.7 王棋录像对照第 2 批（按你的回复）：① 银狼<b>每次强普算 1 个【怪怪怪味豆】</b>（+3 笑点，银狼设置里可改个数，0 = 不算）。② <b>额外阿哈时刻</b>（爻光终结技 / 秘技 / 骰子给的）的伤害以前在欢愉技效果之前记，吃不到这次爻光欢愉技给的【凶星低语】和“首次施放欢愉技全队欢愉度 +10%”；现在之后再记（普通阿哈时刻本来就是这样）。③ 爻光固有行迹【欢愉万相★心灵感应】升格时【大吉大利】倍率 +20%（阿哈 2 魂 +40%）以前漏了。④ 会重新登场的敌人（喜剧学家）<b>开局不在场，0 行动值在进战秘技之后才召唤</b>（敌人卡开关「秘技之后才登场」，默认开）。对已有配置：有银狼的队伍笑点 / 隐藏分变多；只影响开了敌人掉血、放了喜剧学家的方案（④）；②③ 只影响伤害。</li>
 <li><b>2026-11-17：tv 145（tools/fix145.py）</b>。银狼开大时隐藏分按录像核对：录像里开大前 122（阿哈时刻结束 +4 笑点后 126），开大后 136，期间笑点 +50（专武 20 + 开大 30），所以开大本身净 −40，就是设置里的“开大消耗 40”。tv 143 又加了【隐藏关卡全成就】+20，算了两遍：页面开大后 156，第一次无敌玩家里 2 魂多给了 1 个额外回合和 1 次强普。现在这条行迹默认不另加（设置里可勾，勾上时把开大消耗改成 60）。对已有配置：开大消耗还是 40 的存档自动关掉这条，有银狼的队伍开大后隐藏分少 20，2 魂额外回合可能变少。</li>
@@ -3064,7 +3065,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (u.sm.pause && o) o.paused = true;
       { const sd = smDef(u) || {};
         if (sd.dom) for (const z of U) if (z.kind === "ally" && z !== u && z !== o && !z.paused) { z.paused = true; z.domP = u.id; }   // 境界：其他我方目标离场且无法行动（白厄【时墟铁墓】）
-        if (!was && sd.now) { u.dist = 0; u.zseq = ++zc; }   // 登场后立刻行动
+        if (!was && sd.now) { u.dist = 0; u.zseq = ++zc; u.zpre = -Infinity; }   // 登场后立刻行动
         if (!was && sd.rot) u.rot = Math.min(num(sd.rcap) || Infinity, num(u.rot) + num(sd.rot[0])); if (!was) u.tailOn = false;   // 变身时 +4 点【毁伤】，没用完的保留（上限 7）
         if (!was && sd.fz && o && hasSt(o, String(sd.fz[0]))) {   // 【永续的燃烧】：变身时【火种】每超出开大所需 1 点，暴击伤害 +X%
           const F0 = sd.fz, src0 = U.find(z => z.kind === "ally" && !z.sm && tidOf(z) === String(F0[5])), per = src0 && num(src0.eid) >= num(F0[3]) ? num(F0[2]) : num(F0[1]);
@@ -3149,7 +3150,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const evs = [...S.events].filter(e => byId[e.target] || ["allies", "enemies"].includes(e.target)).sort((a, b) => num(a.av) - num(b.av));
     let ei = 0, guard = 0, seq = 0, zc = 0, lastT = -1, zeroRun = 0;
     // 拉条：被拉到 0 距离且还没进回合的角色，后被拉到 0 的排在前面（正常跑条里会超车先到 0 的角色；额外回合是直接排队，不受影响）
-    const pull = (u, d) => { const was = u.dist; u.dist = Math.max(0, was - d); if (was > 0 && u.dist === 0) u.zseq = ++zc; };
+    const pull = (u, d) => { const was = u.dist; u.dist = Math.max(0, was - d); if (was > 0 && u.dist === 0 && u.zpre == null) { u.zpre = t + was / Math.max(1e-9, spdOf(u)); u.zseq = ++zc; } };   // 拉条前本该行动的时刻（同时被拉到 0 的按它排先后）
     const move = dt => { for (const u of U) if (!u.gone && !u.paused && !(u.sm && u.sm.noTurn)) u.dist = Math.max(0, u.dist - spdOf(u) * dt); };
 
     // 银狼隐藏分
@@ -3972,7 +3973,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (u.gone || u.paused || (u.sm && u.sm.noTurn)) continue;   // 不在场的召唤物、被暂停的本体、不上行动序列的忆灵（德谬歌、小伊卡）不跑条
         const dt = u.dist / spdOf(u);
         if (dt < best - 1e-9) { best = dt; actor = u; }
-        else if (dt <= best + 1e-9 && (u.zseq || 0) > (actor.zseq || 0)) { actor = u; best = Math.min(best, dt); } // 同一时刻：后拉条的先走
+        else if (dt <= best + 1e-9 && (u.zpre ?? t + dt) < (actor.zpre ?? t + best) - 1e-12) { actor = u; best = Math.min(best, dt); } // 同一时刻：按拉条前的先后（拉条前谁先轮到，拉条后还是谁先）
       }
       const next = t + best;
       if (revQ.length) { revQ.sort((a, b) => a.at - b.at); if (revQ[0].at <= next + 1e-9 && revQ[0].at <= END) { const rq = revQ.shift(), at = Math.max(t, rq.at); move(at - t); t = at; reviveEnemy(rq.en); checkUlts(); continue; } }
@@ -4079,7 +4080,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         punchRearm();   // 阿哈时刻结束：愿力的笑点触发重置
       }
       if (!actor.gone) actor.dist = 10000;   // 回合开始时就离场的（晴空乐手倒计时）不再排队
-      actor.zseq = 0;
+      actor.zseq = 0; actor.zpre = null;
       actor.acting = true;
       tickHots(actor);   // 持续治疗：回合开始时回复
       if (actor.kind === "ally") teamFire("aTurn", actor);   // 队友回合开始时（藿藿禳命的治疗）
@@ -4116,7 +4117,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           if (a === "zh" && !D.zh) a = auto;
           rec.kAct = a;
           if (a === "pl") { const n = Math.min(num(actor.rot), num(R[3])); actor.rot -= n; rec.smk = R[2]; rec.smn = n; lab(`支柱•死星天裁（消耗 ${n} 点毁伤，剩 ${actor.rot}）`);
-            if (o && num(o.eid) >= 2 && n >= num(R[3])) { actor.life += 1; actor.dist = 0; actor.zseq = ++zc; lab("2 魂：额外回合"); }   // 2 魂：单次消耗达到 4 点
+            if (o && num(o.eid) >= 2 && n >= num(R[3])) { actor.life += 1; actor.dist = 0; actor.zseq = ++zc; actor.zpre = -Infinity; lab("2 魂：额外回合"); }   // 2 魂：单次消耗达到 4 点
             atkAct(actor); }
           else if (a === "zh") {   // 灾厄：毁伤 + 敌人数，1 层弑魂之炽（4 魂 +4），敌方全体立即行动；这次本身没有伤害
             const ens = U.filter(z => z.kind === "enemy" && !z.gone), Z = D.zh;
