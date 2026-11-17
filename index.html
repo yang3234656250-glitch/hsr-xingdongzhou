@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（没改 tv；tools/bg47.py）</b>。手动事件新类型<b>「引爆【爆梗】」</b>（4.7 王棋归寂）：官方说明是我方角色施放【爆梗】时，归寂对我方全体造成大量伤害，所以全体当作受到一次攻击（受击回能默认 10 点，乘各自充能效率；触发“受到攻击时”）。目标选引爆的人，只写进日志。录像里 128 行动值归寂放【埋梗时刻】后，银狼、真珠、爻光先后引爆，爻光开大前挨了 3 次（约 37 能量），这就是页面上她少的能量。归寂放【埋梗时刻】和出招顺序还没做，暂时手动放。</li>
 <li><b>2026-11-17：tv 146（tools/fix146.py）</b>。星神★阿哈在队里时，<b>阿哈时刻的基础速度自动等于星神★阿哈卡片的基础速度</b>（官方：基础速度从 80 提高至星神★阿哈的基础速度），阿哈时刻设置里的“基础”不用再手填（没有星神★阿哈时照旧用它）。阿哈专武【当第一声「阿哈」响起】补上基础速度 +12（叠影 14 / 16 / 18 / 20，官方数据），换光锥时卡片基础速度自动加减。对已有配置：有星神★阿哈的方案，阿哈时刻速度按她的卡片算（以前手填的值不再用）；装了专武的卡片基础速度按光锥重算。</li>
 <li><b>2026-11-17（行动顺序底层规则，没改 tv；tools/pullord.py）</b>。几个单位被拉条到同一时刻时，<b>按拉条前的先后行动</b>：拉条前谁先轮到，拉条后还是谁先（你说的）。以前是“后被拉条的先走”。“登场立刻行动”和直接给的额外回合照旧排最前。对已有配置：同一时刻有两个以上单位被拉满的地方，先后可能变。</li>
 <li><b>2026-11-17（没改 tv；tools/turn47.py）</b>。4.7 王棋录像对照第 3 批。① <b>真珠欢愉技</b>“我方全体下一次攻击后额外造成欢愉伤害”：阿哈时刻里真珠的欢愉技最先放（官方欢愉技优先级 104，录像一致），后面其他人的欢愉技就是这“下一次攻击”，现在每个有伤害的欢愉技对每个击中的目标加这一段（银狼只在无敌玩家里）；这些人之后的普通攻击不再有这段（以前是阿哈时刻里不算、留给之后到真珠下回合前的所有攻击）。录像开场爻光欢愉技 10.2 万，页面现在约 10 万。② 归寂<b>【转面】</b>（你说的）：每次转阶段归寂拉条 100%（按行动顺序多一次正常行动；掷骰子不算它的行动，转阶段时直接给），【粉墨登场】也拉条 100%（不是立即行动，排在已在等的额外回合之后）：轮到时召唤被消灭的喜剧学家，之后从这一刻起每 65.88 行动值召唤。敌人卡开关「转面拉条」，没设就跟骰子开关。对已有配置：有真珠的欢愉队伤害分布变了（阿哈时刻变高、普通攻击变低）；②只影响放了 4.7 王棋归寂、开了敌人掉血的方案。</li>
@@ -3984,7 +3985,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (ei < evs.length && num(evs[ei].av) <= next + 1e-9 && num(evs[ei].av) <= END) {
         const ev = evs[ei++]; const at = Math.max(t, num(ev.av));
         move(at - t); t = at;
-        apply({ id: ev.id, type: ev.type, target: ev.target, value: ev.value }, null, "var(--accent)");
+        if (ev.type === "bg") {   // 引爆【爆梗】：归寂对我方全体造成伤害（全体受到一次攻击）
+          const who = byId[ev.target]; addLog(`${who ? who.name : "我方"} 引爆【爆梗】：归寂对我方全体造成伤害（全体受到攻击，受击回能 ${num(ev.value, 10)}）`, false, "var(--enemy)");
+          marks.push({ t, uid: who ? who.id : (U.find(z => z.kind === "ally") || {}).id, label: "爆梗", color: "var(--enemy)", from: "引爆【爆梗】" });
+          apply({ id: ev.id, type: "hit", target: "allies", value: num(ev.value, 10) }, null, "var(--enemy)");
+        } else apply({ id: ev.id, type: ev.type, target: ev.target, value: ev.value }, null, "var(--accent)");
         checkUlts();
         continue;
       }
@@ -4833,11 +4838,12 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       <div class="ev">
         AV<input type="number" id="va-${v.id}" min="0" step="1" value="${v.av}" data-v="${i}" data-f="av" aria-label="行动值">
         ${v.type === "punch" ? "" : `<select id="vt-${v.id}" data-v="${i}" data-f="target" aria-label="目标">${targetOptions(v.target, ["allies", "enemies"])}</select>`}
-        <select id="vy-${v.id}" data-v="${i}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["punch", "阿哈笑点"], ["heal", "治疗"], ["shield", "护盾"], ["break", "弱点击破"], ["wkAdd", "我方为敌人添加弱点时"], ["aSup", "我方使用助战技时"], ["fatal", "我方目标受到致命攻击时"], ["kill", "消灭敌人"], ["hit", "受到攻击"], ["fua", "追加攻击"]], v.type)}</select>
+        <select id="vy-${v.id}" data-v="${i}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["punch", "阿哈笑点"], ["heal", "治疗"], ["shield", "护盾"], ["break", "弱点击破"], ["wkAdd", "我方为敌人添加弱点时"], ["aSup", "我方使用助战技时"], ["fatal", "我方目标受到致命攻击时"], ["kill", "消灭敌人"], ["hit", "受到攻击"], ["fua", "追加攻击"], ["bg", "引爆【爆梗】（4.7 王棋归寂）"]], v.type)}</select>
         ${v.type === "heal" ? "（让目标触发“受到治疗时”的效果）" : v.type === "shield" ? "（让目标触发“受到护盾时”的效果）"
           : v.type === "break" ? "（目标选被击破的敌人；我方所有“弱点击破时”效果生效）"
           : v.type === "kill" ? "（目标选消灭敌人的我方角色：回 10 能量，并触发“消灭敌人时”效果）"
           : v.type === "hit" ? `（目标选被攻击的我方角色，触发“受到攻击时”效果）回能 <input type="number" id="vv-${v.id}" step="1" min="0" value="${num(v.value)}" data-v="${i}" data-f="value" aria-label="受击回能" style="width:56px">`
+          : v.type === "bg" ? `（目标选引爆的人；归寂对我方全体造成伤害：全体当作受到攻击）受击回能 <input type="number" id="vv-${v.id}" step="1" min="0" value="${v.value ?? 10}" data-v="${i}" data-f="value" aria-label="受击回能" style="width:52px">`
           : v.type === "fua" ? "（目标选发动追加攻击的我方角色）" : `<input type="number" id="vv-${v.id}" step="1" value="${v.value}" data-v="${i}" data-f="value" aria-label="数值">${v.type === "punch" ? "点" : "%"}`}
         <button class="ghost" data-act="del-ev" data-v="${i}" aria-label="删除事件">✕</button>
       </div>`).join("") || `<p class="empty">没有事件。</p>`;
