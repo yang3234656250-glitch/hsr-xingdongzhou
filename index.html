@@ -1103,6 +1103,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-17（没改 tv；tools/xq47b.py）</b>。【谐星荟萃】跟着每一波喜剧学家走（你说的，录像 3:13【粉墨登场】召唤第二波）：每波被召唤时它从头跑条（速度 220：0 召唤 → 45，65.88 召唤 → 111），这一波全被消灭就从行动序列上消失。</li>
 <li><b>2026-11-17（没改 tv；tools/xq47.py）</b>。4.7 王棋喜剧学家<b>【谐星荟萃】</b>（官方天赋，你确认的做法）：喜剧学家不再各自跑条，行动序列上单独一个【谐星荟萃】（速度 220，从 0 开始），轮到时场上所有喜剧学家依次出手；场上没有就空过。录像里第一次在 45 行动值，和这个一致。敌人卡开关「随【谐星荟萃】出手」，有重新登场周期的敌人默认开。对已有配置：只影响放了喜剧学家的方案。</li>
 <li><b>2026-11-17（没改 tv；tools/xq47.py）</b>。4.7 王棋喜剧学家<b>【谐星荟萃】</b>（官方天赋，你确认的做法）：喜剧学家不再各自跑条，行动序列上单独一个【谐星荟萃】（速度 220，从 0 开始），轮到时场上所有喜剧学家依次出手；场上没有就空过。录像里第一次在 45 行动值，和这个一致。敌人卡开关「随【谐星荟萃】出手」，有重新登场周期的敌人默认开。对已有配置：只影响放了喜剧学家的方案。</li>
 <li><b>2026-11-17（没改 tv；tools/xq47.py）</b>。4.7 王棋喜剧学家<b>【谐星荟萃】</b>（官方天赋，你确认的做法）：喜剧学家不再各自跑条，行动序列上单独一个【谐星荟萃】（速度 220，从 0 开始），轮到时场上所有喜剧学家依次出手；场上没有就空过。录像里第一次在 45 行动值，和这个一致。敌人卡开关「随【谐星荟萃】出手」，有重新登场周期的敌人默认开。对已有配置：只影响放了喜剧学家的方案。</li>
@@ -3848,9 +3849,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     for (const z of U) if (z.rv0Q) { revQ.push({ at: 0, en: z }); delete z.rv0Q; z.rv0F = true; }
     // 【谐星荟萃】：喜剧学家不单独跑条，这个行动轮到时场上所有喜剧学家一同出手
     const XQ = U.filter(z => z.kind === "enemy" && (z.xq ?? num(z.rev) > 0)); for (const z of XQ) z.xqOn = true;
-    const xqSpd = XQ.length ? num(XQ[0].xqS, 220) : 0; let xqAt = XQ.length && xqSpd > 0 ? 10000 / xqSpd : null;   // 【谐星荟萃】速度 220（用户说明），卡片 xqS 可改
-    const killEnemy = (en, killer) => {
+    const xqSpd = XQ.length ? num(XQ[0].xqS, 220) : 0; let xqAt = XQ.length && xqSpd > 0 && XQ.some(z => !z.gone) ? 10000 / xqSpd : null;   // 【谐星荟萃】速度 220（用户说明），卡片 xqS 可改
+    const killEnemy = (en, killer) => {
       en.ehc = 0; en.gone = true; if (num(en.rev) > 0) { const P = num(en.rev); revQ.push({ at: sumT0 + Math.ceil((t + 1e-6 - sumT0) / P) * P, en }); } marks.push({ t, uid: en.id, label: "被消灭", color: "var(--enemy)", from: killer ? killer.name : "" });
+      if (en.xqOn && !U.some(z => z.xqOn && !z.gone)) xqAt = null;   // 这一波喜剧学家全被消灭：【谐星荟萃】从行动序列上消失
       addLog(`${en.name} 被${killer ? " " + killer.name + " " : ""}消灭`, false, killer ? killer.color : "var(--enemy)");
       if (killer && killer.kind === "ally") fireEv("kill", killer);
       for (const b of (en.buffs || []).filter(b => b.lst)) { const o = byId[b.lst[0]]; if (o && o.st && o.st[b.lst[1]]) endSt(o, b.lst[1]); }   // 这个敌人身上挂着的状态联动（貊泽【猎物】被消灭）
@@ -3889,6 +3891,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const ahaU = U.find(z => z.kind === "ally" && !z.sm && tidOf(z) === "1511");   // 星神★阿哈在队：【欢愉负债】
     const reviveEnemy = en => {   // 被消灭的敌人重新登场：满血、减益清空、从头跑条
       if (!en.gone) return;
+      if (en.xqOn && !U.some(z => z.xqOn && !z.gone)) xqAt = t + 10000 / xqSpd;   // 新的一波喜剧学家：【谐星荟萃】从头跑条
       en.gone = false; en.dist = 10000; en.ehc = aha6 ? en.ehx * 0.8 : en.ehx; en.debt = 0; en.debtP = 0;
       en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0; en.broken = false; en.tcur = toughMax(en);
       const first = en.rv0F; en.rv0F = false;
