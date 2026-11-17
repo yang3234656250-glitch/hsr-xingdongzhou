@@ -3853,8 +3853,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       en.broken = false; en.tcur = toughMax(en);   // 韧性回满
       marks.push({ t, uid: en.id, label: "转阶段", color: "var(--enemy)", from: killer ? killer.name : "" });
       if (en.tf ?? en.dice) {   // 4.7 王棋归寂【转面】（用户说明）：归寂拉条 100%（按行动顺序多一次正常行动；掷骰子不算它的行动，转阶段时直接给）；【粉墨登场】也是拉条 100%（不是立即行动）：排在已在等的额外回合之后，轮到时召唤被消灭的喜剧学家
+        const bossLeft = en.dist / Math.max(1e-9, spdOf(en)), P0 = Math.max(...U.filter(z => z.kind === "enemy" && num(z.rev) > 0).map(z => num(z.rev)), 0);
+        const sumLeft = P0 > 0 ? sumT0 + Math.ceil((t + 1e-6 - sumT0) / P0) * P0 - t : Infinity;   // 拉条前【粉墨登场】还要多久
+        const bossFirst = bossLeft < sumLeft;   // 拉条前谁先轮到，拉条后还是谁先（用户说明）
         pull(en, 10000); sumT0 = t;
-        const due = revQ.filter(q => q.en.gone).map(q => (q.at = t, q.en));   // 主循环里额外回合之后、下一个正常行动之前处理
+        const due = revQ.filter(q => q.en.gone).map(q => (q.at = t + (bossFirst ? 1e-6 : 0), q.en));   // 主循环里额外回合之后处理；归寂原本在前就排在归寂这次行动之后
         addLog(`${en.name}【转面】：归寂拉条 100%，【粉墨登场】拉条 100%${due.length ? `（轮到时 ${due.length} 个${[...new Set(due.map(z => z.name))].join("、")}重新登场）` : ""}`, false, "var(--enemy)");
       }
       if ((en.lastR ?? en.dice) && en.ph === en.phs.length - 1) {   // 4.7 王棋：最后一管血出现时按 R：击破韧性条、我方全体行动提前 100%（用户说明）
