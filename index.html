@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/vor47e.py）</b>：用户说明：【贪饕】是<b>直接回满血、不转阶段</b>。所以进入贪饕血条时不再触发秘技、不换形态、不清减益、不回韧性、不【转面】拉条、不掷骰子给阿哈时刻；欢愉负债按比例原样带过去（不截到 10%）。按 R 和喜剧学家退场照旧。归寂这一场：第三条血打完时负债约 30%，贪饕血条从约 70% 开始，和录像一致。</li>
 <li><b>2026-11-18（没改 tv；tools/debt47.py）</b>：修正<b>【欢愉负债】</b>上限。官方（星神权能·阿哈正传）：造成伤害时额外获得损失生命值 25% 的欢愉负债，<b>阶段转换时</b>保留、最高不超过生命上限 10%。以前把 10% 当成负债本身的上限；用户截图第三阶段负债明显超过 10%。现在阶段内不封顶，转阶段只带 10% 过去；贪饕血条上不再累积（整理图按开局 10% 算）。<b>对已有配置</b>：负债从上面占生命上限，正常打的时候生命值本来就在它下面，所以模拟结果基本不变（4 组模板队伍、归寂这一场都没变）；日志里的负债数会变大。</li>
 <li><b>2026-11-18（没改 tv；tools/rdmg47.py）</b>：用户说明：场地技能 R 也有伤害。按 R 时对归寂造成伤害，默认 228315（录像 5:39“点兵，开幕！”的总伤害），先按欢愉伤害算；敌人卡“R 伤害”和“欢愉”勾选框可改。</li>
 <li><b>2026-11-18（没改 tv；tools/vor47d.py）</b>：用户说明：归寂最后一段（贪饕血条）没有喜剧学家。转进这一段时在场的喜剧学家退场，【粉墨登场】不再召唤，【谐星荟萃】消失；伤害全打在归寂身上。</li>
@@ -3905,9 +3906,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!(en.phs && en.ph < en.phs.length - 1)) { killEnemy(en, killer); return; }
       const over = Math.max(0, -en.ehc), old = en.ph + 1, nd = (en.buffs || []).length + (en.dots || []).length + (en.wk || []).length + Object.keys(en.st || {}).length; en.ph++;
       en.ehx = en.ehc = en.phs[en.ph];   // 欢愉负债不清除（写在阿哈的效果里）
-      if (vorOn(en) && en.ph > 0) { const vh = num(en.vorHp, 216); if (vh > 0) en.ehx = en.ehc = en.phs[en.ph - 1] * vh / 100; }   // 【贪饕】污染 4 级多阶段怪物：贪饕血条 = 上一条（最后一条正常血）的 216%（用户给的整理图）；填 0 = 用分阶段里写的
-      techAgain(en);
-      { const pm = String(en.phm ??= phmDef(en)).split("|").map(x => x.trim()), fl = String(pm[en.ph] || "").split("+").map(x => x.trim().split("@")), mn = fl[0][0], m2 = mn && MON.m.find(x => x.n === mn);   // 每段：名字@开始%@速度倍数@每回合几招@第二招
+      const vr = vorOn(en);   // 进入【贪饕】血条：直接回满，不转阶段（用户说明）
+      if (vr && en.ph > 0) { const vh = num(en.vorHp, 216); if (vh > 0) en.ehx = en.ehc = en.phs[en.ph - 1] * vh / 100; }   // 【贪饕】污染 4 级多阶段怪物：贪饕血条 = 上一条（最后一条正常血）的 216%（用户给的整理图）；填 0 = 用分阶段里写的
+      if (!vr) techAgain(en);
+      if (!vr) { const pm = String(en.phm ??= phmDef(en)).split("|").map(x => x.trim()), fl = String(pm[en.ph] || "").split("+").map(x => x.trim().split("@")), mn = fl[0][0], m2 = mn && MON.m.find(x => x.n === mn);   // 每段：名字@开始%@速度倍数@每回合几招@第二招
         en.moX = fl[0][1] != null && fl[0][1] !== "" ? num(fl[0][1]) : null; if (fl[0][4] != null && fl[0][4] !== "") en.sqo = num(fl[0][4]) - en.turns;   // 每管血换形态（4.7 归寂：成 / 成 / 坏 / 坏，录像里的名字）：出招表换成这个形态的，接着按回合数轮
         if (m2 && m2.n !== en.mon) { en.mon = m2.n; en.__mon = undefined; en.seq = (m2.q || []).slice(); addLog(`${en.name} 变成「${m2.n.split("「")[1] || m2.n}：出招表换成这个形态的`, false, "var(--enemy)"); }
         phTok(en, fl[0]);
@@ -3917,10 +3919,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
             if (fix || mf) FACE.push({ boss: en, o0: i, n: nm0(nm), seq: fix || (mf.q || []).slice(), k: k0 != null && k0 !== "" ? num(k0) : en.turns, at: t + num(off) * 100 / sp0, o: i, sm: num(sm) || 1, n2: Math.max(1, num(n2) || 1), s2: s2 != null && s2 !== "" ? num(s2) : null, i2: 0 }); });
           addLog(`${en.name}【三面合一】：${fl.slice(1).map(a => nm0(a[0])).join("、")}各自在行动序列上行动（不可选中，和${m2 ? "「" + (m2.n.split("「")[1] || m2.n) : "本体"}共享生命值）`, false, "var(--enemy)");
         } }
-      en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0;   // 敌人身上的减益（易伤 / 减抗 / 减速 / 持续伤害 / 弱点 / 状态）不继承；【欢愉负债】不清除
-      en.broken = false; en.tcur = toughMax(en);   // 韧性回满
-      marks.push({ t, uid: en.id, label: "转阶段", color: "var(--enemy)", from: killer ? killer.name : "" });
-      if (en.tf ?? en.dice) {   // 4.7 王棋归寂【转面】（用户说明）：归寂拉条 100%（按行动顺序多一次正常行动；掷骰子不算它的行动，转阶段时直接给）；【粉墨登场】也是拉条 100%（不是立即行动）：排在已在等的额外回合之后，轮到时召唤被消灭的喜剧学家
+      if (!vr) { en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0;   // 敌人身上的减益（易伤 / 减抗 / 减速 / 持续伤害 / 弱点 / 状态）不继承；【欢愉负债】不清除
+      en.broken = false; en.tcur = toughMax(en); }   // 韧性回满（贪饕回满不转阶段：减益、韧性不变）
+      marks.push({ t, uid: en.id, label: vr ? "贪饕回满" : "转阶段", color: "var(--enemy)", from: killer ? killer.name : "" });
+      if (!vr && (en.tf ?? en.dice)) {   // 4.7 王棋归寂【转面】（用户说明）：归寂拉条 100%（按行动顺序多一次正常行动；掷骰子不算它的行动，转阶段时直接给）；【粉墨登场】也是拉条 100%（不是立即行动）：排在已在等的额外回合之后，轮到时召唤被消灭的喜剧学家
         const bossLeft = en.dist / Math.max(1e-9, spdOf(en)), P0 = Math.max(...U.filter(z => z.kind === "enemy" && num(z.rev) > 0).map(z => num(z.rev)), 0);
         const sumLeft = P0 > 0 ? sumT0 + Math.ceil((t + 1e-6 - sumT0) / P0) * P0 - t : Infinity;   // 拉条前【粉墨登场】还要多久
         const bossFirst = bossLeft < sumLeft;   // 拉条前谁先轮到，拉条后还是谁先（用户说明）
@@ -3937,8 +3939,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         addLog(`${en.name} 最后一管血出现，按 R：击破韧性条（行动延后 25%），我方全体行动提前 100%（${who.map(z => z.name).join("、")}）`, false, "var(--enemy)");
         { const pb = brkBy; brkBy = null; try { fireEv("break", en); } finally { brkBy = pb; } }
       }
-      if (en.dice && byId.aha) { pendingAha.push({ n: 20, from: en.name + "的骰子" }); addLog(`${en.name}【收束命运的博弈】：选「阿哈时刻」，阿哈获得 1 个固定计入 20 笑点的额外回合`, false, "var(--enemy)"); }
-      if (ahaU && num(en.debtP) > 0) { en.debtP = Math.min(0.1, en.debtP); en.debt = en.debtP * en.ehx; }   // 转阶段保留，最高 10%   // 【欢愉负债】按比例保留到下一阶段（占据生命上限，所以新阶段一开始就少这个比例）
+      if (!vr && en.dice && byId.aha) { pendingAha.push({ n: 20, from: en.name + "的骰子" }); addLog(`${en.name}【收束命运的博弈】：选「阿哈时刻」，阿哈获得 1 个固定计入 20 笑点的额外回合`, false, "var(--enemy)"); }
+      if (ahaU && num(en.debtP) > 0) { if (!vr) en.debtP = Math.min(0.1, en.debtP); en.debt = en.debtP * en.ehx; }   // 转阶段保留，最高 10%   // 【欢愉负债】按比例保留到下一阶段（占据生命上限，所以新阶段一开始就少这个比例）
       if (ahaU) en.ehc = Math.min(en.ehc, en.ehx - debtOf(en));
       if (vorOn(en) && en.dice) {   // 归寂最后一段没有喜剧学家（用户说明）：在场的退场，【粉墨登场】不再召唤
         const out = U.filter(z => z.kind === "enemy" && z !== en && num(z.rev) > 0 && !z.gone); noRev = true; revQ.length = 0; xqAt = null;
@@ -3946,8 +3948,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         addLog(`${en.name} 最后一段（贪饕血条）没有喜剧学家${out.length ? `：${out.length} 个喜剧学家退场` : ""}，【粉墨登场】不再召唤`, false, "var(--enemy)");
       }
       if (vorOn(en)) { const st = num(en.vorSt, 0); en.vmx = en.ehx; if (st > 0) en.ehc = Math.min(en.ehc, st / 100 * en.ehx);   // 【贪饕侵蚀】最后一管血：伤害按 ×4 / ×2 打红血，多出的变灰血；vorSt = 手动指定开始 %
-        addLog(`${en.name} 激活【贪饕】的力量：贪饕血条 ${Math.round(en.ehx)}，从 ${fmt(en.ehc / en.ehx * 100, 1)}% 开始；欢愉伤害 ×4（3 份变灰血）、其他 ×2（1 份变灰血），灰血（含欢愉负债）到 ${100 - num(en.vorAt, 23)}% 才能被消灭，之前受到致命伤害会回满`, false, "var(--enemy)"); }
-      addLog(`${en.name} 第 ${old} 阶段生命值打空，转入第 ${en.ph + 1} 阶段（生命值 ${Math.round(en.ehx)}${ahaU && num(en.debt) > 0 ? `，保留【欢愉负债】${Math.round(en.debt)}，相当于从 ${Math.round((1 - en.debt / en.ehx) * 100)}% 开始` : ""}；上一阶段溢出的 ${Math.round(over)} 点伤害不继承；敌人身上的减益全部清除，共 ${nd} 项）`, false, "var(--enemy)");
+        addLog(`${en.name} 第 ${old} 条血打空，激活【贪饕】的力量：不转阶段，直接回满（减益、韧性、形态都不变${ahaU && num(en.debtP) > 0 ? `，欢愉负债按比例保留 ${fmt(en.debtP * 100, 1)}%` : ""}）；贪饕血条 ${Math.round(en.ehx)}，从 ${fmt(en.ehc / en.ehx * 100, 1)}% 开始；欢愉伤害 ×4（3 份变灰血）、其他 ×2（1 份变灰血），灰血（含欢愉负债）到 ${100 - num(en.vorAt, 23)}% 才能被消灭，之前受到致命伤害会回满`, false, "var(--enemy)"); }
+      if (!vr) addLog(`${en.name} 第 ${old} 阶段生命值打空，转入第 ${en.ph + 1} 阶段（生命值 ${Math.round(en.ehx)}${ahaU && num(en.debt) > 0 ? `，保留【欢愉负债】${Math.round(en.debt)}，相当于从 ${Math.round((1 - en.debt / en.ehx) * 100)}% 开始` : ""}；上一阶段溢出的 ${Math.round(over)} 点伤害不继承；敌人身上的减益全部清除，共 ${nd} 项）`, false, "var(--enemy)");
       if (rNow && eHpOn) { const rd = en.rDmg != null && en.rDmg !== "" ? num(en.rDmg) : (en.dice ? 228315 : 0);   // 场地技能 R 的伤害（用户说明；录像 228315）
         if (rd > 0) { const pe = curEl; curEl = en.rEl ?? true; addLog(`场地技能 R 对${en.name}造成 ${fmt(rd / 1e4, 1)} 万${curEl ? "欢愉" : ""}伤害`, false, "var(--accent)"); hurtEnemy(en, rd, null); curEl = pe; } }
     };
