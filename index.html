@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/qx0.py）</b>。4.7 归寂「清除存在的球戏」的【强烈震荡】行动延后默认改成 0（敌人卡字段 qxDl 仍可填）：用户说明第 2 管归寂的单点（讥讽的目光）打的是真珠，把这一下的【滋扰】算上以后，录像里真珠的回合不用再额外推后。复刻方案里归寂的攻击目标要设成真珠。</li>
 <li><b>2026-11-18（没改 tv；tools/face47c.py）</b>。4.7 归寂「成」每回合<b>第一招固定讥讽的目光</b>，第二招按 存在的闹剧 → 埋梗时刻 → … 轮：录像第 1 管 54「讥讽的目光 → 存在的闹剧」、第 2 管开头 105（转面拉条，我方额外回合之后）「讥讽的目光 → 埋梗时刻」。以前第 2 管开头连出两下群攻，我方被多推了一次条。phm 主形态段多了第 7 项（每回合第一招固定的技能）和第 8 项（自己的出招表，用分号分隔）。</li>
 <li><b>2026-11-18（没改 tv；tools/face47b.py）</b>。4.7 归寂按录像行动条重做（用户认的头像）：归寂「成」<b>每回合连续行动两次</b>（第 1 管 54：讥讽的目光 + 存在的闹剧）。第 3、4 管【三面合一】：本体换成「坏」，第一次出手在转阶段后约 63 行动值（录像 214 埋梗时刻，不吃【转面】拉条）；「成」跟着【转面】马上出手、间隔约 40（录像 151、191；比归寂的速度快，原因不明，按录像取 1.35 倍）、每回合两招且第二招固定「清除存在的球戏」；「住」在转阶段后半个间隔出手（178 收束命运的博弈）；<b>【好戏开场】</b>在转阶段后约 60 行动值放「令欢愉终归死寂」（天赋原文，录像约 211）。这些位置和倍数是按一次录像推算的，敌人卡 phm 里可改（格式：名字@开始%@速度倍数@每回合几招@第二招技能下标）。</li>
 <li><b>2026-11-18（没改 tv；tools/face47.py）</b>。4.7 王棋归寂<b>【三面合一】</b>（天赋原文：成、住、坏共享生命值，成、住不可选中）：第 3、4 管血时「成」「住」两面也各自跑条出手（速度同归寂），借归寂出招，按各自形态的出招表接着归寂的回合数轮。录像第 3 管血正好对上：151 成·虚无的愉悦 → 坏·清除存在的球戏，178 住·收束命运的博弈，196 成·三重的蔑视，约 212 坏·令欢愉终归死寂 → 住·埋梗时刻。开始位置：成跟着【转面】马上出手（排在坏前面）、住晚半个间隔（按录像，敌人卡字段 fo 可改）。另外两面出手不算归寂自己的回合（不结算它身上的增益 / 状态，“归寂第 N 次行动后”的开大时机只认本体）。上一条「球戏自带再次行动」撤掉：录像里的“再次行动”就是另一面接着出手。</li>
@@ -4112,7 +4113,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           enemyDebuff(actor, tgs, (actor.skx || {})[skIdx], "sk" + skIdx);
           if (sk.n === "清除存在的球戏") {   // 4.7 归寂：再次行动（放完马上再出一招）；随机单体陷入【强烈震荡】——按录像反推是行动延后 8%（另外两下攻击各有【滋扰】7.5%），敌人卡 qxDl 可改，先打轮到的那个角色
             const zt = pool.find(x => x.id === actor.qxWho) || main || pool[0];   // 敌人卡 qxWho = 指定被震荡的角色（对录像用）
-            if (zt) { apply({ id: actor.id + "-qx", type: "delay", target: zt.id, value: num(actor.qxDl ?? 8) }, actor, actor.color); addLog(`${actor.name}【清除存在的球戏】：${zt.name} 陷入【强烈震荡】（行动延后 ${num(actor.qxDl ?? 8)}%，按录像推算）`, false, "var(--enemy)"); }
+            if (zt && num(actor.qxDl ?? 0) > 0) { apply({ id: actor.id + "-qx", type: "delay", target: zt.id, value: num(actor.qxDl ?? 0) }, actor, actor.color); addLog(`${actor.name}【清除存在的球戏】：${zt.name} 陷入【强烈震荡】（行动延后 ${num(actor.qxDl ?? 0)}%）`, false, "var(--enemy)"); }
           }
           if (num(actor.zr) > 0 && ZRT.includes(sk.t) && !(FG ? FG.i2 > 0 : num(actor.dblI) > 0)) for (const tg of tgs) apply({ id: actor.id + "-zr", type: "delay", target: tg.id, value: num(actor.zr) }, actor, actor.color);   // 关卡效果【滋扰】：攻击后被打的角色行动延后（妨害 / 强化不算攻击）
         } else {
