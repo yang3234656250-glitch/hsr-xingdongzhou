@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/opener47.py）</b>。队里有<b>两个以上攻击型秘技</b>（开怪秘技：进战有秘技伤害的，和银狼LV.999）时，这些角色卡名字旁边出现「开怪」单选，只有选中的那位的秘技在开局和转阶段触发，其他攻击型角色的秘技都不算（游戏里只能用一个人的秘技打怪进战）。没选时默认队伍里第一个。对已有配置：队里只有一个攻击型秘技时不变；有两个以上的，以前每个人的秘技伤害都算了，现在只算一个。</li>
 <li><b>2026-11-18（没改 tv；tools/tech47b.py）</b>。更正上一条：<b>开怪秘技只算攻击型秘技</b>（用户说明：像银狼这种打敌人的；真珠、爻光那种给自己加状态的、阿哈的领域都不算）。转阶段时，进战效果里有秘技伤害的角色，她 / 他的秘技效果再生效一次；银狼秘技盲盒照旧每次转阶段触发。去掉了「开怪」下拉。</li>
 <li><b>2026-11-18（没改 tv；tools/tech47.py）</b>。① 银狼LV.999 秘技<b>【怪怪怪味豆】</b>建模：每个波次开始时触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏，90% 欢愉伤害由敌方全体均分（1/3 概率多 20% 真实伤害按期望）；笑点 / 回复战技点这些随机结果不算。银狼设置里「秘技盲盒」可关。② <b>开怪秘技在敌人转阶段时再次触发</b>（用户说明）：银狼设置里选「开怪」角色（用秘技攻击敌人进战的那位），4.7 王棋归寂每次转阶段时，她 / 他说明以「秘技」开头的进战效果再生效一次；银狼秘技盲盒（原文“每个波次开始时”）也再触发一次（敌人卡字段 tq 可关，没设跟骰子开关）。对已有配置：有银狼LV.999 的方案开局多一段伤害；没选开怪角色时其他不变。</li>
 <li><b>2026-11-18（没改 tv；tools/bean47.py）</b>。银狼设置里“每次强普怪味豆”旁边多了<b>逐次</b>：按强普的先后逐次填个数（逗号分隔，例 2,1,1），没填到的照旧按上面的个数。依据：4.7 王棋录像里两次强普隐藏分 160 → 166 → 169，第一次出了 2 个。没填时和以前一样。</li>
@@ -3721,21 +3722,21 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     };
     if (swU && pool > 0) setScore(sw.score + pool, "开局笑点");
     const swqFire = why => {   // 银狼秘技【怪怪怪味豆】：每个波次开始时 1 次头号补给盲盒（固定 99 点好活当赏）
-      if (!swU || swU.gone || W.swq === false) return;
+      if (!swU || swU.gone || W.swq === false || openerId(U) !== swU.id) return;
       const e0 = U.find(z => z.kind === "enemy" && !z.gone);
       const r = { t, uid: swU.id, en: e0 ? e0.id : null, k: "秘技·头号补给盲盒", swq: 1, db: dbSnap(swU), edb: edbSnap(e0), eAll: edbAll(), seq: seq++, ebk: ebkNow() }; dotRecs.push(r);
       addLog(`${swU.name} 秘技【怪怪怪味豆】：触发【头号补给盲盒】（${why}；固定计入 99 点好活当赏）`, false, swU.color, swU.id); log[log.length - 1].dd = [r];
     };
     const techAgain = en => {   // 转阶段：开怪秘技再次触发（用户说明）
       if (!(en.tq ?? en.dice)) return;
-      const L = U.filter(u => u.kind === "ally" && !u.gone && !u.sm).map(u => [u, fx(u, "start").filter(e => /^秘技/.test(e.note || ""))]).filter(([u, F]) => F.some(e => e.type === "hitd"));   // 攻击型秘技（有秘技伤害的）才算开怪秘技；加状态的、领域类的不算
+      const L = U.filter(u => u.kind === "ally" && !u.gone && !u.sm).map(u => [u, fx(u, "start").filter(e => /^秘技/.test(e.note || ""))]).filter(([u, F]) => F.some(e => e.type === "hitd") && u.id === openerId(U));   // 攻击型秘技（有秘技伤害的）才算开怪秘技，几个时只有选中的那位；加状态的、领域类的不算
       let n = 0; for (const [u, F] of L) for (const e of F) { apply(e, u, u.color); n++; }
       if (n) addLog(`转阶段：开怪秘技再次触发（${L.filter(x => x[1].length).map(x => x[0].name).join("、")}）`, false, "var(--muted)");
       swqFire("转阶段");
     };
     if (eHpOn) for (const z of U) if (z.kind === "enemy" && num(z.rev) > 0 && (z.rv0 ?? true)) { z.gone = true; z.rv0Q = true; }   // 召唤出来的（喜剧学家）：进战秘技之后、0 行动值才登场
     {   // 战斗开始：先所有人“先生效”的（阿哈帮大忙了的速度、治疗加成等），再其他被动，最后“进战自动施放战技”（爻光秘技），这样按速度 / 欢愉度算的效果拿到的是进战后的数值
-      const S0 = U.map(u => [u, fx(u, "start")]);
+      const OPN = openerId(U); const S0 = U.map(u => [u, atkTech(u) && u.id !== OPN ? fx(u, "start").filter(e => !/^秘技/.test(e.note || "")) : fx(u, "start")]);   // 开怪秘技只有选中的那位触发
       for (const [u, L] of S0) for (const e of L) if (preEff(e) && e.type !== "cast") apply(e, u, u.color);
       for (const [u, L] of S0) for (const e of L) if (!preEff(e) && e.type !== "cast") apply(e, u, u.color);
       for (const [u, L] of S0) for (const e of L) if (e.type === "cast") apply(e, u, u.color);
@@ -4743,6 +4744,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     }).join("");
   };
 
+  // 攻击型秘技（开怪秘技）：进战效果里有秘技伤害，或银狼LV.999（秘技盲盒）；有几个时用 S.opener 选一个触发
+  function atkTech(u) { return !!u && u.kind === "ally" && !u.sm && (tidOf(u) === "1506" || (u.effects || []).some(e => !e.off && e.trigger === "start" && e.type === "hitd" && /^秘技/.test(e.note || ""))); }
+  function openerId(units) { const L = (units || S.units).filter(atkTech); if (!L.length) return null; return (L.find(u => u.id === S.opener) || L[0]).id; }
   function renderEditor() {
     renderUltOrder();
     const actMode = S.tlMode === "act";
@@ -4759,6 +4763,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
             <div class="unit-top">
               <input type="text" id="n-${u.id}" value="${esc(u.name)}" data-u="${i}" data-f="name" aria-label="名称">
               <select id="k-${u.id}" data-u="${i}" data-f="kind" aria-label="阵营">${opt([["ally", "我方"], ["enemy", "敌方"]], u.kind)}</select>
+              ${atkTech(u) && S.units.filter(atkTech).length > 1 ? `<label class="hint" title="队里有几个攻击型（开怪）秘技时只有一个触发：选用谁的秘技打怪进战（敌人转阶段时也是她 / 他的再触发）"><input type="radio" name="opener" data-op="${u.id}" ${openerId() === u.id ? "checked" : ""}> 开怪</label>` : ""}
               <button class="ghost tr-btn" data-act="trace" data-u="${i}" title="查看行迹（技能 / 额外能力 / 属性强化）" aria-label="查看行迹">迹</button>
               <button class="ghost" data-act="fold-card" data-k="${u.id}" title="折叠这张角色卡" aria-label="折叠角色卡" aria-expanded="true">▾</button>
               <button class="ghost" data-act="del-unit" data-u="${i}" aria-label="删除 ${esc(u.name)}">✕</button>
@@ -5057,6 +5062,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   ed.addEventListener("input", e => { const t = e.target; if ((t.dataset.f || t.dataset.a || t.dataset.s) && t.tagName !== "SELECT" && t.type !== "checkbox") { updDefer = true; try { onField(t, false); } finally { updDefer = false; } } });
   ed.addEventListener("change", e => {
     const t = e.target;
+    if (t.dataset.op !== undefined) { S.opener = t.dataset.op; update(); return; }   // 开怪秘技选谁
     if (t.dataset.skt !== undefined) {
       const u = S.units[+t.dataset.skt], k = +t.dataset.n;
       u.skTargets = Array.isArray(u.skTargets) ? u.skTargets : [];
