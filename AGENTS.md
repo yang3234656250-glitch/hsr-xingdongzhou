@@ -205,3 +205,4 @@
 - 2026-11-18 tools/rdmg47.py：按 R（lastR）时对敌人造成 rDmg 伤害（空 = 归寂 228315，录像 5:39），rEl 默认按欢愉伤害。
 - 2026-11-18 tools/debt47.py：欢愉负债阶段内不封顶（官方只说转阶段保留最多 10%），转阶段 debtP = min(debtP, 0.1)；贪饕血条上默认不再累积（en.vorDebt 打开）。
 - 2026-11-18 tools/vor47e.py：进入贪饕血条（vr = vorOn）不转阶段：不 techAgain、不换形态、不清减益 / 不回韧性、不转面、不掷骰子，欢愉负债按比例原样保留（不截 10%）；按 R、喜剧学家退场照旧。
+- 2026-11-18 tools/swend47.py：无敌玩家最后一次强普扣完次数只设 sw.endP，主循环 settleDmg 后（swRe 空时）swEnd() 才结束并清隐藏分；castUlt 遇到 endP 先 swEnd。强普被打断时先记额外回合（swRe + 日志）再让 pend 的敌人转阶段。

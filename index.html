@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/swend47.py）</b>：用户截图（133.06）指出顺序不对：银狼最后一次强普被打断时，以前先“无敌玩家结束、隐藏分清空”，再转阶段，再次施放剩下的部分时已经不在无敌玩家里。现在：最后一次强普的伤害结算完才结束无敌玩家；被打断就按“技能结束 → 获得额外回合 → 转阶段 → 再次施放剩下的部分 → 无敌玩家结束”。</li>
 <li><b>2026-11-18（没改 tv；tools/vor47e.py）</b>：用户说明：【贪饕】是<b>直接回满血、不转阶段</b>。所以进入贪饕血条时不再触发秘技、不换形态、不清减益、不回韧性、不【转面】拉条、不掷骰子给阿哈时刻；欢愉负债按比例原样带过去（不截到 10%）。按 R 和喜剧学家退场照旧。归寂这一场：第三条血打完时负债约 30%，贪饕血条从约 70% 开始，和录像一致。</li>
 <li><b>2026-11-18（没改 tv；tools/debt47.py）</b>：修正<b>【欢愉负债】</b>上限。官方（星神权能·阿哈正传）：造成伤害时额外获得损失生命值 25% 的欢愉负债，<b>阶段转换时</b>保留、最高不超过生命上限 10%。以前把 10% 当成负债本身的上限；用户截图第三阶段负债明显超过 10%。现在阶段内不封顶，转阶段只带 10% 过去；贪饕血条上不再累积（整理图按开局 10% 算）。<b>对已有配置</b>：负债从上面占生命上限，正常打的时候生命值本来就在它下面，所以模拟结果基本不变（4 组模板队伍、归寂这一场都没变）；日志里的负债数会变大。</li>
 <li><b>2026-11-18（没改 tv；tools/rdmg47.py）</b>：用户说明：场地技能 R 也有伤害。按 R 时对归寂造成伤害，默认 228315（录像 5:39“点兵，开幕！”的总伤害），先按欢愉伤害算；敌人卡“R 伤害”和“欢愉”勾选框可改。</li>
@@ -3616,6 +3617,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     };
     const castUlt = where => {
       actSeq++; atkCtx = { u: swU, k: "u" };
+      if (sw.inUlt && sw.endP && !swRe.length) swEnd();   // 最后一次强普已经打完
       if (sw.inUlt) { stats.fails++; addLog(`${where}，${swU.name} 开大失败：还在无敌玩家状态（剩 ${sw.left} 次强普）`, true, null, swU.id); return; }
       if (sw.score < num(W.gate, 60)) { stats.fails++; addLog(`${where}，${swU.name} 开大失败：隐藏分 ${sw.score} < ${num(W.gate, 60)}`, true, null, swU.id); return; }
       stats.ults++;
@@ -3687,6 +3689,11 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const spendCharge = () => {
       sw.left--;
       if (sw.left > 0) return;
+      sw.endP = true;   // 等这次强普的伤害结算完（被打断就等再次施放打完）再结束无敌玩家
+    };
+    const swEnd = () => {
+      if (!sw.endP) return; sw.endP = false;
+      if (sw.left > 0) return;   // 期间 2 魂又加了强普次数：继续
       sw.inUlt = false; spans.push({ a: sw.from, b: t, sa: sw.sa, sb: seq });
       // 无敌玩家 ends: the hidden score is cleared; 1魂 recovery is worked out from the score just before clearing
       const prev = sw.score, r = W.e1 ? Math.round(prev * num(W.e1pct, 20) / 100) : 0;
@@ -4009,12 +4016,13 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           L = L.filter(([z]) => !z.gone && !pend.includes(z));
           if (left > 1e-6 && !L.length) { why = "场上敌人全部受到致命伤害"; break; }
         }
-        for (const z of pend) if (!z.gone) hurtEnemy(z, Math.max(0, z.ehc) + 1e-6, killer);   // 技能结束：转阶段
-        if (!why || !U.some(z => z.kind === "enemy" && !z.gone)) return;   // 没打断，或者已经没有可攻击的敌人（战斗结束）
+        if (why && U.some(z => z.kind === "enemy" && !z.gone)) {   // 打断（转阶段的还在场）：技能结束 → 获得额外回合 → 转阶段 → 再次施放
         const f = left / d.total; rec.cut = f;
         swRe.push({ re: num(rec.re ?? 1, 1) * f, sc: rec.scU ?? rec.score });
         const n = rec.swExt ? 0 : extSelf(swU); rec.swExt = true;
         addLog(`${swU.name} 强化普攻打到${why}${pend.length ? `（${[...new Set(pend.map(z => z.name))].join("、")}随后转阶段）` : ""}，本次技能结束（剩 ${Math.round(f * 100)}% 没打），获得 1 个额外回合再次施放剩下的部分${n ? `；自身 ${n} 个增益延长 1 回合` : ""}`, false, swU.color, swU.id);
+        }
+        for (const z of pend) if (!z.gone) hurtEnemy(z, Math.max(0, z.ehc) + 1e-6, killer);   // 技能结束后转阶段
       };
       const go = (d, uid, en1) => {
         if (!d || !(d.total > 0)) return;
@@ -4052,6 +4060,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     };
     while (guard++ < 3000 && U.length) {
       settleDmg();
+      if (sw.endP && !swRe.length) { swEnd(); checkUlts(); }   // 银狼最后一次强普（含被打断后再次施放的）结算完：无敌玩家结束
       if (eHpOn && U.some(z => z.kind === "enemy") && !U.some(z => z.kind === "enemy" && !z.gone && !(num(z.rev) > 0 && U.some(y => y.kind === "enemy" && !(num(y.rev) > 0))))) {   // 会重新登场的（召唤出来的）在主要敌人都被消灭后一起消失
         const left = U.filter(z => z.kind === "enemy" && !z.gone); for (const z of left) z.gone = true;
         addLog(`行动值 ${fmt(t)}：敌人全部被消灭，战斗结束${left.length ? `（召唤出来的${[...new Set(left.map(z => z.name))].join("、")}随之消失）` : ""}`, false); break; }
