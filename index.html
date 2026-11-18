@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/edmg47.py）</b>。手动事件新类型<b>「额外伤害（万）」</b>：目标选造成伤害的角色，数值填多少万，扣在当时第一个在场敌人身上（要开“我方伤害扣敌人生命值”）。用来补录像里随机出的伤害（比如【头号补给盲盒】出得多），页面按期望算的部分不变。另外修了个顺序：敌人【粉墨登场】重新登场排在更早的手动事件之后（以前会先登场、把手动事件推后到登场时刻）。</li>
 <li><b>2026-11-18（没改 tv；tools/opener47.py）</b>。队里有<b>两个以上攻击型秘技</b>（开怪秘技：进战有秘技伤害的，和银狼LV.999）时，这些角色卡名字旁边出现「开怪」单选，只有选中的那位的秘技在开局和转阶段触发，其他攻击型角色的秘技都不算（游戏里只能用一个人的秘技打怪进战）。没选时默认队伍里第一个。对已有配置：队里只有一个攻击型秘技时不变；有两个以上的，以前每个人的秘技伤害都算了，现在只算一个。</li>
 <li><b>2026-11-18（没改 tv；tools/tech47b.py）</b>。更正上一条：<b>开怪秘技只算攻击型秘技</b>（用户说明：像银狼这种打敌人的；真珠、爻光那种给自己加状态的、阿哈的领域都不算）。转阶段时，进战效果里有秘技伤害的角色，她 / 他的秘技效果再生效一次；银狼秘技盲盒照旧每次转阶段触发。去掉了「开怪」下拉。</li>
 <li><b>2026-11-18（没改 tv；tools/tech47.py）</b>。① 银狼LV.999 秘技<b>【怪怪怪味豆】</b>建模：每个波次开始时触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏，90% 欢愉伤害由敌方全体均分（1/3 概率多 20% 真实伤害按期望）；笑点 / 回复战技点这些随机结果不算。银狼设置里「秘技盲盒」可关。② <b>开怪秘技在敌人转阶段时再次触发</b>（用户说明）：银狼设置里选「开怪」角色（用秘技攻击敌人进战的那位），4.7 王棋归寂每次转阶段时，她 / 他说明以「秘技」开头的进战效果再生效一次；银狼秘技盲盒（原文“每个波次开始时”）也再触发一次（敌人卡字段 tq 可关，没设跟骰子开关）。对已有配置：有银狼LV.999 的方案开局多一段伤害；没选开怪角色时其他不变。</li>
@@ -4047,7 +4048,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (f && f.at <= next + 1e-9 && f.at <= END && !(revQ.length && revQ.some(q => q.at < f.at - 1e-9)) && !(ei < evs.length && num(evs[ei].av) < f.at - 1e-9)) {
           move(f.at - t); t = f.at; f.at = t + 10000 / Math.max(1e-9, spdOf(f.boss) * f.sm); const b = f.boss; b.faceGo = f; b.fSv = b.dist; b.dist = 0; b.zpre = -Infinity; continue;
         } }
-      if (revQ.length) { revQ.sort((a, b) => a.at - b.at); if (revQ[0].at <= next + 1e-9 && revQ[0].at <= END) { const rq = revQ.shift(), at = Math.max(t, rq.at); move(at - t); t = at; reviveEnemy(rq.en); checkUlts(); continue; } }
+      if (revQ.length) { revQ.sort((a, b) => a.at - b.at); if (revQ[0].at <= next + 1e-9 && revQ[0].at <= END && !(ei < evs.length && num(evs[ei].av) < revQ[0].at - 1e-9)) { const rq = revQ.shift(), at = Math.max(t, rq.at); move(at - t); t = at; reviveEnemy(rq.en); checkUlts(); continue; } }
       if (ei < evs.length && num(evs[ei].av) <= next + 1e-9 && num(evs[ei].av) <= END) {
         const ev = evs[ei++]; const at = Math.max(t, num(ev.av));
         move(at - t); t = at;
@@ -4055,6 +4056,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           const who = byId[ev.target]; addLog(`${who ? who.name : "我方"} 引爆【爆梗】：归寂对我方全体造成伤害（全体受到攻击，受击回能 ${num(ev.value, 10)}）`, false, "var(--enemy)");
           marks.push({ t, uid: who ? who.id : (U.find(z => z.kind === "ally") || {}).id, label: "爆梗", color: "var(--enemy)", from: "引爆【爆梗】" });
           apply({ id: ev.id, type: "hit", target: "allies", value: num(ev.value, 10) }, null, "var(--enemy)");
+        } else if (ev.type === "edmg") {   // 额外伤害（随机盲盒等）：数值单位万，扣第一个在场敌人
+          const who = byId[ev.target], en = U.find(z => z.kind === "enemy" && !z.gone), a = num(ev.value) * 1e4;
+          addLog(`${who ? who.name : "我方"} 额外伤害 ${num(ev.value)} 万（手动补的，比如随机盲盒）${en ? " → " + en.name : ""}`, false, who ? who.color : "var(--accent)", who ? who.id : undefined);
+          if (eHpOn && en && a > 0) hurtEnemy(en, a, who || null);
         } else apply({ id: ev.id, type: ev.type, target: ev.target, value: ev.value }, null, "var(--accent)");
         checkUlts();
         continue;
@@ -4921,7 +4926,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       <div class="ev">
         AV<input type="number" id="va-${v.id}" min="0" step="1" value="${v.av}" data-v="${i}" data-f="av" aria-label="行动值">
         ${v.type === "punch" ? "" : `<select id="vt-${v.id}" data-v="${i}" data-f="target" aria-label="目标">${targetOptions(v.target, ["allies", "enemies"])}</select>`}
-        <select id="vy-${v.id}" data-v="${i}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["punch", "阿哈笑点"], ["heal", "治疗"], ["shield", "护盾"], ["break", "弱点击破"], ["wkAdd", "我方为敌人添加弱点时"], ["aSup", "我方使用助战技时"], ["fatal", "我方目标受到致命攻击时"], ["kill", "消灭敌人"], ["hit", "受到攻击"], ["fua", "追加攻击"], ["bg", "引爆【爆梗】（4.7 王棋归寂）"]], v.type)}</select>
+        <select id="vy-${v.id}" data-v="${i}" data-f="type" aria-label="效果">${opt([["advance", "拉条"], ["delay", "推条"], ["punch", "阿哈笑点"], ["heal", "治疗"], ["shield", "护盾"], ["break", "弱点击破"], ["wkAdd", "我方为敌人添加弱点时"], ["aSup", "我方使用助战技时"], ["fatal", "我方目标受到致命攻击时"], ["kill", "消灭敌人"], ["hit", "受到攻击"], ["fua", "追加攻击"], ["bg", "引爆【爆梗】（4.7 王棋归寂）"], ["edmg", "额外伤害（万，随机盲盒等）"]], v.type)}</select>
         ${v.type === "heal" ? "（让目标触发“受到治疗时”的效果）" : v.type === "shield" ? "（让目标触发“受到护盾时”的效果）"
           : v.type === "break" ? "（目标选被击破的敌人；我方所有“弱点击破时”效果生效）"
           : v.type === "kill" ? "（目标选消灭敌人的我方角色：回 10 能量，并触发“消灭敌人时”效果）"

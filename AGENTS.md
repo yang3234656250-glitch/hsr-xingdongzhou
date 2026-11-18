@@ -198,3 +198,4 @@
 - 2026-11-18（tools/tech47.py，用户说明：开怪秘技转阶段会再次触发）：银狼LV.999 秘技【怪怪怪味豆】建模：模拟里 `swqFire(why)` 推一条 dotRecs（`swq: 1`），dotDmgOf 按 key box、`bgFix: 99`（dmgCalc 的 bg 认 `rec.bgFix`）× (1 + 0.2/3) 算；进战（start 效果之后）和每次 endBar 转阶段（`techAgain`）各一次；`S.sw.swq === false` 关。转阶段时只有“开怪”角色（`S.opener`，银狼设置旁的下拉，用秘技攻击敌人进战的那位）说明以「秘技」开头的 start 效果再 apply 一次；敌人卡 `tq`（没设跟 dice）关掉整个转阶段重触发。不要对所有人的秘技重放（阿哈秘技 = 额外阿哈时刻，会和骰子选的重复）。
 - 2026-11-18（tools/tech47b.py，用户更正）：开怪秘技只算攻击型秘技（进战效果里有 `hitd` 秘技伤害的角色 + 银狼秘技盲盒）；给自己加状态的（真珠、爻光）、领域类（阿哈）不算。`techAgain` 按这个筛，去掉了 `S.opener` 下拉。
 - 2026-11-18（tools/opener47.py，用户要求）：`atkTech(u)`（开着的 start + hitd + 说明以「秘技」开头的效果，或银狼LV.999）/ `openerId(units)`（`S.opener` 有效就用它，否则第一个攻击型）。攻击型角色 ≥2 时角色卡名字旁出现「开怪」单选（`data-op`，change 里写 `S.opener`）；模拟开局时没选中的攻击型角色的「秘技」start 效果不生效，`swqFire` / `techAgain` 也只认选中的那位。注意 hitd 秘技伤害模板默认关（“用了秘技再启用”），所以一般只在用户打开了第二个攻击型秘技时才会出现单选。
+- 2026-11-18 tools/edmg47.py：手动事件「额外伤害（万）」(type edmg，扣第一个在场敌人，走 hurtEnemy)；主循环里重新登场 revQ 不再抢在更早的手动事件前面。
