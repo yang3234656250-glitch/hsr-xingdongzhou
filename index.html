@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/tech47.py）</b>。① 银狼LV.999 秘技<b>【怪怪怪味豆】</b>建模：每个波次开始时触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏，90% 欢愉伤害由敌方全体均分（1/3 概率多 20% 真实伤害按期望）；笑点 / 回复战技点这些随机结果不算。银狼设置里「秘技盲盒」可关。② <b>开怪秘技在敌人转阶段时再次触发</b>（用户说明）：银狼设置里选「开怪」角色（用秘技攻击敌人进战的那位），4.7 王棋归寂每次转阶段时，她 / 他说明以「秘技」开头的进战效果再生效一次；银狼秘技盲盒（原文“每个波次开始时”）也再触发一次（敌人卡字段 tq 可关，没设跟骰子开关）。对已有配置：有银狼LV.999 的方案开局多一段伤害；没选开怪角色时其他不变。</li>
 <li><b>2026-11-18（没改 tv；tools/bean47.py）</b>。银狼设置里“每次强普怪味豆”旁边多了<b>逐次</b>：按强普的先后逐次填个数（逗号分隔，例 2,1,1），没填到的照旧按上面的个数。依据：4.7 王棋录像里两次强普隐藏分 160 → 166 → 169，第一次出了 2 个。没填时和以前一样。</li>
 <li><b>2026-11-18（没改 tv；tools/qx0.py）</b>。4.7 归寂「清除存在的球戏」的【强烈震荡】行动延后默认改成 0（敌人卡字段 qxDl 仍可填）：用户说明第 2 管归寂的单点（讥讽的目光）打的是真珠，把这一下的【滋扰】算上以后，录像里真珠的回合不用再额外推后。复刻方案里归寂的攻击目标要设成真珠。</li>
 <li><b>2026-11-18（没改 tv；tools/face47c.py）</b>。4.7 归寂「成」每回合<b>第一招固定讥讽的目光</b>，第二招按 存在的闹剧 → 埋梗时刻 → … 轮：录像第 1 管 54「讥讽的目光 → 存在的闹剧」、第 2 管开头 105（转面拉条，我方额外回合之后）「讥讽的目光 → 埋梗时刻」。以前第 2 管开头连出两下群攻，我方被多推了一次条。phm 主形态段多了第 7 项（每回合第一招固定的技能）和第 8 项（自己的出招表，用分号分隔）。</li>
@@ -3718,12 +3719,26 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (gain) { setScore(sw.score + gain, rec.why || (rec.extra ? "额外阿哈时刻欢愉技" : "欢愉技")); checkE2(); }
     };
     if (swU && pool > 0) setScore(sw.score + pool, "开局笑点");
+    const swqFire = why => {   // 银狼秘技【怪怪怪味豆】：每个波次开始时 1 次头号补给盲盒（固定 99 点好活当赏）
+      if (!swU || swU.gone || W.swq === false) return;
+      const e0 = U.find(z => z.kind === "enemy" && !z.gone);
+      const r = { t, uid: swU.id, en: e0 ? e0.id : null, k: "秘技·头号补给盲盒", swq: 1, db: dbSnap(swU), edb: edbSnap(e0), eAll: edbAll(), seq: seq++, ebk: ebkNow() }; dotRecs.push(r);
+      addLog(`${swU.name} 秘技【怪怪怪味豆】：触发【头号补给盲盒】（${why}；固定计入 99 点好活当赏）`, false, swU.color, swU.id); log[log.length - 1].dd = [r];
+    };
+    const techAgain = en => {   // 转阶段：开怪秘技再次触发（用户说明）
+      if (!(en.tq ?? en.dice)) return;
+      const L = U.filter(u => u.kind === "ally" && !u.gone && !u.sm && u.id === S.opener).map(u => [u, fx(u, "start").filter(e => /^秘技/.test(e.note || ""))]);   // 只有开怪的那位（S.opener）
+      let n = 0; for (const [u, F] of L) for (const e of F) { apply(e, u, u.color); n++; }
+      if (n) addLog(`转阶段：开怪秘技再次触发（${L.filter(x => x[1].length).map(x => x[0].name).join("、")}）`, false, "var(--muted)");
+      swqFire("转阶段");
+    };
     if (eHpOn) for (const z of U) if (z.kind === "enemy" && num(z.rev) > 0 && (z.rv0 ?? true)) { z.gone = true; z.rv0Q = true; }   // 召唤出来的（喜剧学家）：进战秘技之后、0 行动值才登场
     {   // 战斗开始：先所有人“先生效”的（阿哈帮大忙了的速度、治疗加成等），再其他被动，最后“进战自动施放战技”（爻光秘技），这样按速度 / 欢愉度算的效果拿到的是进战后的数值
       const S0 = U.map(u => [u, fx(u, "start")]);
       for (const [u, L] of S0) for (const e of L) if (preEff(e) && e.type !== "cast") apply(e, u, u.color);
       for (const [u, L] of S0) for (const e of L) if (!preEff(e) && e.type !== "cast") apply(e, u, u.color);
       for (const [u, L] of S0) for (const e of L) if (e.type === "cast") apply(e, u, u.color);
+      swqFire("进战");
     }
     checkPunchE();
     checkUlts();
@@ -3881,6 +3896,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!(en.phs && en.ph < en.phs.length - 1)) { killEnemy(en, killer); return; }
       const over = Math.max(0, -en.ehc), old = en.ph + 1, nd = (en.buffs || []).length + (en.dots || []).length + (en.wk || []).length + Object.keys(en.st || {}).length; en.ph++;
       en.ehx = en.ehc = en.phs[en.ph];   // 欢愉负债不清除（写在阿哈的效果里）
+      techAgain(en);
       { const pm = String(en.phm ??= phmDef(en)).split("|").map(x => x.trim()), fl = String(pm[en.ph] || "").split("+").map(x => x.trim().split("@")), mn = fl[0][0], m2 = mn && MON.m.find(x => x.n === mn);   // 每段：名字@开始%@速度倍数@每回合几招@第二招
         en.moX = fl[0][1] != null && fl[0][1] !== "" ? num(fl[0][1]) : null; if (fl[0][4] != null && fl[0][4] !== "") en.sqo = num(fl[0][4]) - en.turns;   // 每管血换形态（4.7 归寂：成 / 成 / 坏 / 坏，录像里的名字）：出招表换成这个形态的，接着按回合数轮
         if (m2 && m2.n !== en.mon) { en.mon = m2.n; en.__mon = undefined; en.seq = (m2.q || []).slice(); addLog(`${en.name} 变成「${m2.n.split("「")[1] || m2.n}：出招表换成这个形态的`, false, "var(--enemy)"); }
@@ -4500,6 +4516,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${sn("base", "未开大欢愉技 +", 'step="1"')}
         ${sn("tierBonus", "每档阈值 +", 'step="1"')}
         ${sn("charges", "强普次数", 'min="1" step="1"')}
+        <label title="秘技【怪怪怪味豆】：每个波次开始时（进战、敌人转阶段）触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏；只算伤害"><input type="checkbox" data-s="swq" ${W.swq === false ? "" : "checked"}> 秘技盲盒</label>
+        <label title="用秘技攻击敌人进战的那位：敌人转阶段时，她 / 他的开怪秘技再触发一次">开怪 <select data-s="opener">${opt([["", "（不算）"], ...S.units.filter(x => x.kind === "ally" && !x.sm).map(x => [x.id, x.name])], S.opener || "")}</select></label>
         ${sn("skillPunch", "未开大战技笑点 +", 'min="0" step="1"')}
         <label for="s-bean" title="【狼尊时刻】里的头号补给盲盒是随机的；这里按每次强普出 N 个【怪怪怪味豆】算，每个 +3 笑点（用户定的，默认 1）">每次强普怪味豆 <input type="number" id="s-bean" value="${W.bean ?? 1}" data-s="bean" min="0" step="1" style="width:50px"> 个（各 +3 笑点）</label>
         <label for="s-beanL" title="按强普先后逐次填怪味豆个数，逗号分隔（例：2,1,1）；没填到的按上面的个数">逐次 <input type="text" id="s-beanL" value="${esc(String(W.beanL ?? ""))}" data-s="beanL" placeholder="如 2,1,1" style="width:90px"></label>
@@ -4983,6 +5001,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   function onField(el, structural) {
     if (el.dataset.s) {
       const k = el.dataset.s;
+      if (k === "opener") { if (el.value) S.opener = el.value; else delete S.opener; update(); return; }
       S.sw[k] = el.type === "checkbox" ? el.checked : k === "uid" || k === "e2when" || k === "beanL" ? el.value : num(el.value);
       if (structural) renderEditor();
       update(); return;
@@ -6789,7 +6808,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     let elStat = 0, punch = 0, punchM = 1, elM = 1;
     // 笑点区的 P：阿哈时刻里的欢愉技按这次计入的笑点（额外阿哈时刻是固定计入的数），其它时候按持有的【好活当赏】
     const inAha = !!(rec && rec.uid === "aha" && e.key === "e");
-    let bg = inAha ? num(rec.consumed, 0) : bangerAt(u, rec);
+    let bg = inAha ? num(rec.consumed, 0) : rec && rec.bgFix != null ? num(rec.bgFix) : bangerAt(u, rec);   // bgFix：固定计入的好活当赏（银狼秘技 99）
     // 星神★阿哈 4 魂：她造成的欢愉伤害额外计入队友持有的【好活当赏】总和的 100%
     if (tidOf(u) === "1511" && num(u.eid) >= 4) for (const x of S.units) if (x !== u && x.kind === "ally" && !x.sm) bg += bangerAt(x, rec);
     // 银狼LV.999 4 魂：【崩坏级伤害演示】（无敌玩家结界里的欢愉技）额外计入 5 倍的笑点（这里按共 6 倍）
@@ -7034,6 +7053,12 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   function dotDmgOf(r, u) {
     if (!r || !u || u.kind !== "ally") return null;
     if (r.__dmg !== undefined) return r.__dmg;
+    if (r.swq) {   // 银狼秘技【怪怪怪味豆】：头号补给盲盒，固定计入 99 点好活当赏；90% 欢愉伤害敌方全体均分，1/3 概率再多 20% 真实伤害（期望）
+      const ent = { v: num(dmgLv(u, "u")) >= 12 ? 0.99 : 0.9, adj: 0, rnd: 0, tg: 0, stat: "lv", el: true, key: "box", n: "秘技·头号补给盲盒", lv: dmgLv(u, "u") };
+      const d = dmgCalc(u, ent, { t: r.t, seq: r.seq, uid: u.id, db: r.db, edb: r.edb, eAll: r.eAll, ebk: r.ebk, __box: true, bgFix: 99 });
+      if (d) d.total *= 1 + 0.2 / 3;
+      return (r.__dmg = d);
+    }
     if (r.sup) { let e = dmgEntry(u, r.sup); if (e && num(r.mul) > 0 && r.mul !== 1) e = Object.assign({}, e, { v: num(e.v) * r.mul, adj: num(e.adj) * r.mul, rnd: num(e.rnd) * r.mul });   // mul：倍率乘数（弑魂之炽层数）
       return (r.__dmg = e ? dmgCalc(u, e, { t: r.t, uid: u.id, db: r.db, edb: r.edb, ebk: r.ebk, lsCut: r.lsCut }) : null); }
     if (r.fixed != null) { const d = dmgCalc(u, { v: 1, adj: 0, rnd: 0, tg: 1, el: 0, stat: "atk", key: "x", n: r.k, lv: 0, dot: true, brk: true, defIg: 0 }, { t: r.t, uid: u.id, db: r.db, edb: r.edb, ebk: r.ebk }, r.fixed); if (d) { d.noPanel = false; d.stat = "记录的治疗量"; } return (r.__dmg = d); }   // 固定数值的附加伤害（时节不居）   // 助战技：按姬子•启行当时的增益，会暴击
