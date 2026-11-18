@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/tech47b.py）</b>。更正上一条：<b>开怪秘技只算攻击型秘技</b>（用户说明：像银狼这种打敌人的；真珠、爻光那种给自己加状态的、阿哈的领域都不算）。转阶段时，进战效果里有秘技伤害的角色，她 / 他的秘技效果再生效一次；银狼秘技盲盒照旧每次转阶段触发。去掉了「开怪」下拉。</li>
 <li><b>2026-11-18（没改 tv；tools/tech47.py）</b>。① 银狼LV.999 秘技<b>【怪怪怪味豆】</b>建模：每个波次开始时触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏，90% 欢愉伤害由敌方全体均分（1/3 概率多 20% 真实伤害按期望）；笑点 / 回复战技点这些随机结果不算。银狼设置里「秘技盲盒」可关。② <b>开怪秘技在敌人转阶段时再次触发</b>（用户说明）：银狼设置里选「开怪」角色（用秘技攻击敌人进战的那位），4.7 王棋归寂每次转阶段时，她 / 他说明以「秘技」开头的进战效果再生效一次；银狼秘技盲盒（原文“每个波次开始时”）也再触发一次（敌人卡字段 tq 可关，没设跟骰子开关）。对已有配置：有银狼LV.999 的方案开局多一段伤害；没选开怪角色时其他不变。</li>
 <li><b>2026-11-18（没改 tv；tools/bean47.py）</b>。银狼设置里“每次强普怪味豆”旁边多了<b>逐次</b>：按强普的先后逐次填个数（逗号分隔，例 2,1,1），没填到的照旧按上面的个数。依据：4.7 王棋录像里两次强普隐藏分 160 → 166 → 169，第一次出了 2 个。没填时和以前一样。</li>
 <li><b>2026-11-18（没改 tv；tools/qx0.py）</b>。4.7 归寂「清除存在的球戏」的【强烈震荡】行动延后默认改成 0（敌人卡字段 qxDl 仍可填）：用户说明第 2 管归寂的单点（讥讽的目光）打的是真珠，把这一下的【滋扰】算上以后，录像里真珠的回合不用再额外推后。复刻方案里归寂的攻击目标要设成真珠。</li>
@@ -3727,7 +3728,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     };
     const techAgain = en => {   // 转阶段：开怪秘技再次触发（用户说明）
       if (!(en.tq ?? en.dice)) return;
-      const L = U.filter(u => u.kind === "ally" && !u.gone && !u.sm && u.id === S.opener).map(u => [u, fx(u, "start").filter(e => /^秘技/.test(e.note || ""))]);   // 只有开怪的那位（S.opener）
+      const L = U.filter(u => u.kind === "ally" && !u.gone && !u.sm).map(u => [u, fx(u, "start").filter(e => /^秘技/.test(e.note || ""))]).filter(([u, F]) => F.some(e => e.type === "hitd"));   // 攻击型秘技（有秘技伤害的）才算开怪秘技；加状态的、领域类的不算
       let n = 0; for (const [u, F] of L) for (const e of F) { apply(e, u, u.color); n++; }
       if (n) addLog(`转阶段：开怪秘技再次触发（${L.filter(x => x[1].length).map(x => x[0].name).join("、")}）`, false, "var(--muted)");
       swqFire("转阶段");
@@ -4517,7 +4518,6 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${sn("tierBonus", "每档阈值 +", 'step="1"')}
         ${sn("charges", "强普次数", 'min="1" step="1"')}
         <label title="秘技【怪怪怪味豆】：每个波次开始时（进战、敌人转阶段）触发 1 次【头号补给盲盒】，固定计入 99 点好活当赏；只算伤害"><input type="checkbox" data-s="swq" ${W.swq === false ? "" : "checked"}> 秘技盲盒</label>
-        <label title="用秘技攻击敌人进战的那位：敌人转阶段时，她 / 他的开怪秘技再触发一次">开怪 <select data-s="opener">${opt([["", "（不算）"], ...S.units.filter(x => x.kind === "ally" && !x.sm).map(x => [x.id, x.name])], S.opener || "")}</select></label>
         ${sn("skillPunch", "未开大战技笑点 +", 'min="0" step="1"')}
         <label for="s-bean" title="【狼尊时刻】里的头号补给盲盒是随机的；这里按每次强普出 N 个【怪怪怪味豆】算，每个 +3 笑点（用户定的，默认 1）">每次强普怪味豆 <input type="number" id="s-bean" value="${W.bean ?? 1}" data-s="bean" min="0" step="1" style="width:50px"> 个（各 +3 笑点）</label>
         <label for="s-beanL" title="按强普先后逐次填怪味豆个数，逗号分隔（例：2,1,1）；没填到的按上面的个数">逐次 <input type="text" id="s-beanL" value="${esc(String(W.beanL ?? ""))}" data-s="beanL" placeholder="如 2,1,1" style="width:90px"></label>
@@ -5001,7 +5001,6 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   function onField(el, structural) {
     if (el.dataset.s) {
       const k = el.dataset.s;
-      if (k === "opener") { if (el.value) S.opener = el.value; else delete S.opener; update(); return; }
       S.sw[k] = el.type === "checkbox" ? el.checked : k === "uid" || k === "e2when" || k === "beanL" ? el.value : num(el.value);
       if (structural) renderEditor();
       update(); return;
