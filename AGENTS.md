@@ -199,3 +199,4 @@
 - 2026-11-18（tools/tech47b.py，用户更正）：开怪秘技只算攻击型秘技（进战效果里有 `hitd` 秘技伤害的角色 + 银狼秘技盲盒）；给自己加状态的（真珠、爻光）、领域类（阿哈）不算。`techAgain` 按这个筛，去掉了 `S.opener` 下拉。
 - 2026-11-18（tools/opener47.py，用户要求）：`atkTech(u)`（开着的 start + hitd + 说明以「秘技」开头的效果，或银狼LV.999）/ `openerId(units)`（`S.opener` 有效就用它，否则第一个攻击型）。攻击型角色 ≥2 时角色卡名字旁出现「开怪」单选（`data-op`，change 里写 `S.opener`）；模拟开局时没选中的攻击型角色的「秘技」start 效果不生效，`swqFire` / `techAgain` 也只认选中的那位。注意 hitd 秘技伤害模板默认关（“用了秘技再启用”），所以一般只在用户打开了第二个攻击型秘技时才会出现单选。
 - 2026-11-18 tools/edmg47.py：手动事件「额外伤害（万）」(type edmg，扣第一个在场敌人，走 hurtEnemy)；主循环里重新登场 revQ 不再抢在更早的手动事件前面。
+- 2026-11-18 tools/vor47.py：归寂最后一管血【贪饕侵蚀】（en.vor ?? en.dice；vmx = 被压制的生命上限，从 vorSt%（70）开始，每次伤害压 vorR 50 / 欢愉 vorRe 75 个百分点，压到 vorAt%（25）以下才能消灭，之前打空 vorRevive 回满；curEl 标记当前伤害是否欢愉）。
