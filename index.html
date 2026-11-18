@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/vor47d.py）</b>：用户说明：归寂最后一段（贪饕血条）没有喜剧学家。转进这一段时在场的喜剧学家退场，【粉墨登场】不再召唤，【谐星荟萃】消失；伤害全打在归寂身上。</li>
 <li><b>2026-11-18（没改 tv；tools/vor47c.py）</b>：【贪饕】血量按用户给的《贪饕污染说明》整理图：污染 4 级多阶段怪物的贪饕血条 = 最后一条正常血的 <b>216%</b>（非多阶段 120%；3 级 144% / 80%），可回复生命上限降到 23% 才能消灭。归寂最后一条从 6707346 变成 31859894 × 216% ≈ 6882 万（敌人卡“血条 %”可改，填 0 = 用分阶段里写的）。核对录像：214 那一波血条掉 38%，按 6882 万 × 4 倍约 650 万欢愉伤害，和页面算的一致。</li>
 <li><b>2026-11-18（没改 tv；tools/vor47b.py）</b>：核对上一条【贪饕侵蚀】，按用户给的 B 站《崩铁贪饕污染4机制解析》（逻忆央的远方）改：“灰血转化率”75% / 50% 不是“额外压掉伤害的 75%”，而是<b>欢愉伤害按 ×4 打、其中 3 份变灰血</b>（多出的不显示数字），<b>非欢愉 ×2、1 份变灰血</b>；侵蚀 4 级灰血最低 77%（欢愉负债也算，所以有阿哈时欢愉伤害只要打 100%），没到就回满。去掉了上一版“从 70% 开始”的假设（开始 % 留空 = 按机制算，也可以手填）。</li>
 <li><b>2026-11-18（没改 tv；tools/vor47.py）</b>：4.7 王棋归寂最后一管血加<b>【贪饕侵蚀】</b>。依据：官方 4.5 更新说明（受到致命伤害不会被消灭而是回复一定比例生命值，伤害持续压制生命上限，压到一定比例后才能彻底消灭）；玩家 wiki（每次伤害额外压制 50% 生命上限，侵蚀 3/4 级受到欢愉伤害 75%；回满不清除欢愉负债）；这关侵蚀 4 级；用户：标记在 25%，录像里最后一管血从 70% 开始。页面做法：转进最后一管血时生命上限降到 70%，之后每次伤害按上面的比例压制，压到 25% 以下前生命值打空会回满。敌人卡上“贪饕”勾选框（归寂默认开）和“压到 / 开始”两个数。<b>对已有配置</b>：只影响勾了“掷骰子”的归寂的最后一管血，其他敌人不变。</li>
@@ -3936,13 +3937,19 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (en.dice && byId.aha) { pendingAha.push({ n: 20, from: en.name + "的骰子" }); addLog(`${en.name}【收束命运的博弈】：选「阿哈时刻」，阿哈获得 1 个固定计入 20 笑点的额外回合`, false, "var(--enemy)"); }
       if (ahaU && num(en.debtP) > 0) en.debt = en.debtP * en.ehx;   // 【欢愉负债】按比例保留到下一阶段（占据生命上限，所以新阶段一开始就少这个比例）
       if (ahaU) en.ehc = Math.min(en.ehc, en.ehx - debtOf(en));
+      if (vorOn(en) && en.dice) {   // 归寂最后一段没有喜剧学家（用户说明）：在场的退场，【粉墨登场】不再召唤
+        const out = U.filter(z => z.kind === "enemy" && z !== en && num(z.rev) > 0 && !z.gone); noRev = true; revQ.length = 0; xqAt = null;
+        for (const z of out) { z.gone = true; z.ehc = 0; marks.push({ t, uid: z.id, label: "退场", color: "var(--enemy)", from: "" }); }
+        addLog(`${en.name} 最后一段（贪饕血条）没有喜剧学家${out.length ? `：${out.length} 个喜剧学家退场` : ""}，【粉墨登场】不再召唤`, false, "var(--enemy)");
+      }
       if (vorOn(en)) { const st = num(en.vorSt, 0); en.vmx = en.ehx; if (st > 0) en.ehc = Math.min(en.ehc, st / 100 * en.ehx);   // 【贪饕侵蚀】最后一管血：伤害按 ×4 / ×2 打红血，多出的变灰血；vorSt = 手动指定开始 %
         addLog(`${en.name} 激活【贪饕】的力量：贪饕血条 ${Math.round(en.ehx)}，从 ${fmt(en.ehc / en.ehx * 100, 1)}% 开始；欢愉伤害 ×4（3 份变灰血）、其他 ×2（1 份变灰血），灰血（含欢愉负债）到 ${100 - num(en.vorAt, 23)}% 才能被消灭，之前受到致命伤害会回满`, false, "var(--enemy)"); }
       addLog(`${en.name} 第 ${old} 阶段生命值打空，转入第 ${en.ph + 1} 阶段（生命值 ${Math.round(en.ehx)}${ahaU && num(en.debt) > 0 ? `，保留【欢愉负债】${Math.round(en.debt)}，相当于从 ${Math.round((1 - en.debt / en.ehx) * 100)}% 开始` : ""}；上一阶段溢出的 ${Math.round(over)} 点伤害不继承；敌人身上的减益全部清除，共 ${nd} 项）`, false, "var(--enemy)");
     };
     const ahaU = U.find(z => z.kind === "ally" && !z.sm && tidOf(z) === "1511");   // 星神★阿哈在队：【欢愉负债】
+    let noRev = false;   // 4.7 归寂最后一段（贪饕血条）没有喜剧学家（用户说明）
     const reviveEnemy = en => {   // 被消灭的敌人重新登场：满血、减益清空、从头跑条
-      if (!en.gone) return;
+      if (!en.gone || noRev) return;
       if (en.xqOn && !U.some(z => z.xqOn && !z.gone)) xqAt = t + 10000 / xqSpd;   // 新的一波喜剧学家：【谐星荟萃】从头跑条
       en.gone = false; en.dist = 10000; en.ehc = aha6 ? en.ehx * 0.8 : en.ehx; en.debt = 0; en.debtP = 0;
       en.buffs = []; en.dots = []; en.wk = []; en.st = {}; en.frozen = false; en.cmz = null; en.cmzUsed = false; en.yh = 0; en.broken = false; en.tcur = toughMax(en);
