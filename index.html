@@ -1105,6 +1105,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-18（没改 tv；tools/bean47.py）</b>。银狼设置里“每次强普怪味豆”旁边多了<b>逐次</b>：按强普的先后逐次填个数（逗号分隔，例 2,1,1），没填到的照旧按上面的个数。依据：4.7 王棋录像里两次强普隐藏分 160 → 166 → 169，第一次出了 2 个。没填时和以前一样。</li>
 <li><b>2026-11-18（没改 tv；tools/qx0.py）</b>。4.7 归寂「清除存在的球戏」的【强烈震荡】行动延后默认改成 0（敌人卡字段 qxDl 仍可填）：用户说明第 2 管归寂的单点（讥讽的目光）打的是真珠，把这一下的【滋扰】算上以后，录像里真珠的回合不用再额外推后。复刻方案里归寂的攻击目标要设成真珠。</li>
 <li><b>2026-11-18（没改 tv；tools/face47c.py）</b>。4.7 归寂「成」每回合<b>第一招固定讥讽的目光</b>，第二招按 存在的闹剧 → 埋梗时刻 → … 轮：录像第 1 管 54「讥讽的目光 → 存在的闹剧」、第 2 管开头 105（转面拉条，我方额外回合之后）「讥讽的目光 → 埋梗时刻」。以前第 2 管开头连出两下群攻，我方被多推了一次条。phm 主形态段多了第 7 项（每回合第一招固定的技能）和第 8 项（自己的出招表，用分号分隔）。</li>
 <li><b>2026-11-18（没改 tv；tools/face47b.py）</b>。4.7 归寂按录像行动条重做（用户认的头像）：归寂「成」<b>每回合连续行动两次</b>（第 1 管 54：讥讽的目光 + 存在的闹剧）。第 3、4 管【三面合一】：本体换成「坏」，第一次出手在转阶段后约 63 行动值（录像 214 埋梗时刻，不吃【转面】拉条）；「成」跟着【转面】马上出手、间隔约 40（录像 151、191；比归寂的速度快，原因不明，按录像取 1.35 倍）、每回合两招且第二招固定「清除存在的球戏」；「住」在转阶段后半个间隔出手（178 收束命运的博弈）；<b>【好戏开场】</b>在转阶段后约 60 行动值放「令欢愉终归死寂」（天赋原文，录像约 211）。这些位置和倍数是按一次录像推算的，敌人卡 phm 里可改（格式：名字@开始%@速度倍数@每回合几招@第二招技能下标）。</li>
@@ -3670,7 +3671,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     }
     // each 银狼 action inside 无敌玩家 spends one 强普; the last one ends the state
     // 每次强普按 W.bean 个【怪怪怪味豆】算（各 +3 笑点；用户定的，盲盒本来是随机的）
-    const beanP = rec => { const n = num(W.bean, 1); if (n > 0 && rec && rec.act === "ebasic") addPunch(3 * n, "怪味豆"); };
+    let beanI = 0; const beanL = String(W.beanL || "").split(/[,，\s]+/).filter(x => x !== "");   // 逐次填的怪味豆个数（按强普先后）
+    const beanP = rec => { if (!(rec && rec.act === "ebasic")) return; const n = beanI < beanL.length ? num(beanL[beanI]) : num(W.bean, 1); beanI++; if (n > 0) addPunch(3 * n, n > 1 ? `怪味豆 ×${n}` : "怪味豆"); };
     const spendCharge = () => {
       sw.left--;
       if (sw.left > 0) return;
@@ -4500,6 +4502,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${sn("charges", "强普次数", 'min="1" step="1"')}
         ${sn("skillPunch", "未开大战技笑点 +", 'min="0" step="1"')}
         <label for="s-bean" title="【狼尊时刻】里的头号补给盲盒是随机的；这里按每次强普出 N 个【怪怪怪味豆】算，每个 +3 笑点（用户定的，默认 1）">每次强普怪味豆 <input type="number" id="s-bean" value="${W.bean ?? 1}" data-s="bean" min="0" step="1" style="width:50px"> 个（各 +3 笑点）</label>
+        <label for="s-beanL" title="按强普先后逐次填怪味豆个数，逗号分隔（例：2,1,1）；没填到的按上面的个数">逐次 <input type="text" id="s-beanL" value="${esc(String(W.beanL ?? ""))}" data-s="beanL" placeholder="如 2,1,1" style="width:90px"></label>
         ${sn("adv", "开大自身拉条 %", 'min="0" max="100" step="1"')}
       </div>
       <div class="row">
@@ -4980,7 +4983,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   function onField(el, structural) {
     if (el.dataset.s) {
       const k = el.dataset.s;
-      S.sw[k] = el.type === "checkbox" ? el.checked : k === "uid" || k === "e2when" ? el.value : num(el.value);
+      S.sw[k] = el.type === "checkbox" ? el.checked : k === "uid" || k === "e2when" || k === "beanL" ? el.value : num(el.value);
       if (structural) renderEditor();
       update(); return;
     }
