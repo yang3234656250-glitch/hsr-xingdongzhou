@@ -1107,6 +1107,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+<li><b>2026-11-19（没改 tv；tools/eskov.py）</b>：用户要求：<b>敌人出招可以自己选</b>。套了敌人模板的敌人卡上多一行“每次出招”，列出显示范围内这个敌人的每次行动（按行动次数编号，归寂另一面借本体出手、连续行动的第二下也各算一次），默认就是原来的出招顺序，下拉改成别的招只改这一次；选回标“（顺序）”的那招就恢复，“全部改回按顺序”一次清掉。改了出招以后，这一招的打谁、受击回能、推条减速、伤害都按新选的招算；后面没改的照旧按顺序轮。没改的配置结果不变。</li>
 <li><b>2026-11-19（全页自检，没改 tv；tools/selfchk1.py、selfchk2.py）</b>：所有 99 个角色模板分 25 队，星魂 0 / 6，各放一组按关卡的敌人、开敌我掉血，逐个跑了一遍，再用归寂复刻方案把 14 种手动事件各加一次（电脑 / 手机宽度）。改了：① 归寂「连续行动」的行动轴提示显示成“undefined → 连续行动”；② 伤害提示“× N 个目标”按敌人卡数量写，和实际算伤害用的在场敌人数（比如归寂最后一段只剩它自己）对不上；③ 【贪饕】补上整理图里的注：贪饕血条满血时，一次攻击最多把可回复生命上限压到 50%。tv 149（敌人第 1 批）的工具和日志这次一起补进了 GitHub（之前推送失败，页面已经是 tv 149）。</li>
 <li><b>2026-11-19（敌人第 1 批）：tv 149（tools/mon149.py）</b>。依据官方数据（DimbreathBot TurnBasedGameData 的 MonsterConfig / MonsterTemplateConfig / MonsterSkillConfig / EliteGroup / HardLevelGroup / StageConfig / Challenge*Config + TextMapCHS）。① <b>新敌人 4 个</b>（敌人模板 471 → 475）：含辛茹苦的列车长（MonsterID / 模板 5014024，末日幻影「领航冥茫」上半首领，速度 134、韧性 1200、弱点 物火量虚）、渊兽原体（5033010，异相仲裁骑士（一），速度 135、韧性 600、弱点 火量虚；出招按“拟态发光诱饵（蓄力）→ 下回合原初的圣餐”排）、贪欢的神颅（5035010，主线两阶段）和贪欢的神颅（历战余响）（5035012，历战余响三阶段，同名不同形态分开放；速度都是 160、韧性 960、弱点 物量虚）。“神的餐前甜点”的伤害是之后【贪欢时刻】行动时打的，这一招本身不写倍率。末日兽、昔在今在永在的剧目本体速度是 0（不行动，靠部位 / 傀儡行动），没加。② <b>按关卡放敌人</b>：新加 混沌回忆「漆黑残响」、虚构叙事「虚事成理」、异相仲裁·4.7 骑士（一～三）；原来的「末日幻影（3022）」是占位数据（和「支配遗忘」一样），按官方现在的数据换成「领航冥茫」（列车长 / 枯茎朽骨的引路人）；每种保留最近两期（去掉「来生泅渡」「立界开篇」）。波次速度按 敌人速度 × 关卡精英组 × 难度组 计算，现有「物竞天择」「取象为文」「支配遗忘」「王棋」用同一方法重算完全一致。③ <b>敌人模板速度和官方不一致的改正</b>：初号机 144 → 168（模板 144 + SpeedModifyValue 24，以前漏了加值）、托帕幻象 200 → 120、奇想林中的蕉研组（完整）70 → 80；已经放上去、速度没手改过的这几种敌人卡跟着改（tv 149 迁移）。④ <b>标签是「妨害」、原文写“对我方全体造成伤害”的 5 招改成打我方全体</b>（以前按标签只打一个人）：点数喷泉（「石心十人」诡弈砂金）、收益抽成（孤注一掷的掷骰者）、极乐螺旋（乐变化天人）、儆惧（边塞诗人、金人司阍）、原初的圣餐（渊兽原体）——被打的每个角色都受击回能、触发“受到攻击时”和卡片上填的推条 / 减速。没用到这些敌人的配置行动顺序不变。</li>
 <li><b>2026-11-19（差异清单第 25 批）：tv 148（tools/fix148.py）</b>。依据官方原文（Mar-7th character_skills / skill_trees / ranks）。① <b>椒丘【烬煨】叠层</b>：天赋“【烬煨】最多叠加 5 层”（6 魂 9 层）、E1“每当触发天赋效果使敌方目标陷入【烬煨】时本次叠加层数额外 +1”，以前【烬煨】始终 1 层（天赋易伤只有 15%、E6 减抗只 3%）；补上战技本身对主目标的 1 层（和天赋击中的 1 层分开）、终结技“将敌方目标的【烬煨】层数统一设置为场上最高值”、秘技的 1 层（默认关）。E1 增伤 40% 只对有【烬煨】的敌人（以前对所有敌人）。持续伤害新字段：几魂起叠层上限 / 每次叠几层，方式“统一为最高层数”。② <b>忘归人行迹玑星太素</b>：击破特攻 ≥220% 时每层额外 +12%，以前要自己改数值。③ <b>灵砂行迹朱燎</b>攻击力改成按卡片击破特攻 × 25%（最多 50%，仍默认关）；<b>秘技</b>补上敌方全体【醇醉】2 回合（默认关）。④ <b>飞霄 E4</b>“天赋的追加攻击削韧值提高 100%”：追加攻击主目标削韧 +15（5 点）。<b>对已有配置</b>：不开“我方伤害扣敌人生命值”时行动顺序不变，只影响伤害显示和击破时机（飞霄 4 魂以上破韧会更早）；开了时椒丘队的敌人掉血更快。老存档的椒丘 / 灵砂 / 忘归人卡片按新模板重建，原来开着的效果保持开着。</li>
@@ -4176,7 +4177,10 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (actor.mon && seq.length) {
           // 敌人模板：按出招顺序轮流放，按技能标签决定打谁，被打的回该技能的能量
           const fxA = !FG && actor.dblF != null && !(num(actor.dblI) > 0) && MON.sk[actor.dblF] ? actor.dblF : null; if (fxA != null) actor.sqo = num(actor.sqo) - 1;   // 每回合第一招固定（phm 第 7 项），不推进出招表
-          const sqI = ((actor.turns - 1 + (FG ? 0 : num(actor.sqo))) % seq.length + seq.length) % seq.length, skI = fxA ?? seq[sqI], sk = MON.sk[skI];   // sqo：换形态后从出招表第几招开始（phm 第 5 项）
+          const sqI = ((actor.turns - 1 + (FG ? 0 : num(actor.sqo))) % seq.length + seq.length) % seq.length, skN = fxA ?? seq[sqI];
+          actor.eAct = num(actor.eAct) + 1; const eKey = String(actor.eAct), ovK = actor.skOv ? actor.skOv[eKey] : null;   // 用户单独指定的出招（敌人卡“每次出招”），键 = 第几次行动
+          const skI = ovK != null && MON.sk[+ovK] ? +ovK : skN, sk = MON.sk[skI];
+          rec.eKey = eKey; rec.eNat = skN; rec.eOpts = [...new Set(seq.concat(((FG ? MON.m.find(m => m.n === FG.n) : monOf(actor)) || {}).k || []))].filter(k => MON.sk[k]);   // sqo：换形态后从出招表第几招开始（phm 第 5 项）
           rec.eskill = sk.n;
           let tgs = [];
           if (HITALL.includes(sk.t) || sk.ha || aw === "all") tgs = HIT1.concat(HIT3, HITALL).includes(sk.t) ? pool : [];   // sk.ha：标签是妨害、原文是“对我方全体造成伤害”（tv 149）
@@ -4895,6 +4899,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         ${(m => !m || !m.k || !m.k.length ? "" : `<div class="effects">
           <div class="ult-list"><span class="hint">出招顺序（循环）：</span>${(u.seq || []).map((k, n) => MON.sk[k] ? `<span class="ult-chip" title="${esc(MON.sk[k].d)}">${n + 1}. ${esc(MON.sk[k].n)}<button class="ghost" data-act="seq-del" data-u="${i}" data-k="${n}" aria-label="删除这一招">✕</button></span>` : "").join("") || `<span class="hint">（空：不出招）</span>`}<button type="button" class="ghost" data-act="seq-reset" data-u="${i}" title="恢复默认出招">↺ 默认</button></div>
           <div class="ult-list"><span class="hint">点技能加到末尾：</span>${m.k.map(k => `<button type="button" data-act="seq-add" data-u="${i}" data-k="${k}" title="${esc(MON.sk[k].d)}" style="font-size:12px;padding:1px 8px">${esc(MON.sk[k].n)}<span class="hint">（${esc(MON.sk[k].t)}${MON.sk[k].sp ? " · 回能 " + MON.sk[k].sp : ""}）</span></button>`).join("")}</div>
+          <div class="turn-acts e-acts" data-ei="${i}"></div>
+          ${u.skOv ? `<div class="ult-list"><span class="hint">单独指定了 ${Object.keys(u.skOv).length} 次出招</span><button class="ghost" data-act="del-skov" data-u="${i}" style="font-size:12px;padding:1px 8px">全部改回按顺序</button></div>` : ""}
           ${(m.p || []).map(k => `<p class="hint">天赋：${esc(MON.sk[k].d)}</p>`).join("")}
           <details class="skx"${u.skx ? " open" : ""}><summary>技能的推条 / 减速（游戏数据里没写数值，需要的话自己填）</summary>
             ${m.k.map(k => { const s = MON.sk[k], x = (u.skx || {})[k] || {}, hot = /行动延后|速度降低|减速/.test(s.d); return `<div class="row" title="${esc(s.d)}">
@@ -5182,6 +5188,13 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       if (!Object.keys(u.kOv).length) delete u.kOv;
       renderEditor(); update(); return;
     }
+    if (t.dataset.esk !== undefined) {   // 敌人卡“每次出招”：选回按顺序的那招就删掉单独指定
+      const u = S.units[+t.dataset.esk], k = t.dataset.k;
+      u.skOv = Object.assign({}, u.skOv);
+      if (t.value === t.dataset.nat) delete u.skOv[k]; else u.skOv[k] = +t.value;
+      if (!Object.keys(u.skOv).length) delete u.skOv;
+      renderEditor(); update(); return;
+    }
     if (t.dataset.tact !== undefined) {
       // 角色卡上的“每次行动”：选回原本（不单独指定时）的动作就删掉这条单独指定
       const u = S.units[+t.dataset.tact], k = t.dataset.k;
@@ -5460,6 +5473,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       }
       case "del-ev": S.events.splice(+b.dataset.v, 1); break;
       case "del-ult": S.sw.ultAfter = (S.sw.ultAfter || []).filter(k => k !== b.dataset.k); break;
+      case "del-skov": delete S.units[i].skOv; break;
       case "del-actov": if (S.units[i].actOv) { delete S.units[i].actOv[b.dataset.k]; if (!Object.keys(S.units[i].actOv).length) delete S.units[i].actOv; } break;
       case "seq-add": { const u = S.units[i]; u.seq = (u.seq || []).concat(+b.dataset.k); break; }
       case "seq-del": { const u = S.units[i]; u.seq = (u.seq || []).filter((x, n) => n !== +b.dataset.k); break; }
@@ -6567,12 +6581,25 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     renderSwStats(R);
     renderUltTargets(R);
     renderSkTargets(R);
-    renderTurnActs(R); renderKActs(R);
+    renderTurnActs(R); renderKActs(R); renderEActs(R);
   }
 
   // 角色卡上的“每次行动”：显示范围内这个角色的每次行动（正常回合、额外回合）各一个下拉，直接选 战技 / 普攻 / 强普
   // 卡厄斯兰那（召唤物模板 rot）：每个额外回合选 自动 / 强化普攻 / 支柱 / 灾厄；最后一个额外回合固定最后一击
   function kRotOf(u) { const o = u && u.sm && S.units.find(x => x.id === u.sm.owner), T = o && tplOf(o), d = T && (T.sm || []).find(m => m.k === u.sm.key); return !!(d && d.rot); }
+  function renderEActs(R) {   // 敌人卡“每次出招”：显示范围内这个敌人的每次行动，默认按出招顺序，可以单独改
+    document.querySelectorAll(".e-acts").forEach(box => {
+      const i = +box.dataset.ei, u = S.units[i]; if (!u) return;
+      const acts = R.actions.filter(a => a.uid === u.id && a.eKey);
+      if (!acts.length) { box.innerHTML = ""; return; }
+      box.innerHTML = `<span class="hint">每次出招（默认按顺序）：</span>` + acts.map(a => {
+        const ov = !!(u.skOv && u.skOv[a.eKey]), cur = ov ? +u.skOv[a.eKey] : a.eNat;
+        const opts = (a.eOpts || []).concat(a.eOpts && a.eOpts.includes(cur) ? [] : [cur]).filter(k => MON.sk[k]);
+        const when = `第 ${a.eKey} 次行动${a.face ? `（${a.face}）` : ""}，AV ${fmt(a.t, 2)}；按顺序是「${MON.sk[a.eNat] ? MON.sk[a.eNat].n : "?"}」`;
+        return `<span class="ta-wrap"><label class="ta${ov ? " ov" : ""}" title="${esc(when)}${ov ? "（单独指定过）" : ""}">${a.eKey}<span class="hint" style="font-size:11px">·${fmt(a.t, 1)}</span><select data-esk="${i}" data-k="${a.eKey}" data-nat="${a.eNat}" aria-label="${esc(when)}">${opts.map(k => `<option value="${k}"${k === cur ? " selected" : ""}>${esc(MON.sk[k].n)}${k === a.eNat ? "（顺序）" : ""}</option>`).join("")}</select></label></span>`;
+      }).join("");
+    });
+  }
   function renderKActs(R) {
     document.querySelectorAll(".k-acts").forEach(box => {
       const i = +box.dataset.ki, u = S.units[i]; if (!u) return;
