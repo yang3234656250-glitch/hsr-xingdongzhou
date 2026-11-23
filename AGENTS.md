@@ -64,6 +64,7 @@
 
 - 状态对象 `S` 存在 localStorage `hsr-av-timeline-v1`。**云端同步：在 claude.ai 里用 `window.claude.use("db")`；在外部用 Firebase（`firebaseDb()`，Firestore + 谷歌登录，数据在 `users/<uid>/` 下，配置在 `FB_CFG`），没配置或没登录时只存本机。** Firebase 的 API 和原来的 db 接口（`collection` / `doc` / `get` / `set` / `onSnapshot` / `orderBy`）一致，改同步逻辑时保持两边都能用。
 - **共享面板**（2026-10-30 用户要求）：同一角色（`panelKey` = "t" + 模板 id）的面板数值 `PANELF`（hp / atk / def / hb / cr / cd / dmg / el / er / mult）存在 `S.panels`，所有方案共用；`panelSync(S)` 在 `update()` 开头跑：卡片改了就写回面板库，`u.pk` 和键对不上（刚载入 / 刚换模板）就从面板库拉。`u.ownPanel` = 本方案单独面板，不参与。`loadConfig(d, true)`（载入方案 / 导入 / 恢复历史 / 示例）保留当前面板库，撤销和云端同步传 false 原样接收。速度、星魂、光锥、遗器不在面板里。
+- **「角色」页**（2026-11-23，tools/roster1.py）：面板库 `S.panels[键]` 扩成三组：面板数值 `PANELF`、速度 `SPDF`（spd）、装备 `EQF`（eid / ex / lc / lcR / rA / rB / r4 / rP）；`p.g = {s, e}` 标记速度 / 装备组已建。卡片“本方案单独”三个勾：`ownPanel` / `ownSpd` / `ownEq`（勾了的那组不参与）。等于默认值的不存（`PDEF`：eid 0、lcR 1、r4 / ex false）。拉到装备组时 `applyEquip(u)`。老配置（没有 `S.pv`，这版以前存的）第一次对齐时，速度 / 装备和角色库不一样的卡自动勾“单独”（不改结果），之后 `S.pv = 2`。页面切换 `body[data-pg]`（"axis" / "ros"，localStorage `-pg`），角色页 `#roster` 由 `renderRoster()` 画（update() 末尾在角色页时刷新），在角色页改了就删掉对应卡片的 `u.pk` 让它们重新拉。
 - 左栏：方案、单位卡（角色 / 敌人 / 召唤物）、使用说明、阿哈时刻、手动事件、配速助手、导入导出、更新日志；右栏：SVG 行动轴、每轮行动次数、行动顺序。手机宽度 ≤ 920px 用顶部标签切换。
 - 旧配置靠版本字段迁移（`migrateX` / `e2rev` / `migrateTpl`，`tv` 当前是 115）。改模板写法或数据格式时要加迁移（`TPLFIX*` 表 + `fixTpl`）；新字段一律做成“没有就是旧行为”。
 - 效果字段、触发、类型、单位字段很多，细节看代码里 `dbEffects()`、`simulate()` 和更新日志。

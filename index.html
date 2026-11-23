@@ -704,6 +704,28 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
 .ta-sup.on{ color:var(--gold); }
 .ta-sup.no{ color:var(--enemy); }
 @media (max-width:420px){ .unit .en-row{ gap:0 12px; } .unit .en-row > label{ font-size:12px; white-space:nowrap; } .unit .en-row > label input[type=number]{ width:50px !important; font-size:13px; } .unit .stat-row > label, .unit .dmg-row > label{ white-space:nowrap; font-size:12.5px; } .unit .stat-row > label input[type=number], .unit .dmg-row > label input[type=number]{ width:64px !important; } }
+
+/* 「角色」页（2026-11-23） */
+.pgtabs{ display:flex; gap:6px; margin:10px 0 4px; }
+.pgtabs button{ padding:6px 18px; font-weight:600; }
+.pgtabs button[aria-selected="true"]{ background:var(--accent); border-color:var(--accent); color:#000; }
+.roster{ display:none; }
+body[data-pg="ros"] .roster{ display:block; }
+body[data-pg="ros"] .main, body[data-pg="ros"] .mtabs{ display:none !important; }
+.ros-head{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+.ros-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:12px; }
+.ros-card{ border:1px solid var(--line); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:7px; background:rgba(255,255,255,.02); min-width:0; }
+.ros-card.inteam{ border-color:var(--accent); }
+.ros-top{ display:flex; gap:10px; align-items:center; }
+.ros-top img.rimg{ width:56px; height:56px; object-fit:cover; object-position:top; border-radius:10px; flex:none; }
+.ros-top .rn{ font-weight:700; font-size:15px; }
+.ros-card .row{ display:flex; flex-wrap:wrap; gap:6px 10px; align-items:center; }
+.ros-card input[type=number]{ width:74px; }
+.ros-card .pickbtn{ max-width:180px; }
+.ros-stats{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+.ros-stats label{ display:flex; flex-direction:column; font-size:12px; color:var(--muted); gap:2px; }
+.ros-stats input{ width:100% !important; }
+@media (max-width: 520px){ .ros-grid{ grid-template-columns:1fr; } }
 </style>
 
 <!-- 校对记录（每日任务按此挑选最久未校对的项目）
@@ -985,6 +1007,9 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
     </div>
   </header>
 
+  <nav class="pgtabs" id="pgtabs" aria-label="切换页面"><button type="button" data-pg="axis">行动轴</button><button type="button" data-pg="ros">角色</button></nav>
+  <section class="section roster" id="roster" aria-label="角色"></section>
+
   <nav class="mtabs" id="mtabs" role="tablist" aria-label="切换显示内容">
     <button type="button" role="tab" data-mt="tl">行动轴</button>
     <button type="button" role="tab" data-mt="tab">表格</button>
@@ -1058,6 +1083,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
             <li><b>状态切换</b>：“之后的行动方式”效果让角色进入状态后自动改用强普 / 寒川映月这类行动（Saber 开大后、镜流转魄、刃地狱变、乱破结印、阿格莱雅至高之姿），单独指定过的优先。</li>
             <li><b>攻击判定</b>：“队友攻击后”只算攻击：普攻和强普都算，战技、开大看卡片上的勾选，欢愉技看“有没有伤害”，追加攻击也算。</li>
             <li><b>追加攻击</b>：“追加攻击”效果让目标立即追击一次（行动轴上标“追击”，点它可以安排在这次追击后开大）：算攻击，但不算行动、不占回合、不耗战技点；触发自己的“施放追加攻击时”和队友的“队友追加攻击后”；召唤物卡上勾“行动算追加攻击”的（账账、神君），每次行动都算追击。</li>
+            <li><b>「角色」页</b>：页面最上面切到「角色」，每个角色存一份面板、速度、星魂、光锥、遗器，所有方案共用；方案里套用这个角色的模板就带上这份配置。角色卡上“本方案单独”勾上哪一项（面板 / 速度 / 星魂·光锥·遗器），那一项就只在这个方案里用自己的。以前存的方案第一次打开时，速度 / 装备和角色页不一样的卡会自动勾“单独”，原来的结果不变。</li>
             <li><b>同一行动值的结算顺序</b>（页面就是按这个算的）：① <b>进战</b>：开局效果分三轮（先结算排在最前的效果，再其他开局效果，最后“进战自动施放战技”的秘技）→ 敌人进入战斗 → 开怪秘技伤害 → 满能量的自动开大。② <b>真正的追加攻击</b>在触发它的那次攻击里立即结算，排在下面所有事之前（“视为追加攻击”的按原来的位置）。③ <b>一个正常回合</b>：增益到期 → “每回合开始时 −1”的状态 → 统一结算（小伊卡）→ 安排在“××回合中”的大招 → 这些大招带来的额外回合 / 额外阿哈时刻（在这个角色行动之前处理完）→ 回合开始效果 → 行动（施放时效果、回能、攻击）→ 回合结束的状态 → 安排在“××第 N 次行动后”的大招 → 满能量自动开大和连开排队的大招。④ <b>排队的额外回合</b>，每次处理一项：银狼被打断后的再次施放 → 银狼额外强普 → 角色额外回合（按获得的先后）→ 额外阿哈时刻；每项结束后同样先看“之后”安排的大招，再看自动开大。⑤ 都处理完才选下一个跑满行动条的单位；<b>手动事件、敌人重新登场</b>在同一行动值时排在单位行动之前；几个单位同时被拉到 0，按拉条前的先后行动。同一处安排了几个大招时，按“开大时机”下方拖出来的顺序。</li>
             <li><b>回能记录和溢出</b>：行动顺序表头的“回能记录”打开后，每次能量变化都列一行（来源、变化后 / 上限），被能量上限截掉的部分标“溢出”，表尾汇总每人一共被截掉多少。拉条把行动条拉满后多出的部分不会留到下一次行动，行动轴上这个拉条标记右上角有红点，鼠标放上去看溢出多少。轮次标题点一下可以收起 / 展开那一轮。</li>
             <li><b>召唤物和计数</b>：召唤物 / 忆灵 / 倒计时是单独的卡（卡片“计数器 · 召唤物”里勾选），可以设成本体速度的百分比、行动几次后离场、在场时本体暂停，靠“召唤 / 登场”效果上场，登场 / 离场时分别触发本体的“召唤物登场时 / 召唤物离场时”。“计数”效果往卡片上的计数器里加点，满了触发“计数满时”（比如三月七充能 7、镜流朔望 2）。“额外回合”效果任何角色都能用。</li>
@@ -1117,7 +1143,8 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-23（借鉴绯绯狐工具箱的三处显示，没改 tv）</b>。① 使用说明新加「同一行动值的结算顺序」：进战、追加攻击、一个正常回合、排队的额外回合、手动事件和同时拉到 0 的先后，按页面引擎实际的顺序写（没有改顺序）。② 行动顺序表头新加「回能记录」（默认隐藏，本机记住）：每次能量变化一行，写来源、变化后 / 上限，被能量上限截掉的部分标“溢出”，表尾汇总每人被截掉多少；拉条把行动条拉满后多出的部分（不累积到下一次行动）也列在这里，行动轴上这个拉条标记右上角加红点，提示里写溢出多少。③ 行动顺序按轮分组：轮次标题写本轮行动次数，点一下收起 / 展开（本机记住）；显示范围内没有行动的轮也画标题；表尾写“显示到 AV ×｜共 × 次行动、× 条记录”，治疗记录隐藏时写隐藏了几条。对已有配置：模拟只多记了几个显示用的字段，行动顺序、能量、战技点、开大次数完全不变。</li>
+<li><b>2026-11-23（「角色」页，没改 tv）</b>。用户：“每个角色保存一个面板，单独做一页角色”（参考绯绯狐工具箱），选了面板、速度、星魂、光锥、遗器全部一起存。① 页面最上面新加「行动轴 / 角色」切换。「角色」页列出角色库里的每个角色（当前方案里有的排前面、加框），可以改速度、星魂、奇缘星魂、光锥和叠影、遗器、生命 / 攻击 / 防御 / 暴击 / 爆伤 / 增伤 / 充能效率 / 治疗加成 / 欢愉度（面板留空 = 按基础值，灰字就是基础值），“添加角色”“加入当前方案”“从角色页删除”。② 原来的共享面板（只有面板数值）扩成三组：面板、速度、星魂 / 光锥 / 遗器；角色卡上“本方案单独”分三个勾。在卡片上改也会写回角色页，所有没勾“单独”的方案一起变（配速助手“设成”也一样）。③ 老方案保护：这版以前存的配置（没有 pv）第一次和角色库对齐时，速度或装备和角色库不一样的卡自动勾上对应的“单独”，数值不动；当前配置是第一份，用它建角色库。对已有配置：当前方案的行动顺序完全不变；载入其他老方案也不变（不一样的都会自动勾“单独”），想让它们跟角色页走就把勾去掉。</li>
+            <li><b>2026-11-23（借鉴绯绯狐工具箱的三处显示，没改 tv）</b>。① 使用说明新加「同一行动值的结算顺序」：进战、追加攻击、一个正常回合、排队的额外回合、手动事件和同时拉到 0 的先后，按页面引擎实际的顺序写（没有改顺序）。② 行动顺序表头新加「回能记录」（默认隐藏，本机记住）：每次能量变化一行，写来源、变化后 / 上限，被能量上限截掉的部分标“溢出”，表尾汇总每人被截掉多少；拉条把行动条拉满后多出的部分（不累积到下一次行动）也列在这里，行动轴上这个拉条标记右上角加红点，提示里写溢出多少。③ 行动顺序按轮分组：轮次标题写本轮行动次数，点一下收起 / 展开（本机记住）；显示范围内没有行动的轮也画标题；表尾写“显示到 AV ×｜共 × 次行动、× 条记录”，治疗记录隐藏时写隐藏了几条。对已有配置：模拟只多记了几个显示用的字段，行动顺序、能量、战技点、开大次数完全不变。</li>
             <li><b>2026-11-23（差异清单第 29 批）：tv 153（tools/fix153.py）</b>。依据官方原文（Mar-7th character_skills / character_ranks）。① <b>刻律德菈 E4</b>（141204）“终结技的伤害倍率提高 240%”：以前按“伤害 ×2”写，只在终结技 10 级时对；5 魂起 12 级是 259.2% + 240% = 499.2%（以前算成 518.4%）。新加伤害增益属性“技能倍率另加”（mlt），E4 改用它。② <b>刻律德菈 E2 / E6</b>（141202 / 141206）“场上存在持有【军功】的队友时”伤害 +160% / 抗性穿透 +20%：以前开局一直有，改成出手时场上有【军功】队友才算（ec.tst 新加选项 tso = 不算自己）。③ <b>大黑塔普通战技【格局打开】</b>（140102）“对指定敌方单体造成 70%……对本次战技命中过的目标及其相邻目标造成 70%，该效果可重复 2 次”：主目标 70% → 210%、相邻 70% → 140%（3 / 2 段；第 4、5 个敌人的 1 段没算）。④ <b>星期日【蒙福者】</b>（131303）：暴伤和 E2 增伤改成给目标和它的忆灵（“目标及其召唤物”）；3 魂固定部分 12% → 12.8%；星期日倒下时解除。<b>对已有配置</b>：只影响伤害显示，行动顺序不变；老存档的星期日终结技暴伤那条按新说明换掉（开关保留），刻律德菈 / 星期日的星魂效果重建。</li>
 <li><b>2026-11-22 晚（敌人第 4 批，没改 tv；tools/enemy4.py）</b>。依据官方数据（DimbreathBot TurnBasedGameData 的 MonsterConfig / MonsterTemplateConfig / MonsterSkillConfig / StageConfig + TextMapCHS）。① <b>新加敌人：可可利亚，虚妄之母（历战余响）</b>（MonsterID 1005012，历战余响关卡 1052020～1052026 用）：比主线版本多一个天赋【灭世者的决意】（“对指定我方单体施放【裂魂寒流】大概率使该目标陷入冻结状态”，冻结我方没做），裂魂寒流倍率 650%（主线 950%），速度 120 / 弱点火雷量 / 韧性 540 和主线相同。② <b>敌人技能改我方战技点</b>：锁元（丰饶玄莲）“使我方战技点减少1个”、大破大立（被操弄的逻各斯）“并使我方战技点减少1个”：施放时我方战技点 −1（日志写变化）；归元（丰饶玄莲）“受到致命攻击后使我方战技点恢复3个”：开了“我方伤害扣敌人生命值”、它被消灭时我方战技点 +3。“减少我方战技点”没写个数的（坏猴来了记大过、狼的讥讽、极乐螺旋）没做。③ <b>以牙还牙</b>（杰帕德（末日幻影）/（完整）/（幻象））“进入反击状态，持续1回合。在该状态下受到我方目标攻击后，立即对该目标施放【霜之惩击】”：施放后进入反击状态（行动轴标“反击状态”），到它下一个回合开始时结束；状态中我方角色每次攻击打到它，它立即对攻击者施放霜之惩击（被打的角色回 15 能量、触发“受到攻击时”，开了敌人伤害时按 360% / 350% 倍率扣血；（完整）原文“最多触发1次”）。页面的取舍（原文没写，等用户确认）：反击引起的我方攻击（克拉拉被反击后的反击）不再被反击；攻击者是召唤物 / 忆灵时不反击，只写日志。对已有配置：没放这几个敌人的行动顺序完全不变；放了杰帕德（末日幻影）的，被反击的角色多回能量，开大可能提前。</li>
 <li><b>2026-11-21 晚（敌人第 3 批，没改 tv；tools/enemy3.py）</b>。依据官方数据（DimbreathBot TurnBasedGameData 的 MonsterConfig / MonsterTemplateConfig / MonsterSkillConfig / StageConfig / Challenge*Config + TextMapCHS）。① <b>新加 6 个敌人</b>：速度 0、自己不行动的本体 <b>昔在、今在、永在的剧目</b>（3004010，混沌回忆用）、<b>昔在、今在、永在的剧目（完整）</b>（3004011）、<b>末日兽</b>（8015010，弱点物火冰风）、<b>毁灭的容器，卡厄斯兰那</b>（4034020）、<b>朱明三不</b>（300401002）：选这些模板的敌人卡<b>不上行动轴</b>（卡片上写“速度 0：本体自己不行动”），可以当伤害目标；靠别的东西行动的部分没做（剧目的【宣诫】在官方数据里不是单独的怪物、速度查不到；末日兽“部位没全部击溃时无法攻击”没做）。<b>天谴先锋（虚构叙事）</b>（401301201）：虚构叙事「取象为文」「虚事成理」里的版本没有【快从坟墓中苏生】（召唤），出招是 横扫 → 横扫 → 蓄力 → 在滔滔血海中沉溺 循环；按关卡放敌人时这两期的天谴先锋改用它。② <b>罪血眈视</b>（金血忆灵•裁定忘却之形、弗兰肯Official、迷惘之渊的裁定者）原文“施放该技能后再行动1次”：放完马上再行动一次（行动轴标“连续行动”，接着出下一招）；“使自身的速度提高”没写数值，没做。③ <b>起床铃声</b>（惊梦剧团的发条暴徒、钟表老子）“使除自身外的敌方全体立即行动”、<b>鼓劲</b>（银鬃尉官（错误））“使敌方除【银鬃尉官（错误）】外的目标……立即行动”、<b>棋快一着</b>（浮烟，4 种）“使敌方全体立即行动”：施放后其他在场敌人行动提前 100%（日志写谁立即行动）；浮烟自己算不算“全体”原文没写清，先不算，等用户确认；攻击力 / 伤害 / 速度提高没写数值，没做。④ <b>弱点 / 韧性按关卡实际用的配置</b>：有 16 个敌人模板的弱点或韧性取自没有任何关卡用到的配置，改成关卡里用的：天谴先锋 冰雷风→冰雷量、丰饶灵兽•长右 火冰虚→火冰风、自动机兵•甲虫 物雷风→雷风虚、无想面具 火雷风→火量、毁灭扑满 物火冰虚→冰风量、银枝 火冰量→物火冰（关卡里还有物冰量、物冰风两种）、忆域迷因「狂怒褪去之壳」补弱点雷量虚、奇想林中的蕉研组 补弱点火冰雷虚、韧性 360→0（官方模板没有韧性）、蕉研组的谐乐蕉师 火冰雷虚→火冰虚 / 900→420、幼蛰虫 180→90、乐变化天人•终 420→240、杰帕德（幻象）450→540、蕉研组的助蕉 450→180、筑梦蕉师 270→180、财富蕉师 360→180；<b>蚀蛰虫</b>整条换成关卡用的 8022030（速度 118、韧性 90、弱点物冰、角击倍率 3.2，只有天赋蚀亡语；原来是没有关卡用到的 8022031）。“按关卡放敌人”的每个敌人也和关卡实际配置比，不一样的记在波次里（当期有 24 个：虚卒•掠夺者 物雷、银鬃近卫 风量；合金机铠•帕姆王 虚构叙事里韧性 600），“换上这一波敌人”时写到敌人卡上（弱点后面标“按关卡”，韧性填进卡片的“韧性”）。<b>对已有配置的影响</b>：没放这些敌人的配置完全不变；已放上的敌人卡速度不变（存在卡片上），用到上面改了弱点 / 韧性的模板、并开着击破模拟时，破韧时机和伤害会按新数据算；以前放上的关卡敌人卡没有“按关卡”弱点，重新“换上这一波敌人”才有。</li>
@@ -1808,26 +1835,45 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   const tplOf = u => { const X = tplIx(); return X.id.get(u.tplId) || X.nm.get(normName(u.name)); };
   // 角色的模板 id（字符串）：没套模板、但名字对得上的老角色（比如早期手动建的“银狼LV999”）也按模板认，召唤物不算
   const tidOf = u => !u ? "" : u.tplId != null && u.tplId !== "" ? String(u.tplId) : u.kind === "ally" && !u.sm ? String((tplOf(u) || {}).id || "") : "";
-  // 共享面板（2026-10-30 用户要求）：同一个角色（按模板）在所有方案里共用一份面板数值，存在 S.panels[模板id]；
-  // 卡片勾“本方案单独面板”（u.ownPanel）的不参与。u.pk = 这张卡上次对上的面板键：键变了（刚载入方案 / 刚换模板）就从面板库拉，
-  // 没变就把卡片上的数值写回面板库。速度、星魂、光锥、遗器不在里面（仍跟着方案走）。
+  // 共享面板（2026-10-30 用户要求）：同一个角色（按模板）在所有方案里共用一份，存在 S.panels[模板id]。
+  // 2026-11-23 起（「角色」页）分三组：面板数值（PANELF）、速度（spd）、装备（星魂 / 光锥 / 遗器，EQF）；
+  // 卡片勾“本方案单独 面板 / 速度 / 装备”（u.ownPanel / ownSpd / ownEq）的那一组不参与。u.pk = 这张卡上次对上的面板键：
+  // 键变了（刚载入方案 / 刚换模板）就从角色库拉，没变就把卡片上改过的写回角色库。p.g = {s, e}：这个角色的速度 / 装备组已经建过。
+  // 老方案（配置没有 pv，2026-11-23 以前存的）第一次对齐时：速度 / 装备和角色库不一样的卡自动勾“单独”，结果不变。
   const PANELF = ["hp", "atk", "def", "hb", "cr", "cd", "dmg", "el", "er", "mult"];
+  const SPDF = ["spd"], EQF = ["eid", "ex", "lc", "lcR", "rA", "rB", "r4", "rP"];
+  const PGRP = [["p", PANELF, "ownPanel"], ["s", SPDF, "ownSpd"], ["e", EQF, "ownEq"]];
+  const PDEF = { eid: 0, lcR: 1, r4: false, ex: false };   // 等于默认值的不存
   const panelKey = u => { const t = u && u.kind === "ally" && !u.sm ? tidOf(u) : ""; return t ? "t" + t : ""; };
+  const pPick = (u, F) => { const o = {}; for (const f of F) { const v = u ? u[f] : undefined; if (v !== undefined && v !== null && v !== "" && v !== PDEF[f]) o[f] = JSON.parse(JSON.stringify(v)); } return o; };
+  const pHas = (p, g) => g === "p" ? !!p : !!(p && p.g && p.g[g]);
   function panelSync(s) {
     s = s || S; if (!s.panels || typeof s.panels !== "object") s.panels = {};
-    const pick = u => { const o = {}; for (const f of PANELF) if (u[f] !== undefined && u[f] !== null && u[f] !== "") o[f] = JSON.parse(JSON.stringify(u[f])); return o; };
-    const L = s.units.filter(u => { const k = panelKey(u); if (!k || u.ownPanel) { delete u.pk; return false; } return true; });
-    // ① 已经对上面板的卡：和面板库不一样 = 刚被改过，写回面板库
-    for (const u of L) { const k = panelKey(u); if (u.pk === k && JSON.stringify(pick(u)) !== JSON.stringify(s.panels[k] || {})) s.panels[k] = pick(u); }
-    // ② 刚载入 / 刚换模板的卡：面板库里没有这个角色就用卡上的数值建一份
-    for (const u of L) { const k = panelKey(u); if (u.pk !== k && !s.panels[k]) s.panels[k] = pick(u); }
-    // ③ 所有卡跟面板库对齐（同一方案里有两张同一角色的卡时也一样）
+    const old = !(num(s.pv) >= 2);
+    const same = (u, p, F) => JSON.stringify(pPick(u, F)) === JSON.stringify(pPick(p, F));
+    const put = (k, g, F, u) => { const p = Object.assign({}, s.panels[k] || {}); for (const f of F) delete p[f]; Object.assign(p, pPick(u, F)); if (g !== "p") p.g = Object.assign({}, p.g || {}, { [g]: 1 }); s.panels[k] = p; };   // 换成新对象（方案对比的临时配置和这里共用同一批对象）
+    const L = s.units.filter(u => { const k = panelKey(u); if (!k) { delete u.pk; return false; } return true; });
+    for (const [g, F, own] of PGRP) {
+      // ① 已经对上的卡：和角色库不一样 = 刚被改过，写回角色库
+      for (const u of L) { const k = panelKey(u); if (!u[own] && u.pk === k && pHas(s.panels[k], g) && !same(u, s.panels[k], F)) put(k, g, F, u); }
+      // ② 角色库里还没有这一组：用卡上的建一份
+      for (const u of L) { const k = panelKey(u); if (!u[own] && !pHas(s.panels[k], g)) put(k, g, F, u); }
+      // 老方案：速度 / 装备和角色库不一样的卡，自动改成本方案单独，不动它的数值
+      if (old && g !== "p") for (const u of L) { const k = panelKey(u); if (!u[own] && u.pk !== k && !same(u, s.panels[k], F)) u[own] = true; }
+    }
+    // ③ 所有卡跟角色库对齐（同一方案里有两张同一角色的卡时也一样）
     let pulled = false;
     for (const u of L) {
-      const k = panelKey(u), p = s.panels[k];
-      if (JSON.stringify(pick(u)) !== JSON.stringify(p)) { for (const f of PANELF) { if (p[f] !== undefined) u[f] = JSON.parse(JSON.stringify(p[f])); else delete u[f]; } pulled = true; }
+      const k = panelKey(u), p = s.panels[k]; let eq = false;
+      for (const [g, F, own] of PGRP) {
+        if (u[own] || !pHas(p, g) || same(u, p, F)) continue;
+        for (const f of F) { if (p[f] !== undefined) u[f] = JSON.parse(JSON.stringify(p[f])); else delete u[f]; }
+        pulled = true; if (g === "e") eq = true;
+      }
+      if (eq) applyEquip(u);
       u.pk = k;
     }
+    s.pv = 2;
     return pulled;
   }
   // 角色立绘（StarRailRes 的 character_preview，裁上半身压成小图）：套了模板、或名字对得上的角色才有
@@ -4890,7 +4936,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
           <input type="range" id="sr-${u.id}" min="70" max="250" step="0.1" value="${u.spd}" data-u="${i}" data-f="spd" aria-label="速度滑块">
         </div>
         ${u.kind === "ally" && !u.sm ? `<div class="sec-t">属性 <em>照游戏面板填</em></div><div class="row stat-row">${STATS.map(([k, l]) => `<label for="${k}p-${u.id}" title="面板${l}：照游戏里角色面板填；没填就按基础${l}">${l} <input type="number" id="${k}p-${u.id}" min="0" step="1" value="${u[k] ?? ""}" placeholder="${u[k + "B"] ?? ""}" data-u="${i}" data-f="${k}" style="width:76px"></label>`).join("")}<label for="hb-${u.id}" title="面板上的治疗量加成：行迹、遗器、常驻的光锥效果都算在里面，照游戏面板填">治疗加成 % <input type="number" id="hb-${u.id}" min="0" step="0.1" value="${u.hb ?? ""}" placeholder="0" data-u="${i}" data-f="hb" style="width:60px"></label></div>` : ""}
-        ${panelKey(u) ? `<div class="row"><label for="op-${u.id}" title="不勾：这些面板数值在所有方案里共用，改一处所有方案都跟着变；勾上：这张卡只在这个方案里用自己的面板（取消勾选会换回共用的面板）"><input type="checkbox" id="op-${u.id}" ${u.ownPanel ? "checked" : ""} data-u="${i}" data-f="ownPanel"> 本方案单独面板</label><span class="hint">${u.ownPanel ? "只在这个方案里用" : "生命 / 攻击 / 防御、治疗加成、暴击 / 爆伤 / 增伤 / 欢愉度、充能效率、手填倍率：所有方案共用"}</span></div>` : ""}
+        ${panelKey(u) ? `<div class="row"><span title="不勾：这些在所有方案里共用（也就是「角色」页里这个角色的配置），改一处所有方案都跟着变；勾上：这张卡只在这个方案里用自己的（取消勾选会换回角色页里的）">本方案单独：</span><label for="op-${u.id}"><input type="checkbox" id="op-${u.id}" ${u.ownPanel ? "checked" : ""} data-u="${i}" data-f="ownPanel"> 面板</label><label for="os-${u.id}"><input type="checkbox" id="os-${u.id}" ${u.ownSpd ? "checked" : ""} data-u="${i}" data-f="ownSpd"> 速度</label><label for="oe-${u.id}"><input type="checkbox" id="oe-${u.id}" ${u.ownEq ? "checked" : ""} data-u="${i}" data-f="ownEq"> 星魂 / 光锥 / 遗器</label><span class="hint">${u.ownPanel && u.ownSpd && u.ownEq ? "都只在这个方案里用" : "没勾的跟「角色」页共用"}</span></div>` : ""}
         ${u.kind === "ally" && !u.sm ? `<div class="row dmg-row">
           <span class="lab">伤害</span>
           <label for="cr-${u.id}" title="面板暴击率，没填按 5%">暴击 % <input type="number" id="cr-${u.id}" min="0" max="100" step="0.1" value="${u.cr ?? ""}" placeholder="5" data-u="${i}" data-f="cr" style="width:58px"></label>
@@ -5155,7 +5201,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       else if (f.startsWith("xrn.")) { u.xrn = u.xrn || {}; if (String(el.value).trim() === "") delete u.xrn[f.slice(4)]; else u.xrn[f.slice(4)] = Math.max(0, Math.round(num(el.value, 0))); }
       else if (f.startsWith("mult.")) { u.mult = u.mult || {}; const mk = f.slice(5); if (String(el.value).trim() === "") delete u.mult[mk]; else u.mult[mk] = num(el.value, 0) / 100; if (!Object.keys(u.mult).length) delete u.mult; }
       else u[f] = val;
-      if (f === "ownPanel") { if (!val) delete u.ownPanel; delete u.pk; structural = true; }   // 取消单独面板 = 换回共用的面板
+      if (f === "ownPanel" || f === "ownSpd" || f === "ownEq") { if (!val) delete u[f]; delete u.pk; structural = true; }   // 取消单独 = 换回「角色」页里的
       if (["basicE", "skillE", "ebasicE", "fuaE", "hp", "atk", "def", "hpB", "atkB", "defB", "hb", "cr", "cd", "dmg", "el", "capE", "maxE2", "ultCost", "skillSP"].includes(f) && String(el.value).trim() === "") delete u[f];   // 清空 = 用默认 / 基础值   // 清空 = 用“每回合回能”
       if (f === "wks") { u.wks = String(el.value || "").replace(/[^物火冰雷风量虚]/g, ""); if (!u.wks) delete u.wks; }
       if (f === "phs") { u.phs = String(el.value || "").replace(/[^0-9.,，\s\/]/g, "").trim(); if (!u.phs) delete u.phs; }   // 分阶段生命值
@@ -5547,6 +5593,85 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     renderEditor(); update();
   };
   $("add-ally").onclick = () => addUnit("ally");
+
+  // ---------- 「角色」页（2026-11-23）：每个角色一份配置（面板 + 速度 + 星魂 / 光锥 / 遗器），所有方案共用 ----------
+  const PG_KEY = STORE + "-pg";
+  let pgNow = (() => { try { return localStorage.getItem(PG_KEY) === "ros" ? "ros" : "axis"; } catch (e) { return "axis"; } })();
+  const setPg = k => {
+    pgNow = k === "ros" ? "ros" : "axis"; document.body.dataset.pg = pgNow;
+    document.querySelectorAll("#pgtabs [data-pg]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.pg === pgNow)));
+    try { localStorage.setItem(PG_KEY, pgNow); } catch (e) {}
+    if (pgNow === "ros") renderRoster(); else { paint.tl = paint.tab = true; paint(); }
+  };
+  const rosTpl = k => DB.chars.find(c => "t" + c.id === k);
+  const rosBase = (T, lcId, f) => { const lc = DB.lcs.find(x => x.id === lcId); return Math.floor(num(T[f]) + (lc && lc[f] != null ? lc[f] : 0) + 1e-9); };
+  function renderRoster() {
+    const box = $("roster"); if (!box || pgNow !== "ros") return;
+    if (!S.panels || typeof S.panels !== "object") S.panels = {};
+    const inTeam = k => S.units.filter(u => panelKey(u) === k);
+    const keys = Object.keys(S.panels).filter(k => rosTpl(k));
+    keys.sort((a, b) => (inTeam(b).length ? 1 : 0) - (inTeam(a).length ? 1 : 0) || rosTpl(a).name.localeCompare(rosTpl(b).name, "zh"));
+    const free = DB.chars.filter(c => !S.panels["t" + c.id]).sort((a, b) => a.path.localeCompare(b.path, "zh") || a.name.localeCompare(b.name, "zh"));
+    const nf = (k, f, v, ph, lab, step) => `<label>${lab}<input type="number" step="${step || "any"}" data-rs="${esc(k)}" data-rf="${f}" value="${v ?? ""}" placeholder="${ph ?? ""}" aria-label="${lab}"></label>`;
+    let h = `<div class="ros-head"><h2 style="margin:0"><b>角色</b>Characters</h2>
+      <label for="ros-add">添加角色 <select id="ros-add"><option value="">（选一个）</option>${free.map(c => `<option value="${c.id}">${esc(c.path)} · ${esc(c.name)}</option>`).join("")}</select></label></div>
+      <p class="hint">每个角色存一份：面板（生命 / 攻击 / 防御 / 治疗加成 / 暴击 / 爆伤 / 增伤 / 欢愉度 / 充能效率）、速度、星魂、光锥、遗器，所有方案共用。在这里改，或者在行动轴页的角色卡上改，两边是同一份；方案里套用这个角色的模板就会带上这里的配置。某个方案想用别的速度 / 装备，在那张卡上勾“本方案单独”。面板留空 = 按基础值（角色 80 级 + 光锥）。</p>`;
+    if (!keys.length) h += `<p class="hint">还没有角色。上面选一个添加，或者在行动轴页给角色卡套用模板。</p>`;
+    h += `<div class="ros-grid">`;
+    for (const k of keys) {
+      const T = rosTpl(k), p = S.panels[k], tm = inTeam(k), img = IMG.ch && IMG.ch[T.id];
+      const own = tm.filter(u => u.ownPanel || u.ownSpd || u.ownEq).length;
+      h += `<div class="ros-card${tm.length ? " inteam" : ""}">
+        <div class="ros-top">${img ? `<img class="rimg" src="${img}" alt="">` : ""}<div style="min-width:0;flex:1"><div class="rn">${esc(T.name)}</div><div class="hint">${esc(T.path)} · 基础速度 ${T.spd}${tm.length ? `　<b style="color:var(--accent)">在当前方案里</b>${own ? `（${own} 张卡有“本方案单独”）` : ""}` : ""}</div></div>
+          ${tm.length ? "" : `<button type="button" data-ract="join" data-rk="${esc(k)}">加入当前方案</button>`}</div>
+        <div class="row">${nf(k, "spd", p.spd, T.spd, "速度 ", "0.1")}<label>星魂 <select data-rs="${esc(k)}" data-rf="eid">${[0, 1, 2, 3, 4, 5, 6].map(n => `<option value="${n}"${num(p.eid) === n ? " selected" : ""}>${n}</option>`).join("")}</select></label>${T.exe ? `<label title="奇缘星魂「${esc(T.exe.n)}」"><input type="checkbox" data-rs="${esc(k)}" data-rf="ex"${p.ex ? " checked" : ""}> 奇缘星魂</label>` : ""}</div>
+        <div class="row"><div class="pickwrap">光锥 ${pickBtn("lc", -1, p.lc)}<select hidden data-rs="${esc(k)}" data-rf="lc" aria-label="光锥">${lcOptions(p.lc)}</select></div><label>叠影 <select data-rs="${esc(k)}" data-rf="lcR">${[1, 2, 3, 4, 5].map(n => `<option value="${n}"${num(p.lcR, 1) === n ? " selected" : ""}>${n}</option>`).join("")}</select></label></div>
+        <div class="row"><div class="pickwrap">遗器 ${pickBtn("rA", -1, p.rA)}<select hidden data-rs="${esc(k)}" data-rf="rA" aria-label="遗器套装">${relicOptions(p.rA, false)}</select></div><label><input type="checkbox" data-rs="${esc(k)}" data-rf="r4"${p.r4 ? " checked" : ""}>4件套</label>
+          ${p.r4 ? "" : `<div class="pickwrap">+2件 ${pickBtn("rB", -1, p.rB)}<select hidden data-rs="${esc(k)}" data-rf="rB" aria-label="另一套2件">${relicOptions(p.rB, false)}</select></div>`}
+          <div class="pickwrap">位面 ${pickBtn("rP", -1, p.rP)}<select hidden data-rs="${esc(k)}" data-rf="rP" aria-label="位面饰品">${relicOptions(p.rP, true)}</select></div></div>
+        <div class="ros-stats">${nf(k, "hp", p.hp, T.hp != null ? rosBase(T, p.lc, "hp") : "", "生命")}${nf(k, "atk", p.atk, T.atk != null ? rosBase(T, p.lc, "atk") : "", "攻击")}${nf(k, "def", p.def, T.def != null ? rosBase(T, p.lc, "def") : "", "防御")}
+          ${nf(k, "cr", p.cr, 5, "暴击率 %")}${nf(k, "cd", p.cd, 50, "暴击伤害 %")}${nf(k, "dmg", p.dmg, 0, "增伤 %")}
+          ${nf(k, "er", p.er, 100, "充能效率 %")}${nf(k, "hb", p.hb, 0, "治疗加成 %")}${T.path === "欢愉" ? nf(k, "el", p.el, 0, "欢愉度 %") : ""}</div>
+        <div class="row" style="justify-content:flex-end"><button type="button" class="ghost" data-ract="del" data-rk="${esc(k)}">从角色页删除</button></div>
+      </div>`;
+    }
+    $("roster").innerHTML = h + `</div>`;
+  }
+  // 改角色页 = 改角色库；跟着角色库的卡（没勾“本方案单独”的那一组）马上换成新的
+  const rosTouch = k => { for (const u of S.units) if (panelKey(u) === k) delete u.pk; };
+  $("roster").addEventListener("change", e => {
+    const t = e.target;
+    if (t.id === "ros-add") {
+      const id = +t.value; if (!id) return; const T = DB.chars.find(c => c.id === id); if (!T) return;
+      S.panels = Object.assign({}, S.panels, { ["t" + id]: { spd: T.spd, g: { s: 1, e: 1 } } });
+      renderEditor(); update(); renderRoster(); return;
+    }
+    if (t.dataset.rs === undefined) return;
+    const k = t.dataset.rs, f = t.dataset.rf, p = Object.assign({}, S.panels[k] || {});
+    const v = t.type === "checkbox" ? t.checked : t.value === "" ? null : num(t.value);
+    if (v === null || v === PDEF[f]) delete p[f]; else p[f] = v;
+    if (f === "r4" && v) delete p.rB;
+    const g = SPDF.includes(f) ? "s" : EQF.includes(f) ? "e" : "p";
+    if (g !== "p") p.g = Object.assign({}, p.g || {}, { [g]: 1 });
+    if (g === "s" && p.spd == null) { const T = rosTpl(k); if (T) p.spd = T.spd; }
+    S.panels = Object.assign({}, S.panels, { [k]: p });
+    rosTouch(k); renderEditor(); update(); renderRoster();
+  });
+  $("roster").addEventListener("click", e => {
+    const b = e.target.closest("[data-ract]"); if (!b) return;
+    const k = b.dataset.rk, T = rosTpl(k); if (!T) return;
+    if (b.dataset.ract === "join") {
+      addUnit("ally"); const u = S.units[S.units.length - 1]; applyDb(u, T.id); delete u.pk;
+      renderEditor(); update(); renderRoster(); return;
+    }
+    if (b.dataset.ract === "del") {
+      if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "再点一次确认删除（当前方案里的卡会保留现在的数值）"; return; }
+      const P = Object.assign({}, S.panels); delete P[k]; S.panels = P;
+      for (const u of S.units) if (panelKey(u) === k) delete u.pk;   // 卡片保留现在的数值，下次同步时用卡上的重新建
+      update(); renderRoster();
+    }
+  });
+  $("pgtabs").addEventListener("click", e => { const b = e.target.closest("[data-pg]"); if (b) { setPg(b.dataset.pg); window.scrollTo(0, 0); } });
   // 按关卡放敌人
   const stgSel = () => { const g = STG[+$("stg-g").value] || STG[0], f = g && g.f[+$("stg-f").value] || (g && g.f[0]), hf = f && f.h[+$("stg-h").value] || []; return { g, f, hf, w: hf[+$("stg-w").value] || hf[0] || [] }; };
   const stgFill = lvl => {
@@ -6664,6 +6789,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     renderUltTargets(R);
     renderSkTargets(R);
     renderTurnActs(R); renderKActs(R); renderEActs(R);
+    if (pgNow === "ros" && !$("roster").contains(document.activeElement)) renderRoster();   // 「角色」页（撤销、云端同步后跟着刷新；正在里面输入时不打断）
   }
 
   // 角色卡上的“每次行动”：显示范围内这个角色的每次行动（正常回合、额外回合）各一个下拉，直接选 战技 / 普攻 / 强普
@@ -8114,7 +8240,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   });
   syncInfoRows(S);   // 说明行每次载入都补（不升版本号）
   if (!(S.tv >= 153)) { migrateTpl(S); lastSaved = JSON.stringify(S); }
-  { const before = JSON.stringify(S); panelSync(S); if (before === lastSaved) lastSaved = JSON.stringify(S); }   // 第一次打开新版：用现在的配置建共享面板，不算一次修改
+  { const before = JSON.stringify(S); panelSync(S); if (before === lastSaved) lastSaved = JSON.stringify(S); }
+  setPg(pgNow);   // 第一次打开新版：用现在的配置建共享面板，不算一次修改
   renderEditor();
   update();
 
