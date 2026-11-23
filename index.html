@@ -1058,6 +1058,8 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
             <li><b>状态切换</b>：“之后的行动方式”效果让角色进入状态后自动改用强普 / 寒川映月这类行动（Saber 开大后、镜流转魄、刃地狱变、乱破结印、阿格莱雅至高之姿），单独指定过的优先。</li>
             <li><b>攻击判定</b>：“队友攻击后”只算攻击：普攻和强普都算，战技、开大看卡片上的勾选，欢愉技看“有没有伤害”，追加攻击也算。</li>
             <li><b>追加攻击</b>：“追加攻击”效果让目标立即追击一次（行动轴上标“追击”，点它可以安排在这次追击后开大）：算攻击，但不算行动、不占回合、不耗战技点；触发自己的“施放追加攻击时”和队友的“队友追加攻击后”；召唤物卡上勾“行动算追加攻击”的（账账、神君），每次行动都算追击。</li>
+            <li><b>同一行动值的结算顺序</b>（页面就是按这个算的）：① <b>进战</b>：开局效果分三轮（先结算排在最前的效果，再其他开局效果，最后“进战自动施放战技”的秘技）→ 敌人进入战斗 → 开怪秘技伤害 → 满能量的自动开大。② <b>真正的追加攻击</b>在触发它的那次攻击里立即结算，排在下面所有事之前（“视为追加攻击”的按原来的位置）。③ <b>一个正常回合</b>：增益到期 → “每回合开始时 −1”的状态 → 统一结算（小伊卡）→ 安排在“××回合中”的大招 → 这些大招带来的额外回合 / 额外阿哈时刻（在这个角色行动之前处理完）→ 回合开始效果 → 行动（施放时效果、回能、攻击）→ 回合结束的状态 → 安排在“××第 N 次行动后”的大招 → 满能量自动开大和连开排队的大招。④ <b>排队的额外回合</b>，每次处理一项：银狼被打断后的再次施放 → 银狼额外强普 → 角色额外回合（按获得的先后）→ 额外阿哈时刻；每项结束后同样先看“之后”安排的大招，再看自动开大。⑤ 都处理完才选下一个跑满行动条的单位；<b>手动事件、敌人重新登场</b>在同一行动值时排在单位行动之前；几个单位同时被拉到 0，按拉条前的先后行动。同一处安排了几个大招时，按“开大时机”下方拖出来的顺序。</li>
+            <li><b>回能记录和溢出</b>：行动顺序表头的“回能记录”打开后，每次能量变化都列一行（来源、变化后 / 上限），被能量上限截掉的部分标“溢出”，表尾汇总每人一共被截掉多少。拉条把行动条拉满后多出的部分不会留到下一次行动，行动轴上这个拉条标记右上角有红点，鼠标放上去看溢出多少。轮次标题点一下可以收起 / 展开那一轮。</li>
             <li><b>召唤物和计数</b>：召唤物 / 忆灵 / 倒计时是单独的卡（卡片“计数器 · 召唤物”里勾选），可以设成本体速度的百分比、行动几次后离场、在场时本体暂停，靠“召唤 / 登场”效果上场，登场 / 离场时分别触发本体的“召唤物登场时 / 召唤物离场时”。“计数”效果往卡片上的计数器里加点，满了触发“计数满时”（比如三月七充能 7、镜流朔望 2）。“额外回合”效果任何角色都能用。</li>
             <li><b>触发条件</b>：“每回合效果”在该单位行动开始时生效；“施放普攻时 / 施放战技时”跟着每次行动的动作走。“队友施放战技后 / 队友开大后 / 阿哈时刻结束时 / 敌方回合开始时”也能当触发条件。“队友行动后”在其他队友每次行动完（正常回合和额外回合，可选开大也算）时生效，可以限制每回合最多几次（按效果持有者自己的回合清零）。</li>
             <li><b>治疗和状态</b>：治疗效果选按谁的什么属性算（治疗者的生命上限 / 攻击力 / 防御力，或被治疗者自己的生命上限）再加固定值；持续治疗填回合数（目标每回合开始时回复）。数值用卡片上的面板属性和“治疗加成”算，召唤物 / 忆灵治疗时用主人的属性；行动顺序里能看到每次治疗了多少。“状态”效果给目标挂一个有名字的状态（禳命、结界……），别的效果点“条件”填这个名字，就只在拥有它时生效（可以看自己、事件对象或任意敌人身上）；名字前加 ! 则是没有它时才生效。“生命上限”效果给目标加生命上限（按基础生命 %、施放者生命上限 % 等），治疗按当前生命上限算；增益键写“st:状态名”的跟着那个状态结束。“治疗加成”效果分三种：治疗量提高（加在治疗者身上，召唤物 / 忆灵按主人算）、受到的治疗量提高（加在被治疗的人身上）、只算这次施放（比如物穰：只加到自己“施放战技时 / 开大时”的治疗）；治疗量 = 基础 ×（1 + 卡片上的治疗加成 + 这些加成）。卡片上的治疗加成照面板填，面板里已经有的（行迹转换、位面饰品这类）不要再开对应的效果。触发“为队友提供治疗后”：治疗了自己和自己的忆灵以外的目标时生效（女武神 4 件）。<b>当前生命值</b>：模拟里每个角色和忆灵开局满血（忆灵登场时满血），按面板生命上限算；“消耗生命值”效果（遐蝶战技、长夜月、死龙的焰息、风堇的光锥）按当前生命值 / 生命上限的百分比扣，最多降到 1 点，治疗加回来（不超过上限）。（刃、万敌、流萤、镜流、阿兰、千冶•刃、翡翠的收债人也在内）每扣一次都触发“我方目标生命值降低时”（风堇 2 魂加速、刃和万敌的充能、长夜月加忆质、小伊卡记下这个目标：到任意目标回合开始时或行动后统一为记下的目标各回复一次），并带上损失量：遐蝶的【新蕊】就是按它算的（满 34000 自动开大，死龙在场时改成转给死龙）；“我方目标受到治疗后”带治疗数值（遐蝶收容的暗潮）。敌人的攻击没有伤害数值，只触发效果、不扣生命值。生命上限变化时当前生命值默认按比例变，顶部可以改成不变。</li>
@@ -1115,7 +1117,8 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
         <details id="changelog">
           <summary>更新日志</summary>
           <ul class="hint" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-<li><b>2026-11-23（差异清单第 29 批）：tv 153（tools/fix153.py）</b>。依据官方原文（Mar-7th character_skills / character_ranks）。① <b>刻律德菈 E4</b>（141204）“终结技的伤害倍率提高 240%”：以前按“伤害 ×2”写，只在终结技 10 级时对；5 魂起 12 级是 259.2% + 240% = 499.2%（以前算成 518.4%）。新加伤害增益属性“技能倍率另加”（mlt），E4 改用它。② <b>刻律德菈 E2 / E6</b>（141202 / 141206）“场上存在持有【军功】的队友时”伤害 +160% / 抗性穿透 +20%：以前开局一直有，改成出手时场上有【军功】队友才算（ec.tst 新加选项 tso = 不算自己）。③ <b>大黑塔普通战技【格局打开】</b>（140102）“对指定敌方单体造成 70%……对本次战技命中过的目标及其相邻目标造成 70%，该效果可重复 2 次”：主目标 70% → 210%、相邻 70% → 140%（3 / 2 段；第 4、5 个敌人的 1 段没算）。④ <b>星期日【蒙福者】</b>（131303）：暴伤和 E2 增伤改成给目标和它的忆灵（“目标及其召唤物”）；3 魂固定部分 12% → 12.8%；星期日倒下时解除。<b>对已有配置</b>：只影响伤害显示，行动顺序不变；老存档的星期日终结技暴伤那条按新说明换掉（开关保留），刻律德菈 / 星期日的星魂效果重建。</li>
+<li><b>2026-11-23（借鉴绯绯狐工具箱的三处显示，没改 tv）</b>。① 使用说明新加「同一行动值的结算顺序」：进战、追加攻击、一个正常回合、排队的额外回合、手动事件和同时拉到 0 的先后，按页面引擎实际的顺序写（没有改顺序）。② 行动顺序表头新加「回能记录」（默认隐藏，本机记住）：每次能量变化一行，写来源、变化后 / 上限，被能量上限截掉的部分标“溢出”，表尾汇总每人被截掉多少；拉条把行动条拉满后多出的部分（不累积到下一次行动）也列在这里，行动轴上这个拉条标记右上角加红点，提示里写溢出多少。③ 行动顺序按轮分组：轮次标题写本轮行动次数，点一下收起 / 展开（本机记住）；显示范围内没有行动的轮也画标题；表尾写“显示到 AV ×｜共 × 次行动、× 条记录”，治疗记录隐藏时写隐藏了几条。对已有配置：模拟只多记了几个显示用的字段，行动顺序、能量、战技点、开大次数完全不变。</li>
+            <li><b>2026-11-23（差异清单第 29 批）：tv 153（tools/fix153.py）</b>。依据官方原文（Mar-7th character_skills / character_ranks）。① <b>刻律德菈 E4</b>（141204）“终结技的伤害倍率提高 240%”：以前按“伤害 ×2”写，只在终结技 10 级时对；5 魂起 12 级是 259.2% + 240% = 499.2%（以前算成 518.4%）。新加伤害增益属性“技能倍率另加”（mlt），E4 改用它。② <b>刻律德菈 E2 / E6</b>（141202 / 141206）“场上存在持有【军功】的队友时”伤害 +160% / 抗性穿透 +20%：以前开局一直有，改成出手时场上有【军功】队友才算（ec.tst 新加选项 tso = 不算自己）。③ <b>大黑塔普通战技【格局打开】</b>（140102）“对指定敌方单体造成 70%……对本次战技命中过的目标及其相邻目标造成 70%，该效果可重复 2 次”：主目标 70% → 210%、相邻 70% → 140%（3 / 2 段；第 4、5 个敌人的 1 段没算）。④ <b>星期日【蒙福者】</b>（131303）：暴伤和 E2 增伤改成给目标和它的忆灵（“目标及其召唤物”）；3 魂固定部分 12% → 12.8%；星期日倒下时解除。<b>对已有配置</b>：只影响伤害显示，行动顺序不变；老存档的星期日终结技暴伤那条按新说明换掉（开关保留），刻律德菈 / 星期日的星魂效果重建。</li>
 <li><b>2026-11-22 晚（敌人第 4 批，没改 tv；tools/enemy4.py）</b>。依据官方数据（DimbreathBot TurnBasedGameData 的 MonsterConfig / MonsterTemplateConfig / MonsterSkillConfig / StageConfig + TextMapCHS）。① <b>新加敌人：可可利亚，虚妄之母（历战余响）</b>（MonsterID 1005012，历战余响关卡 1052020～1052026 用）：比主线版本多一个天赋【灭世者的决意】（“对指定我方单体施放【裂魂寒流】大概率使该目标陷入冻结状态”，冻结我方没做），裂魂寒流倍率 650%（主线 950%），速度 120 / 弱点火雷量 / 韧性 540 和主线相同。② <b>敌人技能改我方战技点</b>：锁元（丰饶玄莲）“使我方战技点减少1个”、大破大立（被操弄的逻各斯）“并使我方战技点减少1个”：施放时我方战技点 −1（日志写变化）；归元（丰饶玄莲）“受到致命攻击后使我方战技点恢复3个”：开了“我方伤害扣敌人生命值”、它被消灭时我方战技点 +3。“减少我方战技点”没写个数的（坏猴来了记大过、狼的讥讽、极乐螺旋）没做。③ <b>以牙还牙</b>（杰帕德（末日幻影）/（完整）/（幻象））“进入反击状态，持续1回合。在该状态下受到我方目标攻击后，立即对该目标施放【霜之惩击】”：施放后进入反击状态（行动轴标“反击状态”），到它下一个回合开始时结束；状态中我方角色每次攻击打到它，它立即对攻击者施放霜之惩击（被打的角色回 15 能量、触发“受到攻击时”，开了敌人伤害时按 360% / 350% 倍率扣血；（完整）原文“最多触发1次”）。页面的取舍（原文没写，等用户确认）：反击引起的我方攻击（克拉拉被反击后的反击）不再被反击；攻击者是召唤物 / 忆灵时不反击，只写日志。对已有配置：没放这几个敌人的行动顺序完全不变；放了杰帕德（末日幻影）的，被反击的角色多回能量，开大可能提前。</li>
 <li><b>2026-11-21 晚（敌人第 3 批，没改 tv；tools/enemy3.py）</b>。依据官方数据（DimbreathBot TurnBasedGameData 的 MonsterConfig / MonsterTemplateConfig / MonsterSkillConfig / StageConfig / Challenge*Config + TextMapCHS）。① <b>新加 6 个敌人</b>：速度 0、自己不行动的本体 <b>昔在、今在、永在的剧目</b>（3004010，混沌回忆用）、<b>昔在、今在、永在的剧目（完整）</b>（3004011）、<b>末日兽</b>（8015010，弱点物火冰风）、<b>毁灭的容器，卡厄斯兰那</b>（4034020）、<b>朱明三不</b>（300401002）：选这些模板的敌人卡<b>不上行动轴</b>（卡片上写“速度 0：本体自己不行动”），可以当伤害目标；靠别的东西行动的部分没做（剧目的【宣诫】在官方数据里不是单独的怪物、速度查不到；末日兽“部位没全部击溃时无法攻击”没做）。<b>天谴先锋（虚构叙事）</b>（401301201）：虚构叙事「取象为文」「虚事成理」里的版本没有【快从坟墓中苏生】（召唤），出招是 横扫 → 横扫 → 蓄力 → 在滔滔血海中沉溺 循环；按关卡放敌人时这两期的天谴先锋改用它。② <b>罪血眈视</b>（金血忆灵•裁定忘却之形、弗兰肯Official、迷惘之渊的裁定者）原文“施放该技能后再行动1次”：放完马上再行动一次（行动轴标“连续行动”，接着出下一招）；“使自身的速度提高”没写数值，没做。③ <b>起床铃声</b>（惊梦剧团的发条暴徒、钟表老子）“使除自身外的敌方全体立即行动”、<b>鼓劲</b>（银鬃尉官（错误））“使敌方除【银鬃尉官（错误）】外的目标……立即行动”、<b>棋快一着</b>（浮烟，4 种）“使敌方全体立即行动”：施放后其他在场敌人行动提前 100%（日志写谁立即行动）；浮烟自己算不算“全体”原文没写清，先不算，等用户确认；攻击力 / 伤害 / 速度提高没写数值，没做。④ <b>弱点 / 韧性按关卡实际用的配置</b>：有 16 个敌人模板的弱点或韧性取自没有任何关卡用到的配置，改成关卡里用的：天谴先锋 冰雷风→冰雷量、丰饶灵兽•长右 火冰虚→火冰风、自动机兵•甲虫 物雷风→雷风虚、无想面具 火雷风→火量、毁灭扑满 物火冰虚→冰风量、银枝 火冰量→物火冰（关卡里还有物冰量、物冰风两种）、忆域迷因「狂怒褪去之壳」补弱点雷量虚、奇想林中的蕉研组 补弱点火冰雷虚、韧性 360→0（官方模板没有韧性）、蕉研组的谐乐蕉师 火冰雷虚→火冰虚 / 900→420、幼蛰虫 180→90、乐变化天人•终 420→240、杰帕德（幻象）450→540、蕉研组的助蕉 450→180、筑梦蕉师 270→180、财富蕉师 360→180；<b>蚀蛰虫</b>整条换成关卡用的 8022030（速度 118、韧性 90、弱点物冰、角击倍率 3.2，只有天赋蚀亡语；原来是没有关卡用到的 8022031）。“按关卡放敌人”的每个敌人也和关卡实际配置比，不一样的记在波次里（当期有 24 个：虚卒•掠夺者 物雷、银鬃近卫 风量；合金机铠•帕姆王 虚构叙事里韧性 600），“换上这一波敌人”时写到敌人卡上（弱点后面标“按关卡”，韧性填进卡片的“韧性”）。<b>对已有配置的影响</b>：没放这些敌人的配置完全不变；已放上的敌人卡速度不变（存在卡片上），用到上面改了弱点 / 韧性的模板、并开着击破模拟时，破韧时机和伤害会按新数据算；以前放上的关卡敌人卡没有“按关卡”弱点，重新“换上这一波敌人”才有。</li>
 <li><b>2026-11-22（差异清单第 28 批）：tv 152（tools/fix152.py）</b>。依据官方原文（Mar-7th character_skills / character_skill_trees / character_ranks）和 DimbreathBot AvatarSkillConfig。① <b>赛飞儿终结技</b>（140603）“对指定敌方单体造成 120% 攻击力……之后……对指定敌方单体及其相邻目标造成 40% 攻击力的量子属性伤害”：主目标倍率改成 120% + 40% = 160%（以前只算 120%），相邻 40% 不变；天赋记录值的真实伤害仍没做。② <b>赛飞儿天赋追加攻击削韧</b>：官方 140604 削韧 [60, 0, 0]（游戏里 20 点），以前削韧表没有这一项（追加攻击不削韧），补上。③ <b>波提欧行迹幽灵装填</b>（1315101）“暴击率 / 暴击伤害提高，数值等同于击破特攻的 10% / 50%，最多 30% / 150%”：以前按满额写，改成按卡片击破特攻算；仍默认关（游戏面板里如果已经算进去就别开）。④ <b>翡翠 E6</b>（131406）“场上有【收债人】状态的角色时，翡翠量子属性抗性穿透提高 20%”：以前开局一直有，新加伤害增益条件“场上有某状态的我方目标时”（ec.tst），出手时判断。⑤ <b>缇宝 E4</b>（140304）“【神启】持续期间，我方全体无视目标 18% 防御力”：以前只挂在战技上，补上秘技进战获得【神启】时的一条（默认关，和秘技那条一起开）。<b>对已有配置</b>：①③④⑤只影响伤害显示；② 放了有量子弱点的敌人卡时，赛飞儿的追加攻击会削韧，击破可能提前，行动顺序会变；没放敌人卡的行动顺序不变。老存档的波提欧两条按新说明换掉（开关保留），翡翠 / 缇宝的星魂效果重建。</li>
@@ -1422,7 +1425,7 @@ button.tn:hover i{ transform:scale(1.06); box-shadow:0 0 0 4px rgba(8,13,26,.9),
           <p class="hint">“下一档”= 仅靠自身速度（不计拉条与加速），在显示范围内多行动一次所需的最低速度。</p>
         </section>
         <section class="section">
-          <div class="section-head"><h2><b>行动顺序</b>Order</h2><div class="row"><button type="button" id="heal-log" class="ghost" aria-pressed="true" title="行动顺序里每次治疗的数值">治疗记录：显示</button><button type="button" id="ord-cols" class="ghost ocols" aria-pressed="false">显示全部列</button></div></div>
+          <div class="section-head"><h2><b>行动顺序</b>Order</h2><div class="row"><button type="button" id="heal-log" class="ghost" aria-pressed="true" title="行动顺序里每次治疗的数值">治疗记录：显示</button><button type="button" id="e-log" class="ghost" aria-pressed="false" title="行动顺序里每次能量变化：来源、变化前后、被能量上限截掉的部分；拉条溢出也列在这里">回能记录：隐藏</button><button type="button" id="ord-cols" class="ghost ocols" aria-pressed="false">显示全部列</button></div></div>
           <div class="tbl-wrap"><table id="t-order"></table></div>
         </section>
       </div>
@@ -2977,7 +2980,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         if (eff.type === "advance" && tg.sm && tg.sm.fua && tg === curActor) continue;   // 召唤物在自己行动中不会被拉条（账账）   // 不在场的召唤物：登场时会重新跑条
         if (eff.type === "advance" && src && tg !== src && tg.kind === "ally" && [src, ownerOf(src)].some(z => z && z.kind === "ally" && hasSt(z, "特邀嘉宾"))) {   // 【特邀嘉宾】的持有者及其召唤物无法使其他友方目标行动提前
           addLog(`${src.name} 持有【特邀嘉宾】，无法使 ${tg.name} 行动提前`, false, srcColor, src.id); continue; }
-        if (eff.type === "advance") { pull(tg, v * 100); marks.push({ t, uid: tg.id, label: "+" + v + "%", color: srcColor, from: src ? src.name : "事件" }); }
+        if (eff.type === "advance") { const ov = pull(tg, v * 100); marks.push({ t, uid: tg.id, label: "+" + v + "%", color: srcColor, from: src ? src.name : "事件", pov: ov >= 10 ? ov / 100 : undefined, sq: seq - 0.5, self: tg === curActor || undefined }); }   // pov：溢出的拉条 %（行动轴角标、回能记录）
         else if (eff.type === "delay") { if (num(eff.turnCap) > 0) { tg.dlC = tg.dlC || {}; const k0 = String(eff.bk || eff.id), c0 = tg.dlC[k0] || 0; if (c0 >= num(eff.turnCap)) continue; tg.dlC[k0] = c0 + 1; }   // 每个目标每回合最多 N 次（瓦尔特【失重】受击推条 8 次）
           if (v < 0) pull(tg, -v * 100); else tg.dist += v * 100;   // 负数推条 = 拉条，不会把距离推成负数
           marks.push({ t, uid: tg.id, label: "−" + v + "%", color: srcColor, from: src ? src.name : "事件" }); }
@@ -3226,7 +3229,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const evs = [...S.events].filter(e => byId[e.target] || ["allies", "enemies"].includes(e.target)).sort((a, b) => num(a.av) - num(b.av));
     let ei = 0, guard = 0, seq = 0, zc = 0, lastT = -1, zeroRun = 0;
     // 拉条：被拉到 0 距离且还没进回合的角色，后被拉到 0 的排在前面（正常跑条里会超车先到 0 的角色；额外回合是直接排队，不受影响）
-    const pull = (u, d) => { const was = u.dist; u.dist = Math.max(0, was - d); if (was > 0 && u.dist === 0 && u.zpre == null) { u.zpre = t + was / Math.max(1e-9, spdOf(u)); u.zseq = ++zc; } };   // 拉条前本该行动的时刻（同时被拉到 0 的按它排先后）
+    const pull = (u, d) => { const was = u.dist; u.dist = Math.max(0, was - d); if (was > 0 && u.dist === 0 && u.zpre == null) { u.zpre = t + was / Math.max(1e-9, spdOf(u)); u.zseq = ++zc; } return Math.max(0, d - was); };   // 返回拉满后多出的距离（溢出，只给显示用）   // 拉条前本该行动的时刻（同时被拉到 0 的按它排先后）
     const move = dt => { for (const u of U) if (!u.gone && !u.paused && !(u.sm && u.sm.noTurn)) u.dist = Math.max(0, u.dist - spdOf(u) * dt); };
 
     // 银狼隐藏分
@@ -3560,9 +3563,9 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     function addEnergy(u, amt, useER) {
       if (!hasEnergy(u)) return;
       const c = eCfg(u);
-      const before = u.e;
-      u.e = Math.max(0, Math.min(c.capE, u.e + amt * (useER ? erOf(u) / 100 : 1)));
-      eH[u.id].push({ t, v: u.e, d: u.e - before, why: curWhy });
+      const before = u.e, g = amt * (useER ? erOf(u) / 100 : 1);
+      u.e = Math.max(0, Math.min(c.capE, u.e + g));
+      eH[u.id].push({ t, v: u.e, d: u.e - before, why: curWhy, w: g, sq: seq - 0.5 });   // w = 这次应得的量（比 d 多的部分被上限截掉）；sq = 排在行动顺序哪条之前（只给显示用）
       curWhy = "";
       if (!noStdE(u) && before < c.maxE - 1e-9 && u.e >= c.maxE - 1e-9 && eMaxDepth < 2) { eMaxDepth++; try { teamFire("eMax", u); } finally { eMaxDepth--; } }   // 我方角色能量达到上限时（驭空 E2；追忆 / 新蕊这类不算）
       if (u.cntSrc === "energy" && u.e - before > 0) addCnt(u, u.e - before);   // 计数来源：获得的能量（绯英）
@@ -3578,7 +3581,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     };
     const castOther = (u, why) => {
       actSeq++; atkCtx = { u, k: "u" };
-      { const b0 = u.e; u.e = Math.max(0, u.e - eCfg(u).ultCost); u.ueb = b0; u.uec = b0 - u.e; eH[u.id].push({ t, v: u.e, d: u.e - b0, why: "开大消耗" }); }
+      { const b0 = u.e; u.e = Math.max(0, u.e - eCfg(u).ultCost); u.ueb = b0; u.uec = b0 - u.e; eH[u.id].push({ t, v: u.e, d: u.e - b0, why: "开大消耗", sq: seq - 0.5 }); }
       curWhy = "开大后返还"; addEnergy(u, num(u.ultRefund, 5), true);   // 开大扣 maxE，溢出部分保留；返还默认 5（愿力没有）
       u.ultN = (u.ultN || 0) + 1;
       for (const e of u.effects) if (e.nthU) delete firedMap[u.id + ":nth:" + e.id];   // 施放终结技时重置“每第 N 次”的计数（忍法帖的雷遁）
@@ -5772,6 +5775,22 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
   const healLogUi = () => { $("heal-log").setAttribute("aria-pressed", String(healLogOn)); $("heal-log").textContent = healLogOn ? "治疗记录：显示" : "治疗记录：隐藏"; };
   healLogUi();
   $("heal-log").addEventListener("click", () => { healLogOn = !healLogOn; try { localStorage.setItem(HLOG_KEY, healLogOn ? "1" : "0"); } catch (e) {} healLogUi(); update(); });
+  // 回能记录（默认隐藏，本机记住）
+  const ELOG_KEY = STORE + "-elog";
+  let eLogOn = (() => { try { return localStorage.getItem(ELOG_KEY) === "1"; } catch (e) { return false; } })();
+  const eLogUi = () => { $("e-log").setAttribute("aria-pressed", String(eLogOn)); $("e-log").textContent = eLogOn ? "回能记录：显示" : "回能记录：隐藏"; };
+  eLogUi();
+  $("e-log").addEventListener("click", () => { eLogOn = !eLogOn; try { localStorage.setItem(ELOG_KEY, eLogOn ? "1" : "0"); } catch (e) {} eLogUi(); update(); });
+  // 行动顺序按轮收起（本机显示偏好，存收起的轮次）
+  const OCYC_KEY = STORE + "-ocyc";
+  let ocycFold = (() => { try { return new Set(JSON.parse(localStorage.getItem(OCYC_KEY) || "[]")); } catch (e) { return new Set(); } })();
+  $("t-order").addEventListener("click", e => {
+    const tr = e.target.closest("tr[data-cyc]"); if (!tr) return;
+    const c = Number(tr.dataset.cyc); if (ocycFold.has(c)) ocycFold.delete(c); else ocycFold.add(c);
+    try { localStorage.setItem(OCYC_KEY, JSON.stringify([...ocycFold])); } catch (err) {}
+    update();
+  });
+  $("t-order").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest("tr[data-cyc]")) { e.preventDefault(); e.target.closest("tr[data-cyc]").click(); } });
   $("ord-cols").addEventListener("click", () => {
     const on = !$("t-order").classList.contains("allcols");
     $("t-order").classList.toggle("allcols", on); $("ord-cols").setAttribute("aria-pressed", String(on)); $("ord-cols").textContent = on ? "精简列" : "显示全部列";
@@ -7585,8 +7604,8 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     for (const m of marks) {
       if (idx[m.uid] === undefined) continue;
       const prev = MK[MK.length - 1] && MK.filter(p => p.uid === m.uid && !p.key && !m.key && Math.abs(p.t - m.t) < 1e-6).pop();
-      const tip = `${m.from ? esc(m.from) + " → " : ""}${m.label}`;
-      if (prev) { prev.label += " " + m.label; prev.tips.push(tip); continue; }
+      const tip = `${m.from ? esc(m.from) + " → " : ""}${m.label}${m.pov ? `（${m.self ? "正在行动，" : ""}溢出 ${fmt(m.pov)}%，不累积到下一次行动）` : ""}`;
+      if (prev) { prev.label += " " + m.label; prev.tips.push(tip); if (m.pov) prev.pov = num(prev.pov) + m.pov; continue; }
       MK.push(Object.assign({}, m, { tips: [tip] }));
     }
     const nextX = new Map();
@@ -7602,7 +7621,7 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
       const tipM = `AV ${fmt(m.t)}：${m.tips.join("；")}` + (pl.length ? `｜追击后开大：${nmsOf(pl)}` : "")
         + (fk ? `｜点击${pl.includes(whoM) ? "取消" : "让"}${esc(whoM.name)}在这次追击后开大` : "");
       s += `<g${fk ? ` data-ultkey="${esc(fk)}" data-fua="1" style="cursor:pointer"` : ""}><title>${tipM}</title>${fk ? `<rect x="${cx - 7}" y="${cy - 8}" width="${tw(m.label) + 18}" height="16" fill="transparent"></rect>` : ""}<path d="M${cx} ${cy - 5} L${cx + 5} ${cy} L${cx} ${cy + 5} L${cx - 5} ${cy} Z" fill="${m.color}"${pl.length ? ` stroke="${esc(pl[0].color)}" stroke-width="2"` : ""}></path>
-        <text x="${cx + 7}" y="${cy + 3.5}" font-size="9.5" fill="${m.key ? "var(--fg)" : "var(--muted)"}">${m.label}</text>
+        <text x="${cx + 7}" y="${cy + 3.5}" font-size="9.5" fill="${m.key ? "var(--fg)" : "var(--muted)"}">${m.label}</text>${m.pov ? `<circle cx="${cx + 4.5}" cy="${cy - 5}" r="2.6" fill="var(--enemy)" stroke="var(--panel)" stroke-width="1"></circle>` : ""}
         ${fuaR && fuaR.total >= 10 ? `<text class="dmgnum${fuaR.noPanel ? " np" : ""}" x="${cx}" y="${cy + 13}" font-size="7.5" fill="${fuaR.noPanel ? "var(--muted)" : esc(m.color)}" text-anchor="middle">${dmgFmtS(fuaR.total)}</text>` : ""}
         ${pl.map((p, k) => `<rect x="${cx + 11 + tw(m.label) + k * 14}" y="${cy - 6}" width="13" height="12" rx="3" fill="${esc(p.color)}"></rect><text x="${cx + 17.5 + tw(m.label) + k * 14}" y="${cy + 3}" font-size="9" font-weight="700" fill="${ink(p.color)}" text-anchor="middle">大</text>`).join("")}</g>`;
       m.label = full;
@@ -7744,19 +7763,35 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
     const byId = Object.fromEntries(allUnits().map(u => [u.id, u]));
     const P = ahaOn(), Q = R.swOn, cols = 9 + (P ? 1 : 0) + (Q ? 1 : 0);
     let h = `<thead><tr><th class="num">#</th><th class="num">行动值</th><th>单位</th><th class="num c-opt">回合</th><th>动作</th><th class="num">战技点</th><th class="num c-opt">速度</th><th class="num">伤害</th><th class="num c-opt">能量</th>${P ? `<th class="num c-opt">笑点</th>` : ""}${Q ? `<th class="num c-opt">隐藏分</th>` : ""}</tr></thead><tbody>`;
-    let cur = -1, li = 0;
-    const logs = healLogOn ? R.log : R.log.filter(l => !l.heal);
+    let cur = -1, li = 0, hid = false;
+    const logs0 = healLogOn ? R.log : R.log.filter(l => !l.heal);
+    // 回能记录：每次能量变化（来源、前后、被上限截掉的部分）和拉条溢出，按发生的先后插进日志
+    const eRows = [];
+    if (eLogOn) {
+      for (const [id, L] of Object.entries(R.eH || {})) { const u = byId[id]; if (!u) continue;
+        for (const x of L) { if (x.sq == null) continue; const cut = x.w != null && x.w > 0 ? x.w - x.d : 0;
+          if (Math.abs(x.d) < 1e-9 && cut < 0.05) continue;
+          const nm = typeof eName === "function" ? eName(u) : "能量", mx = eCfg(u).maxE;
+          eRows.push({ t: x.t, seq: x.sq, elog: 1, uid: id, color: u.color, cut: cut >= 0.05 ? cut : 0,
+            text: `${u.name} ${nm}${x.d >= 0 ? "+" : "−"}${fmt(Math.abs(x.d), 1)}${x.why ? `（${x.why}）` : ""} → ${fmt(x.v, 1)}/${mx}${cut >= 0.05 ? `，上限截掉 ${fmt(cut, 1)}` : ""}` }); } }
+      for (const m of R.marks) if (m.pov && m.sq != null && byId[m.uid]) eRows.push({ t: m.t, seq: m.sq, elog: 1, uid: m.uid, color: byId[m.uid].color, cut: 0, pull: m.pov,
+        text: `${byId[m.uid].name} 被 ${m.from} 拉条 ${m.label.replace(/^\+/, "")}：${m.self ? "正在行动，" : ""}溢出 ${fmt(m.pov)}%（不累积到下一次行动）` });
+    }
+    const logs = eRows.length ? logs0.concat(eRows).sort((p, q) => p.seq - q.seq) : logs0;
+    const cycN = {}; for (const a of actions) cycN[a.cycle] = (cycN[a.cycle] || 0) + 1;
+    const cycEnd = c => c === 0 ? S.c0 : S.c0 + S.cn * c;
+    const head = c => { hid = ocycFold.has(c); return `<tr class="cyc" data-cyc="${c}" tabindex="0" style="cursor:pointer" title="点击${hid ? "展开" : "收起"}这一轮" aria-expanded="${!hid}"><td colspan="${cols}">${hid ? "▸" : "▾"} 第 ${c} 轮　·　AV ≤ ${cycEnd(c)}　·　${cycN[c] ? `${cycN[c]} 次行动` : "本轮没有行动"}${hid ? "（已收起）" : ""}</td></tr>`; };
+    const toCyc = c => { if (c <= cur) return; for (let k = cur + 1; k <= c; k++) h += head(k); cur = c; };
+    const logRow = l => {
+      if (l.elog) return `<tr class="elog"><td></td><td class="num">${fmt(l.t, 2)}</td><td class="logcell" colspan="${cols - 2}" style="color:${esc(l.color)};opacity:.85">${l.pull ? "⤴ " : "⚡ "}${esc(l.text)}${l.cut || l.pull ? ` <span class="bp" style="color:var(--enemy)">溢出</span>` : ""}</td></tr>`;
+      const fd = !dmgOn ? null : l.fm ? fuaDmgOf(l.fm, byId[l.fm.uid]) : l.um ? ultDmgOf(l.um, byId[l.um.uid]) : l.em ? elskDmgOf(l.em, byId[l.em.uid]) : l.dd ? dotSum(l.dd, byId) : null;
+      return `<tr><td></td><td class="num">${fmt(l.t, 2)}</td><td class="logcell" colspan="${cols - 2}" style="color:${l.bad ? "var(--enemy)" : l.color ? esc(l.color) : "var(--sw)"};font-weight:600">${esc(l.text)}${fd ? `｜伤害 <b>${dmgFmt(fd.total)}</b>` : ""}</td></tr>`;
+    };
+    const emitLog = l => { toCyc(Math.max(cur, cycleOf(l.t))); if (!hid) h += logRow(l); };
     actions.forEach((a, i) => {
-      while (li < logs.length && logs[li].seq < a.seq) {
-        const l = logs[li++];
-        const fd = !dmgOn ? null : l.fm ? fuaDmgOf(l.fm, byId[l.fm.uid]) : l.um ? ultDmgOf(l.um, byId[l.um.uid]) : l.em ? elskDmgOf(l.em, byId[l.em.uid]) : l.dd ? dotSum(l.dd, byId) : null;
-        h += `<tr><td></td><td class="num">${fmt(l.t, 2)}</td><td class="logcell" colspan="${cols - 2}" style="color:${l.bad ? "var(--enemy)" : l.color ? esc(l.color) : "var(--sw)"};font-weight:600">${esc(l.text)}${fd ? `｜伤害 <b>${dmgFmt(fd.total)}</b>` : ""}</td></tr>`;
-      }
-      if (a.cycle !== cur) {
-        cur = a.cycle;
-        const end = cur === 0 ? S.c0 : S.c0 + S.cn * cur;
-        h += `<tr class="cyc"><td colspan="${cols}">第 ${cur} 轮　·　AV ≤ ${end}</td></tr>`;
-      }
+      while (li < logs.length && logs[li].seq < a.seq) emitLog(logs[li++]);
+      toCyc(a.cycle);
+      if (hid) return;
       const u = byId[a.uid];
       const pc = !P ? "" : u.kind === "aha"
         ? (w => `<td class="num c-opt">${tierOf(a.consumed) ? `<span class="bp">${w} ${a.consumed} ≥${tierOf(a.consumed)}</span>` : `${w} ${a.consumed}`}${!a.extra && a.poolBefore != null && a.consumed > a.poolBefore ? `<span class="hint">（本刻 +${a.consumed - a.poolBefore}）</span>` : ""}</td>`)(a.extra ? "计入" : "消耗")
@@ -7771,12 +7806,15 @@ const BGR={"1503":{"s":[15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,15.0,1
         <td><span class="chip"><i style="background:${esc(u.color)}"></i>${esc(u.name)}${a.ult ? ` <small style="color:var(--sw)">无敌玩家</small>` : ""}</span></td>
         <td class="num c-opt">${a.extra ? "额外" : a.turn}</td><td>${a.act ? actName[a.act] : a.fua ? "追击" : a.eskill ? esc(a.eskill) : ""}</td><td class="num"${a.spShort ? ` style="color:var(--enemy);font-weight:700" title="施放战技时战技点不够"` : ""}>${a.sp !== undefined ? a.sp + (a.spShort ? " 不足" : "") : ""}</td><td class="num c-opt">${fmt(a.spd)}</td><td class="num dmg-cell">${(dd => dd ? `<span class="bp${dd.noPanel ? " np" : ""}" title="${esc(a.uid === "aha" ? elationTip(dd) : dmgTip(dd, u))}">${dmgFmt(dd.total)}</span>` : "")(a.uid === "aha" ? elationDmgOf(a) : dmgOf(a, u))}</td><td class="num c-opt">${ec}</td>${pc}${qc}</tr>`;
     });
-    while (li < logs.length) {
-      const l = logs[li++];
-      const fd = !dmgOn ? null : l.fm ? fuaDmgOf(l.fm, byId[l.fm.uid]) : l.um ? ultDmgOf(l.um, byId[l.um.uid]) : l.em ? elskDmgOf(l.em, byId[l.em.uid]) : l.dd ? dotSum(l.dd, byId) : null;
-      h += `<tr><td></td><td class="num">${fmt(l.t, 2)}</td><td class="logcell" colspan="${cols - 2}" style="color:${l.bad ? "var(--enemy)" : l.color ? esc(l.color) : "var(--sw)"};font-weight:600">${esc(l.text)}${fd ? `｜伤害 <b>${dmgFmt(fd.total)}</b>` : ""}</td></tr>`;
-    }
+    while (li < logs.length) emitLog(logs[li++]);
+    if (actions.length) toCyc(Math.max(0, Math.round(num(S.cycles, 1)) - 1));   // 后面没有行动的轮也画出标题
     if (!actions.length) h += `<tr><td colspan="${cols}" style="color:var(--muted)">显示范围内没有行动。添加单位或增加显示轮次。</td></tr>`;
+    else {   // 表尾：一共多少条，免得把“收起 / 隐藏”看成“没算”
+      const hl = healLogOn ? 0 : R.log.filter(l => l.heal).length, cuts = {};
+      for (const [id, L] of Object.entries(R.eH || {})) for (const x of L) if (x.w != null && x.w - x.d >= 0.05 && byId[id]) cuts[id] = (cuts[id] || 0) + x.w - x.d;
+      const ct = Object.entries(cuts).map(([id, v]) => `${byId[id].name} ${fmt(v, 1)}`).join("、");
+      h += `<tr class="otail"><td colspan="${cols}" style="color:var(--muted);font-size:12px">显示到 AV ${fmt(R.END)}｜共 ${actions.length} 次行动、${R.log.length} 条记录${hl ? `（治疗记录隐藏了 ${hl} 条）` : ""}${ocycFold.size ? `｜收起了 ${[...ocycFold].filter(c => c <= cur).length} 轮` : ""}${ct ? `｜能量被上限截掉：${ct}` : ""}</td></tr>`;
+    }
     $("t-order").innerHTML = h + "</tbody>";
   }
 
