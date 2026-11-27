@@ -6,7 +6,7 @@
 MON 条目字段（同 mon149.py 开头的说明）：
   n 名字；r 模板 Rank（BigBoss B / LittleBoss L / Elite E / Minion、MinionLv2 M）；s = SpeedBase × SpeedModifyRatio + SpeedModifyValue；
   w = StanceWeakList 首字；d = InitialDelayRatio（≠1 才写）；tn = StanceBase × StanceModifyRatio；
-  k = 有名字、类型不是“天赋”的技能；p = 有名字的天赋；q = 默认出招；a / h = 攻击 / 生命基础 × 修正 × 怪物自己的 EliteGroup；x = 技能倍率。
+  k = 有名字、类型和标签都不是“天赋”的技能；p = 有名字的天赋（类型或标签是“天赋”，2026-11-25 起标签也算）；q = 默认出招；a / h = 攻击 / 生命基础 × 修正 × 怪物自己的 EliteGroup；x = 技能倍率。
 （2026-11-20 敌人任务写的；定时任务当时推不上仓库，2026-11-21 从 claude.ai 页面合回仓库时按项目文档补进来）
 """
 import json, re
@@ -84,8 +84,9 @@ class Mon:
             e = {'n': T(sk['SkillName']), 't': tag, 'sp': num(V(sk, 'SPHitBase', 0)), 'd': d if len(d) <= 110 else d[:110] + '…'}
             if ht and e['n'] in ht: e['ht'] = ht[e['n']]
             i = len(MON['sk']); MON['sk'].append(e)
-            (pas if typ == '天赋' else act).append(i)
-            if typ != '天赋' and e['n'] not in nox:
+            pasv = typ == '天赋' or tag == '天赋'   # 类型写“技能”但标签是「天赋」的也是被动（2026-11-25 敌人第 7 批：以前会混进默认出招，敌人白白空过一回合）
+            (pas if pasv else act).append(i)
+            if not pasv and e['n'] not in nox:
                 r = self.ratios(sk, tag)
                 if r: xr[str(i)] = r
         o['k'] = act
